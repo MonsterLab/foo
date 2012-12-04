@@ -154,6 +154,30 @@ class M_cms extends CI_Model{
     }
     
     /**
+     * this method is the same as the method updateStatus,
+     * both of them just change the status ,but not delete the article truely
+     * 
+     * @param type $aid
+     * @param type $status
+     * @return int
+     */
+    public function deleteArticle($aid, $status){
+        $data = array(
+            'status' => $status
+        );
+        $this->db->where('aid', $aid);
+        $this->db->update('zx_articles', $data); 
+        $affectedRows = $this->db->affected_rows();
+        $this->db->close();
+        if( $affectedRows > 0){
+            
+            return 1;
+        } else {
+            
+            return 0;
+        }
+    }
+    /**
      * update the status of article 
      * @param type $aid
      * @param type $status
@@ -223,6 +247,7 @@ class M_cms extends CI_Model{
         }
     }
     
+
     /**
      * the article model of cms end
      * 

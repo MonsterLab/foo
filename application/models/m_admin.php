@@ -50,7 +50,7 @@ class M_admin extends CI_Model{
            'power'=>$power,
            'email'=>$email
        );
-       $this->db->insert('admin',$sqlQuery);
+       $this->db->insert('zx_admin',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
            return 1;
@@ -73,7 +73,7 @@ class M_admin extends CI_Model{
        $sqlQuery = array('status'=>0);
        
        $this->db->where('id',$uid);
-       $this->db->update('admin',$sqlQuery);
+       $this->db->update('zx_admin',$sqlQuery);
        
        if($this->db->affected_rows() > 0){
            
@@ -88,7 +88,6 @@ class M_admin extends CI_Model{
     * 修改管理员信息
     * 
     * @param type $uid                          //用户id
-    * @param type $username                     //用户名
     * @param type $password                     //用户密码
     * @param type $truename                     //真实姓名，使用人
     * @param type $department                   //部门
@@ -97,14 +96,8 @@ class M_admin extends CI_Model{
     * 
     * @return int                       成功返回 1，失败返回 0 ，用户名存在返回 -1
     */
-   public function update($uid,$username,$password,$truename,$department,$phone,$power,$email){
-       $isExist = $this->checkUsername($username);
-       if($isExist){
-           //用户名存在返回-1
-           return -1;
-       }
+   public function update($uid,$password,$truename,$department,$phone,$power,$email){
        $sqlQuery = array(
-           'username'=>$username,
            'password'=>$password,
            '$truename'=>$truename,
            'department'=>$department,
@@ -113,7 +106,7 @@ class M_admin extends CI_Model{
            'email'=>$email
        );
        $this->db->where('id',$uid);
-       $this->db->update('admin',$sqlQuery);
+       $this->db->update('zx_admin',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
            return 1;
@@ -153,8 +146,8 @@ class M_admin extends CI_Model{
        }
        
        $this->db->where('status',1);        //查询没有被弃用的用户
-       $this->db->select('id,username,password,department,phone,power,email');
-       $dbResult = $this->db->get('admin');
+       $this->db->select('id,username,password,truename,department,phone,power,email');
+       $dbResult = $this->db->get('zx_admin');
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){
                $result[] = $row;
@@ -186,7 +179,7 @@ class M_admin extends CI_Model{
        $this->db->where('username',$username);
        $this->db->where('password',$password);
        $this->db->select('id,power');
-       $dbResult = $this->db->get('admin');
+       $dbResult = $this->db->get('zx_admin');
        if($dbResult->num_rows() > 0){
            $result = $dbResult->row_array();
            
@@ -224,7 +217,7 @@ class M_admin extends CI_Model{
    private function checkUsername($_username){
        $this->db->where('username',$_username);
        $this->db->select('id');
-       $dbResult = $this->db->get('admin');
+       $dbResult = $this->db->get('zx_admin');
        
        if($dbResult->num_rows() > 0){
            
@@ -244,7 +237,8 @@ class M_admin extends CI_Model{
    }
    
    /**
-    * 获得管理员权限
+    * 检查管理员是否登录，并获得管理员权限
+    * 
     * @return int / boolean
     */
    public function getPower(){

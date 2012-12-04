@@ -1,41 +1,44 @@
 <?php
-//开启session
-if(!isset($_SESSION)){
-    session_start();
-}
+
 /**
- * 管理员模型
- * createAdmin()
- * deleteAdmin()
- * updateAdmin()
- * searchAdmin()
- * login()
- * logout()
+ * 客户基本信息
  * 
- * 
- * 
- * private checkUsername()
- * private setSession()
+ * create()                     添加用户基本信息
+ * delete()                     删除
+ * update()                     更新用户基本信息
+ * search()                     查询
+ * login()                      登录
+ * logout()                     登出
+ * getPower()                   获得用户权限
+ *      
+ * private checkUsername()      检查用户名是否存在
+ * private setSession()         设置session
  * 
  */
-class M_admin extends CI_Controller{
+class M_user_base extends CI_Model{
    public function __construct() {
        parent::__construct();
        $this->load->database();
    }
    
+   
    /**
-    * 新增管理员
+    * 新增客户基本信息
     * 
-    * @param type $username
-    * @param type $password
-    * @param type $truename
-    * @param type $department
-    * @param type $phone
-    * @param type $email
-    * @return boolean           成功返回 1，失败返回 0，用户名存在返回 -1
+    * @param type $cuid                             新建人id
+    * @param type $zx_code                          征信编码
+    * @param type $sq_code                          授权码
+    * @param type $username                         用户名
+    * @param type $password                         密码
+    * @param type $truename                         真实姓名，联系人
+    * @param type $position                         职务
+    * @param type $phone                            电话
+    * @param type $email                            E-mail
+    * @param type $type                             客户征信类型 topic、medium、talent 
+    * 
+    * @return int                                   成功返回 1，失败返回 0，用户名存在返回 -1
     */
-   public function createAdmin($username,$password,$truename,$department,$phone,$power,$email){
+   public function create($cuid,$zx_code,$sq_code,$username,$password,$truename,$position,$phone,$email,$type){
        $isExist = $this->checkUsername($username);
        if($isExist){
            //用户名存在，返回-1
@@ -43,15 +46,18 @@ class M_admin extends CI_Controller{
        }
        
        $sqlQuery = array(
+           'cuid'=>$cuid,
+           'zx_code'=>$zx_code,
+           'sq_code'=>$sq_code,
            'username'=>$username,
            'password'=>$password,
            '$truename'=>$truename,
-           'department'=>$department,
+           'position'=>$position,
            'phone'=>$phone,
-           'power'=>$power,
-           'email'=>$email
+           'email'=>$email,
+           'type'=>$type
        );
-       $this->db->insert('admin',$sqlQuery);
+       $this->db->insert('zx_user_base',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
            return 1;
@@ -63,17 +69,22 @@ class M_admin extends CI_Controller{
    }
    
    /**
-    * 删除管理员
+    * 删除用户基本信息
+    * 
+    * 不提共删除，只是将该管理员状态status 置 0，弃用
     * 
     * @param type $uid
     * @return boolean       成功返回true，失败返回false
     */
    public function deleteAdmin($uid){
+       $sqlQuery = array('status'=>0);
+       
        $this->db->where('id',$uid);
-       $this->db->delete('admin');
+       $this->db->update('zx_user_base',$sqlQuery);
+       
        if($this->db->affected_rows() > 0){
            
-           return true;
+           return TRUE;
        }  else {
            
            return FALSE;
@@ -82,34 +93,35 @@ class M_admin extends CI_Controller{
    }
    
    /**
-    * 修改管理员信息
+    * 修改客户基本信息
     * 
-    * @param type $uid
-    * @param type $username
-    * @param type $password
-    * @param type $truename
-    * @param type $department
-    * @param type $phone
-    * @param type $email
+    * @param type $cuid                             新建人id
+    * @param type $zx_code                          征信编码
+    * @param type $sq_code                          授权码
+    * @param type $username                         用户名
+    * @param type $password                         密码
+    * @param type $truename                         真实姓名，联系人
+    * @param type $position                         职务
+    * @param type $phone                            电话
+    * @param type $email                            E-mail
+    * @param type $type                             客户征信类型 topic、medium、talent 
+    * 
     * @return int                       成功返回 1，失败返回 0 ，用户名存在返回 -1
     */
-   public function updateAdmin($uid,$username,$password,$truename,$department,$phone,$power,$email){
-       $isExist = $this->checkUsername($username);
-       if($isExist){
-           //用户名存在返回-1
-           return -1;
-       }
+   public function update($cuid,$uid,$zx_code,$sq_code,$password,$truename,$position,$phone,$email,$type){
        $sqlQuery = array(
-           'username'=>$username,
+           'cuid'=>$cuid,
+           'zx_code'=>$zx_code,
+           'sq_code'=>$sq_code,
            'password'=>$password,
            '$truename'=>$truename,
-           'department'=>$department,
+           'position'=>$position,
            'phone'=>$phone,
-           'power'=>$power,
-           'email'=>$email
+           'email'=>$email,
+           'type'=>$type
        );
        $this->db->where('id',$uid);
-       $this->db->update('admin',$sqlQuery);
+       $this->db->update('zx_user_base',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
            return 1;
@@ -120,31 +132,35 @@ class M_admin extends CI_Controller{
    }
    
    /**
-    * 查询管理员
+    * 查询用户基本信息
     * 
-    * @param type $key          关键字，默认为空 ； 如果关键字为空，则全部查询
-    * @param int $method        选择搜索方法，默认0； 0用户名，1真实姓名，2部门，3id
-    * @return array             成功返回数组，失败返回false
+    * @param type $key                  //关键字，默认为空 ； 如果关键字为空，则全部查询
+    * @param int $method                //选择搜索方法，默认0； 0用户名，1征信编码，2 征信库类别 ， 3 用户id
+    * @return array                     //成功返回数组，失败返回false
     */
    public function searchAdmin($key = '',$method = 0){
-       //设置查询方法
-       if($method == 0){
-           $sqlQuery = 'username';      //按用户名查询
-       }
-       if($method == 1){
-           $sqlQuery = 'truename';      //按真实名查询
-       }
-       if($method == 2){
-           $sqlQuery = 'department';    //按部门查询
-       }
-       if($method == 3){
-           $sqlQuery = 'id';            //按管理员id查询
-       }
+       
        //若关键字不为空，设置查询条件
        if($key != ''){
+           //设置查询方法
+            if($method == 0){
+                $sqlQuery = 'username';      //按用户名查询
+            }
+            if($method == 1){
+                $sqlQuery = 'zx_code';       //按征信编码
+            }
+            if($method == 2){
+                $sqlQuery = 'type';          //按客户征信库类型搜索
+            }
+            if($method == 3){
+                $sqlQuery = 'id';            //用户id查询
+            }
+            
            $this->db->where($sqlQuery,$key);
        }
-       $this->db->select('id,username,password,department,phone,power,email');
+       
+       $this->db->where('status',1);        //查询没有被弃用的用户
+       $this->db->select('id,zx_code,sq_code,username,password,truename,position,phone,power,email');
        $dbResult = $this->db->get('admin');
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){
@@ -162,7 +178,7 @@ class M_admin extends CI_Controller{
    }
    
    /**
-    * 管理员登录
+    * 用户登录
     * 
     * @param type $username
     * @param type $password
@@ -176,8 +192,8 @@ class M_admin extends CI_Controller{
        }
        $this->db->where('username',$username);
        $this->db->where('password',$password);
-       $this->db->select('id,power');
-       $dbResult = $this->db->get('admin');
+       $this->db->select('id');
+       $dbResult = $this->db->get('zx_user_base');
        if($dbResult->num_rows() > 0){
            $result = $dbResult->row_array();
            
@@ -186,8 +202,6 @@ class M_admin extends CI_Controller{
            $sessionArray = array(
                'id'=>$result['id'],
                'username'=>$username,
-               'password'=>$password,
-               'power'=>$result['power']
            );
            $this->setSession($sessionArray);
            
@@ -208,15 +222,17 @@ class M_admin extends CI_Controller{
       
    /**
     * 检验用户名是否存在
+    * 
     * 存在，return true
     * 不存在，return false
+    * 
     * @param type $_username
     * @return boolean
     */
    private function checkUsername($_username){
        $this->db->where('username',$_username);
        $this->db->select('id');
-       $dbResult = $this->db->get('admin');
+       $dbResult = $this->db->get('zx_user_base');
        
        if($dbResult->num_rows() > 0){
            
@@ -232,17 +248,23 @@ class M_admin extends CI_Controller{
     */
    private function setSession($_sessionArray){
        
-       $_SESSION['admin'] = $_sessionArray;
+       $_SESSION['user'] = $_sessionArray;
    }
    
    /**
-    * 获得管理员权限
+    * 检查用户是否登录
     * @return int / boolean
     */
    public function getPower(){
-       if(isset($_SESSION['admin'])){
+       if(isset($_SESSION['user'])){
+           if(empty($_SESSION['user']['id'])){
+               
+               return TRUE;
+           }  else {
+               
+               return FALSE;
+           }
            
-           return $_SESSION['power'];
        }  else {
            
            return FALSE;

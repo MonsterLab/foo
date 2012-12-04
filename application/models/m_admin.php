@@ -2,18 +2,17 @@
 
 /**
  * 管理员模型
- * createAdmin()
- * deleteAdmin()
- * updateAdmin()
- * searchAdmin()
- * login()
- * logout()
- * 
- * 
- * 
- * private checkUsername()
- * private setSession()
- * 
+ * create()                     新增管理员
+ * delete()                     删除
+ * update()                     更新管理员信息
+ * search()                     查询
+ * login()                      登录
+ * logout()                     登出
+ * getPower()                   获得管理员权限
+ *      
+ * private checkUsername()      检查用户名是否存在
+ * private setSession()         设置session
+ *  
  */
 class M_admin extends CI_Model{
    public function __construct() {
@@ -24,15 +23,17 @@ class M_admin extends CI_Model{
    /**
     * 新增管理员
     * 
-    * @param type $username
-    * @param type $password
-    * @param type $truename
-    * @param type $department
-    * @param type $phone
-    * @param type $email
-    * @return boolean           成功返回 1，失败返回 0，用户名存在返回 -1
+    * @param int $cuid                      //创建人id
+    * @param type $username                 //用户名
+    * @param type $password                 //密码
+    * @param type $truename                 //真实姓名，使用人
+    * @param type $department               //部门
+    * @param type $phone                    //电话
+    * @param type $email                    //E-mail
+    * 
+    * @return boolean                       //成功返回 1，失败返回 0，用户名存在返回 -1
     */
-   public function create($username,$password,$truename,$department,$phone,$power,$email){
+   public function create($cuid,$username,$password,$truename,$department,$phone,$power,$email){
        $isExist = $this->checkUsername($username);
        if($isExist){
            //用户名存在，返回-1
@@ -40,6 +41,7 @@ class M_admin extends CI_Model{
        }
        
        $sqlQuery = array(
+           'cuid'=>$cuid,
            'username'=>$username,
            'password'=>$password,
            '$truename'=>$truename,
@@ -62,23 +64,37 @@ class M_admin extends CI_Model{
    /**
     * 删除管理员
     * 
+    * 不提共删除，只是将该管理员状态status 置 0，弃用
+    * 
     * @param type $uid
     * @return boolean       成功返回true，失败返回false
     */
    public function delete($uid){
+       $sqlQuery = array('status'=>0);
        
+       $this->db->where('id',$uid);
+       $this->db->update('admin',$sqlQuery);
+       
+       if($this->db->affected_rows() > 0){
+           
+           return TRUE;
+       }  else {
+           
+           return FALSE;
+       }
    }
    
    /**
     * 修改管理员信息
     * 
-    * @param type $uid
-    * @param type $username
-    * @param type $password
-    * @param type $truename
-    * @param type $department
-    * @param type $phone
-    * @param type $email
+    * @param type $uid                          //用户id
+    * @param type $username                     //用户名
+    * @param type $password                     //用户密码
+    * @param type $truename                     //真实姓名，使用人
+    * @param type $department                   //部门
+    * @param type $phone                        //电话
+    * @param type $email                        //E-mail
+    * 
     * @return int                       成功返回 1，失败返回 0 ，用户名存在返回 -1
     */
    public function update($uid,$username,$password,$truename,$department,$phone,$power,$email){
@@ -112,26 +128,31 @@ class M_admin extends CI_Model{
     * 
     * @param type $key          关键字，默认为空 ； 如果关键字为空，则全部查询
     * @param int $method        选择搜索方法，默认0； 0用户名，1真实姓名，2部门，3id
+    * 
     * @return array             成功返回数组，失败返回false
     */
    public function search($key = '',$method = 0){
-       //设置查询方法
-       if($method == 0){
-           $sqlQuery = 'username';      //按用户名查询
-       }
-       if($method == 1){
-           $sqlQuery = 'truename';      //按真实名查询
-       }
-       if($method == 2){
-           $sqlQuery = 'department';    //按部门查询
-       }
-       if($method == 3){
-           $sqlQuery = 'id';            //按管理员id查询
-       }
-       //若关键字不为空，设置查询条件
-       if($key != ''){
+        //若关键字不为空，设置查询条件
+        if($key != ''){
+           
+           //设置查询方法
+            if($method == 0){
+                $sqlQuery = 'username';      //按用户名查询
+            }
+            if($method == 1){
+                $sqlQuery = 'truename';      //按真实名查询
+            }
+            if($method == 2){
+                $sqlQuery = 'department';    //按部门查询
+            }
+            if($method == 3){
+                $sqlQuery = 'id';            //按管理员id查询
+            }
+           
            $this->db->where($sqlQuery,$key);
        }
+       
+       $this->db->where('status',1);        //查询没有被弃用的用户
        $this->db->select('id,username,password,department,phone,power,email');
        $dbResult = $this->db->get('admin');
        if($dbResult->num_rows() > 0){
@@ -176,7 +197,7 @@ class M_admin extends CI_Model{
                'username'=>$username,
                'power'=>$result['power']
            );
-           $this->setSession($sessionArray);
+           $this->setSession($sessionArray);                //设置session
            
            return 1;
        }  else {

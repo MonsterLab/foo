@@ -244,3 +244,6 @@ class M_admin extends CI_Model{
    
    
 }
+
+
+//End of m_admin.php

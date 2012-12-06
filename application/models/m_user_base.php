@@ -9,7 +9,7 @@
  * search()                     查询
  * login()                      登录
  * logout()                     登出
- * getPower()                   获得用户权限
+ * getPower()                   检查用户是否登录
  *      
  * private checkUsername()      检查用户名是否存在
  * private setSession()         设置session
@@ -76,7 +76,7 @@ class M_user_base extends CI_Model{
     * @param type $uid
     * @return boolean       成功返回true，失败返回false
     */
-   public function deleteAdmin($uid){
+   public function delete($uid){
        $sqlQuery = array('status'=>0);
        
        $this->db->where('id',$uid);
@@ -95,7 +95,6 @@ class M_user_base extends CI_Model{
    /**
     * 修改客户基本信息
     * 
-    * @param type $cuid                             新建人id
     * @param type $zx_code                          征信编码
     * @param type $sq_code                          授权码
     * @param type $username                         用户名
@@ -108,9 +107,8 @@ class M_user_base extends CI_Model{
     * 
     * @return int                       成功返回 1，失败返回 0 ，用户名存在返回 -1
     */
-   public function update($cuid,$uid,$zx_code,$sq_code,$password,$truename,$position,$phone,$email,$type){
+   public function update($uid,$zx_code,$sq_code,$password,$truename,$position,$phone,$email,$type){
        $sqlQuery = array(
-           'cuid'=>$cuid,
            'zx_code'=>$zx_code,
            'sq_code'=>$sq_code,
            'password'=>$password,
@@ -138,7 +136,7 @@ class M_user_base extends CI_Model{
     * @param int $method                //选择搜索方法，默认0； 0用户名，1征信编码，2 征信库类别 ， 3 用户id
     * @return array                     //成功返回数组，失败返回false
     */
-   public function searchAdmin($key = '',$method = 0){
+   public function search($key = '',$method = 0){
        
        //若关键字不为空，设置查询条件
        if($key != ''){
@@ -161,7 +159,7 @@ class M_user_base extends CI_Model{
        
        $this->db->where('status',1);        //查询没有被弃用的用户
        $this->db->select('id,zx_code,sq_code,username,password,truename,position,phone,power,email');
-       $dbResult = $this->db->get('admin');
+       $dbResult = $this->db->get('zx_user_base');
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){
                $result[] = $row;
@@ -253,7 +251,9 @@ class M_user_base extends CI_Model{
    
    /**
     * 检查用户是否登录
-    * @return int / boolean
+    * 
+    * 登录返回true，没有返回false
+    * @return boolean
     */
    public function getPower(){
        if(isset($_SESSION['user'])){
@@ -274,3 +274,7 @@ class M_user_base extends CI_Model{
    
    
 }
+
+
+
+//End of m_user_base.php

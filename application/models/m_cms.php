@@ -37,6 +37,7 @@
 class M_cms extends CI_Model{
     function __construct() {
         parent::__construct();
+        $this->load->database();
     }
     
     /**
@@ -63,7 +64,7 @@ class M_cms extends CI_Model{
             'groupid' => $groupid
           );
        $insertId = $this->db->insert('zx_articles',$sql);
-       $this->db->close();
+       
        if($insertId > 0){
 
            return 1;
@@ -78,24 +79,24 @@ class M_cms extends CI_Model{
      * @param type $key
      * @param type $status
      * @param type $method
-     * @param type $start
+     * @param type $limit
      * @param type $offset
      * @return int
      */
-    public function search($key,$method,$status = 1,$start=0,$offset = 5 ){
+    public function search($key,$method,$status = 1,$limit=0,$offset = 5 ){
         $result = null;
         switch ($method){
             case 0:
                 $uid = $key;
-                $result = getUserArticles($uid, $start, $offset, $status);
+                $result = $this->getUserArticles($uid, $limit, $offset, $status);
                 break;
             case 1:
                 $aid = $key;
-                $result = getArticle($aid);
+                $result = $this->getArticle($aid);
                 break;
             case 2:
                 $gid = $key;
-                $result = getArticlesOfGroup($groupid, $start, $offset, $status);
+                $result = $this->getArticlesOfGroup($groupid, $limit, $offset, $status);
                 break;
         }
         
@@ -118,7 +119,7 @@ class M_cms extends CI_Model{
         $query->result_array();
         
         $numRows = $this->db->num_rows();
-        $this->db->close();
+        $query->free_result();
 	if($this->db->num_rows() > 0){
             
             return $query;
@@ -129,23 +130,23 @@ class M_cms extends CI_Model{
     }
     
     /**
-     * get one's articles by uid from start and query offset articles
+     * get one's articles by uid from limit and query offset articles
      * @param type $uid
-     * @param type $start
+     * @param type $limit
      * @param type $offset
      * @return int
      */
-    private function getUserArticles($uid,$start,$offset, $status){
+    private function getUserArticles($uid,$limit,$offset, $status){
         $this->db->select('aid, uid, username, title, groupid, checked, audit, audit_id, status, viewtimes');
         $this->db->where('uid', $uid);
         $this->db->where('status', $status);
-        $this->db->limit($start, $offset);
+        $this->db->limit($limit, $offset);
         
         $query = $this->db->get('zx_articles');
         $query->result_array();
         
         $numRows = $this->db->num_rows();
-        $this->db->close();
+        $query->free_result();
         if($this->db->num_rows() > 0){
             
             return $query;
@@ -156,23 +157,23 @@ class M_cms extends CI_Model{
     }
     
     /**
-     * get articles by groupid from start and query offset articles
+     * get articles by groupid from limit and query offset articles
      * @param type $groupid
-     * @param type $start
+     * @param type $limit
      * @param type $offset
      * @param type $status
      */
-    private function getArticlesOfGroup($groupid, $start, $offset, $status){
+    private function getArticlesOfGroup($groupid, $limit, $offset, $status){
         $this->db->select('aid, uid, username, title, groupid, checked, audit, audit_id, status, viewtimes');
         $this->db->where('groupid', $groupid);
         $this->db->where('status',$status);
-        $this->db->limit($start, $offset);
+        $this->db->limit($limit, $offset);
         
         $query = $this->db->get('zx_articles');
         $query->result_array();
         
         $numRows = $this->db->num_rows();
-        $this->db->close();
+        $query->free_result();
         if($numRows > 0){
             
             return $query;
@@ -215,7 +216,6 @@ class M_cms extends CI_Model{
         $this->db->where('aid', $aid);
         $this->db->update('zx_articles', $data); 
         $affectedRows = $this->db->affected_rows();
-        $this->db->close();
         if( $affectedRows > 0){
             
             return 1;
@@ -242,7 +242,6 @@ class M_cms extends CI_Model{
         $this->db->where('aid', $aid);
         $this->db->update('zx_articles', $data); 
         $affectedRows = $this->db->affected_rows();
-        $this->db->close();
         if( $affectedRows > 0){
             
             return 1;
@@ -267,7 +266,6 @@ class M_cms extends CI_Model{
         $this->db->where('aid', $aid);
         $this->db->update('zx_articles', $data); 
         $affectedRows = $this->db->affected_rows();
-        $this->db->close();
         if( $affectedRows > 0){
             
             return 1;
@@ -294,7 +292,6 @@ class M_cms extends CI_Model{
         $this->db->where('aid', $aid);
         $this->db->update('zx_articles', $data); 
         $affectedRows = $this->db->affected_rows();
-        $this->db->close();
         if( $affectedRows > 0){
             
             return 1;
@@ -317,7 +314,6 @@ class M_cms extends CI_Model{
         $this->db->where('aid', $aid);
         $this->db->update('zx_articles', $data); 
         $affectedRows = $this->db->affected_rows();
-        $this->db->close();
         if( $affectedRows > 0){
             
             return 1;
@@ -353,7 +349,6 @@ class M_cms extends CI_Model{
             'groupfather_id' => $groupfather_id
           );
        $insertId = $this->db->insert('zx_article_groups',$sql);
-       $this->db->close();
        if($insertId > 0){
 
            return 1;
@@ -378,7 +373,7 @@ class M_cms extends CI_Model{
         $query->result_array();
         
         $numRows = $this->db->num_rows();
-        $this->db->close();
+        $query->free_result();
         if($numRows > 0){
             
             return $query;
@@ -411,7 +406,7 @@ class M_cms extends CI_Model{
         $this->db->where('gid', $gid);
         $this->db->update('zx_article_groups', $data); 
         $affectedRows = $this->db->affected_rows();
-        $this->db->close();
+        $query->free_result();
         if( $affectedRows > 0){
             
             return 1;
@@ -436,7 +431,6 @@ class M_cms extends CI_Model{
         $this->db->where('gid', $gid);
         $this->db->update('zx_article_groups', $data); 
         $affectedRows = $this->db->affected_rows();
-        $this->db->close();
         if( $affectedRows > 0){
             
             return 1;

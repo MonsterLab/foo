@@ -176,6 +176,31 @@ class M_user_base extends CI_Model{
    }
    
    /**
+    * 为用户开通空间
+    * 将空间id 即 space_id 置为制定id
+    * 
+    * @param type $uid
+    * @param type $space_id
+    * @return boolean                   成功返回true，失败false
+    */
+   public function setSpaceId($uid,$space_id){
+       //检验space_id必须大于0 
+       if($space_id > 0){
+            $this->db->where('id',$uid);
+            $this->db->update('zx_user_base',array('space_id',$space_id));
+            
+            if($this->db->affected_rows() > 0){
+                
+                return TRUE;
+            }
+       }
+       
+       return FALSE;
+       
+   }
+
+
+   /**
     * 用户登录
     * 
     * @param type $username
@@ -229,6 +254,7 @@ class M_user_base extends CI_Model{
     */
    private function checkUsername($_username){
        $this->db->where('username',$_username);
+       $this->db->where('status',1);
        $this->db->select('id');
        $dbResult = $this->db->get('zx_user_base');
        

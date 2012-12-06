@@ -255,13 +255,13 @@ class M_admin extends CI_Model{
            return FALSE;
        }
    }
-   
+
    /*--------------------------------征信编码池管理-------------------------------*/
    
    public function createCode(){
        
-   }
-   
+}
+
    /**
     * 查询征信编码
     * 
@@ -273,7 +273,7 @@ class M_admin extends CI_Model{
        if($zxCode != ''){
            $this->db->where('zx_code',$zxCode);
        }
-       
+
        $this->db->select('id,zx_code,status');
        $dbResult = $this->db->get('zx_code');
        

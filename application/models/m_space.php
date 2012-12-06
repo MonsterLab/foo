@@ -34,7 +34,7 @@
 
  * 
  */
-class M_cms extends CI_Model{
+class M_space extends CI_Model{
     function __construct() {
         parent::__construct();
         $this->load->database();

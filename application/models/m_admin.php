@@ -44,7 +44,7 @@ class M_admin extends CI_Model{
            'cuid'=>$cuid,
            'username'=>$username,
            'password'=>$password,
-           '$truename'=>$truename,
+           'truename'=>$truename,
            'department'=>$department,
            'phone'=>$phone,
            'power'=>$power,
@@ -94,12 +94,12 @@ class M_admin extends CI_Model{
     * @param type $phone                        //电话
     * @param type $email                        //E-mail
     * 
-    * @return int                       成功返回 1，失败返回 0 ，用户名存在返回 -1
+    * @return boobean                       
     */
    public function update($uid,$password,$truename,$department,$phone,$power,$email){
        $sqlQuery = array(
            'password'=>$password,
-           '$truename'=>$truename,
+           'truename'=>$truename,
            'department'=>$department,
            'phone'=>$phone,
            'power'=>$power,
@@ -109,10 +109,10 @@ class M_admin extends CI_Model{
        $this->db->update('zx_admin',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
-           return 1;
+           return TRUE;
        }  else {
            
-           return 0;
+           return false;
        }
    }
    
@@ -148,7 +148,7 @@ class M_admin extends CI_Model{
        }
        
        $this->db->where('status',1);        //查询没有被弃用的用户
-       $this->db->select('id,username,password,truename,department,phone,power,email');
+       $this->db->select('id,username,truename,department,phone,power,email');
        $dbResult = $this->db->get('zx_admin',$limit,$offset);
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){

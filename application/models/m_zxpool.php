@@ -1,4 +1,8 @@
 <?php
+/**
+ * 征信编码池管理
+ * +createCode()
+ */
 class M_zxpool extends CI_Model{
     public function __construct() {
         parent::__construct();
@@ -8,14 +12,32 @@ class M_zxpool extends CI_Model{
 
     /*--------------------------------征信编码池管理-------------------------------*/
    
-   public function createCode(){
+    /**
+     * 批量导入征信编码
+     * 
+     * @param type $codeArray           征信编码数组
+     * @return boolean                  成功返回true，失败返回false
+     */
+   public function createCode($codeArray){
+       if(!empty($codeArray)){
+           foreach ($codeArray as $data){
+               //TODO：检测每一个数据是否已经存在，循环中检查不好
+               $sqlQuery[] = array('zx_code'=>$data);
+           }
+           $this->db->insert_batch('zx_code',$sqlQuery);
+           if($this->db->affected_rows() > 0){
+               
+               return TRUE;
+           }  
+       }
        
+       return FALSE;
    }
    /**
     * 更新征信编码使用状态
     * 
     * @param int $zxCode
-    * @return int   -1征信编码未设置   0操作失败   1操作成功
+    * @return int                   -1征信编码未设置   0操作失败   1操作成功
     */
    public function useCode($zxCode = 0){
        if($zxCode == 0){
@@ -23,6 +45,7 @@ class M_zxpool extends CI_Model{
        }
        $this->db->where('zx_code',$zxCode);
        $this->db->set('status',1);
+       $this->db->update('zx_code');
        
        if($this->db->affected_rows() > 0){
            
@@ -68,10 +91,14 @@ class M_zxpool extends CI_Model{
     * @param type $cuid                         添加人
     * @param type $industry_name                行业类名      
     * @param type $type                         所属征信库类型，topic、medium、talent
-    * @return int                               成功返回 1 ，失败 返回 0，行业名存在返回 -1
+    * @return int                               成功返回 1 ，失败 返回 0，行业名存在返回 -1，类型错误返回-2
     */
    public function addIndustry($cuid,$industry_name,$type){
-       $isExist = $this->checkIndustryName($industry_name,$type);
+       //检验$type是否在规定之中
+       if(!in_array($type,array('topic','medium','talents'))){
+           return -2;
+       }
+       $isExist = $this->checkIndustry(0,$industry_name,$type);
        if($isExist){
            //行业名已经存在
            return -1;
@@ -118,10 +145,11 @@ class M_zxpool extends CI_Model{
     * @param type $industyId
     * @param type $industry_name
     * @param type $type                         所属征信库
-    * @return int                               -1 行业名存在，0 失败 ，1 成功
+    * @return int                               -1 行业名存在，0 ‘失败’（即数据未做改动） ，1 成功
     */
-   public function updateIndusty($industyId,$industry_name,$type){
-       $isExist = $this->checkIndustryName($industry_name, $type);
+   public function updateIndustry($industyId,$industry_name,$type){
+       //检查修改的行业名在同类型征信库中是否存在
+       $isExist = $this->checkIndustry($industyId,$industry_name, $type);
        if($isExist){
            
            return -1;
@@ -183,16 +211,24 @@ class M_zxpool extends CI_Model{
     * @param type $_industryName
     * @return boolean
     */
-   private function checkIndustryName($_industryName,$_type){
+   //TODO:
+   private function checkIndustry($currentId,$_industryName,$_type){
        $this->db->where('industry_name',$_industryName);
        $this->db->where('type',$_type);
        $this->db->select('id');
        $dbResult = $this->db->get('zx_industry_type');
        
        if($dbResult->num_rows() > 0){
+           $result = $dbResult->row_array();
+          
            $dbResult->free_result();
+           //如果查询出的 重复数据行的id=当前修改行的id，则说明此类行中只存在这一条数据，不算重复，否则重复
+           if($result['id'] != $currentId){
+                return TRUE;
+           }else{
+               return FALSE;
+           }
            
-           return TRUE;
        }  else {
            
            return FALSE;

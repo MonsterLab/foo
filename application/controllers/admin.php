@@ -10,21 +10,13 @@ class Admin extends CI_Controller{
         $this->load->helper('url');
         
         $this->load->model('M_admin','admin');
-<<<<<<< HEAD
         $this->load->model('M_user_base','userbase');
         $this->load->model('M_cms','cms');
         $this->load->model('M_medium','medium');
         $this->load->model('M_zxpool','zxpool');
         $this->load->model('M_space','space');
         $this->load->model('M_talent','talent');
-        $this->load->model('M_topic','topic');        
-=======
-//        $this->load->model('M_user_base','userbase');
-//        $this->load->model('M_cms','cms');
-//        $this->load->model('m_medium','medium');
-//        $this->load->model('M_space','space');
-//        $this->load->model('M_talent','talent');
-//        $this->load->model('M_topic','topic');        
+        $this->load->model('M_topic','topic');              
     }
     
     public function index(){
@@ -34,7 +26,6 @@ class Admin extends CI_Controller{
         }  else {
             $this->load->view('admin/index');
         }
->>>>>>> b0902fe198b118407e852f2ef57a5c31ebac12ae
     }
     
     public function login(){
@@ -61,7 +52,7 @@ class Admin extends CI_Controller{
         redirect(base_url('admin/login/'));
     }
     
-<<<<<<< HEAD
+
     /**
      * 批量导入征信编码
      */
@@ -95,18 +86,13 @@ class Admin extends CI_Controller{
         }# end of post  
     }
     
-    
-    
-
-}# end of class
-=======
     public function left(){
         $this->load->view('admin/left');
         return;
     }
     
 }
->>>>>>> b0902fe198b118407e852f2ef57a5c31ebac12ae
+
 
 
 

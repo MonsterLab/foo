@@ -113,13 +113,13 @@ class M_cms extends CI_Model{
      */
     private function getSArticle($space_aid){		
 	$this->db->select('space_aid, space_uid, space_username, space_title, space_content, space_groupid, space_checked, space_audit, space_audit_id, space_status, space_viewtimes');
-                        
+        $this->db->where('space_aid',$space_aid);       
 	$query = $this->db->get('zx_space_articles');
-        $query->result_array();
+        $query = $query->result_array();
         
-        $numRows = $this->db->num_rows();
+        $numRows = $this->num_rows();
         $query->free_result();
-	if($this->db->num_rows() > 0){
+	if($numRows > 0){
             
             return $query;
 	} else {
@@ -136,17 +136,17 @@ class M_cms extends CI_Model{
      * @return int
      */
     private function getUserSArticles($space_uid,$limit,$offset, $space_status){
-        $this->db->select('space_aid, space_uid, space_username, space_title,  space_groupid, space_checked, space_audit, space_audit_id, space_status, space_viewtimes');
+        $this->db->select('space_aid, space_uid, space_username, space_title,  space_groupid, space_audit, space_audit_id, space_status, space_viewtimes');
         $this->db->where('space_uid', $space_uid);
         $this->db->where('space_status', $space_status);
-        $this->db->limit($limit, $offset);
+        $this->db->limit($offset,$limit);
         
         $query = $this->db->get('zx_space_articles');
-        $query->result_array();
+        $query = $query->result_array();
         
-        $numRows = $this->db->num_rows();
+        $numRows = $this->num_rows();
         $query->free_result();
-        if($this->db->num_rows() > 0){
+        if($numRows > 0){
             
             return $query;
 	} else {
@@ -162,16 +162,16 @@ class M_cms extends CI_Model{
      * @param type $offset
      * @param type $space_status
      */
-    private function getArticlesOfGroup($space_groupid, $limit, $offset, $space_status){
-        $this->db->select('space_aid, space_uid, space_username, space_title,  space_groupid, space_checked, space_audit, space_audit_id, space_status, space_viewtimes');
+    private function getSArticlesOfGroup($space_groupid, $limit, $offset, $space_status){
+        $this->db->select('space_aid, space_uid, space_username, space_title,  space_groupid, space_audit, space_audit_id, space_status, space_viewtimes');
         $this->db->where('space_groupid', $space_groupid);
         $this->db->where('space_status',$space_status);
-        $this->db->limit($limit, $offset);
+        $this->db->limit($offset,$limit);
         
         $query = $this->db->get('zx_space_articles');
         $query->result_array();
         
-        $numRows = $this->db->num_rows();
+        $numRows = $this->num_rows();
         $query->free_result();
         if($numRows > 0){
             
@@ -198,14 +198,13 @@ class M_cms extends CI_Model{
      * @param type $viewtimes
      * @return int
      */
-    public function updateArticleBySuper($space_aid, $space_uid, $space_username, $space_title, $space_groupid, 
-                                  $space_checked, $space_audit, $space_audit_id, $space_space_status, $space_viewtimes ){
+    public function updateSArticleBySuper($space_aid, $uid, $space_username, $space_title, $space_groupid, 
+                                 $space_audit, $space_audit_id, $space_status, $space_viewtimes ){
         $data = array(
                 'space_uid' => $uid,
                 'space_username' => $space_username,
                 'space_title'=> $space_title,
                 'space_groupid' => $space_groupid,
-                'space_checked' => $space_checked,
                 'space_audit' => $space_audit,
                 'space_audit_id' => $space_audit_id,
                 'space_status' => $space_status,
@@ -234,7 +233,7 @@ class M_cms extends CI_Model{
      * @param type $space_status
      * @return int
      */
-    public function deleteArticle($space_aid, $space_status){
+    public function deleteSArticle($space_aid, $space_status){
         $data = array(
             'space_status' => $space_status
         );
@@ -258,7 +257,7 @@ class M_cms extends CI_Model{
      * @param type $space_status
      * @return int
      */
-    public function updateStatus($aid, $space_status){
+    public function updateSStatus($space_aid, $space_status){
         $data = array(
             'space_status' => $space_status
         );
@@ -283,7 +282,7 @@ class M_cms extends CI_Model{
      * @param type $audit
      * @return int
      */
-    public function updateAudit($space_aid, $space_audit, $space_uid){
+    public function updateSAudit($space_aid, $space_audit, $space_audit_id){
         $data = array(
             'space_audit' => $space_audit,
             'space_audit_id' => $space_audit_id
@@ -306,7 +305,7 @@ class M_cms extends CI_Model{
      * @param type $aid
      * @return int  if update the viewtimes successfully ,return 1,else return 0
      */
-    public function updateViewTimes($aid){
+    public function updateSViewTimes($aid){
         $data = array(
             'viewtimes' => 'viewtimes + 1'
         );
@@ -339,7 +338,7 @@ class M_cms extends CI_Model{
      * @param type $groupfather_id
      * @return int
      */
-    public function createGroup($uid,$space_group_name, $space_group_url, $space_group_sumarry, $space_groupfather_id){
+    public function createSGroup($uid,$space_group_name, $space_group_url, $space_group_sumarry, $space_groupfather_id){
         $sql= array(
             'uid' => $uid,
             'space_group_name' => $space_group_name,
@@ -364,14 +363,14 @@ class M_cms extends CI_Model{
      * @param type $uid
      * @return int
      */
-    public function getAllGroups($uid, $space_status){
+    public function getAllSGroups($uid, $space_status = 1){
         $this->db->select("space_gid, space_group_name, space_group_sumarry");
         $this->db->where('uid', $uid); 
         $this->db->where('space_status',$space_status);
         $query = $this->db->get('zx_article_groups');
         $query->result_array();
         
-        $numRows = $this->db->num_rows();
+        $numRows = $this->num_rows();
         $query->free_result();
         if($numRows > 0){
             
@@ -393,7 +392,7 @@ class M_cms extends CI_Model{
      * @param type $groupfather_id
      * @return int
      */
-    public function updateGroup($space_gid ,$uid, $space_group_name, $space_group_url, $space_group_sumarry, $space_groupfather_id, $space_status){
+    public function updateSGroup($space_gid ,$uid, $space_group_name, $space_group_url, $space_group_sumarry, $space_groupfather_id, $space_status){
         $data = array(
             'uid' => $uid,
             'space_group_name' => $space_group_name,
@@ -422,7 +421,7 @@ class M_cms extends CI_Model{
      * 
      * @param type $gid
      */
-    public function deleteGroup($space_gid, $space_status){
+    public function deleteSGroup($space_gid, $space_status = 0){
         $data = array(
             'space_status' => $space_status
         );

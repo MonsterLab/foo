@@ -10,15 +10,16 @@ class Admin extends CI_Controller{
         $this->load->helper('url');
         
         $this->load->model('M_admin','admin');
-
-//        $this->load->model('M_user_base','userbase');
-//        $this->load->model('M_cms','cms');
-//        $this->load->model('m_medium','medium');
-//        $this->load->model('M_space','space');
-//        $this->load->model('M_talent','talent');
-//        $this->load->model('M_topic','topic');        
+        $this->load->model('M_user_base','userbase');
+        $this->load->model('M_cms','cms');
+        $this->load->model('M_medium','medium');
+        $this->load->model('M_zxpool','zxpool');
+        $this->load->model('M_space','space');
+        $this->load->model('M_talent','talent');
+        $this->load->model('M_topic','topic');              
     }
-    
+ 
+    //************************基本操作**********************************************
     public function index(){
         $power = $this->admin->getPower();
         if($power < 1){
@@ -90,7 +91,11 @@ class Admin extends CI_Controller{
         return;
     }
     
+//**************************CMS操作**********************************************
+    
 }# end of class
+
+
 
 
 //End of file admin.php

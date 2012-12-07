@@ -23,7 +23,7 @@
 
     +createGroup()              --create a group of article
 
-    +getAllGroups()		--get all groups created by someone
+    +getAllSGroups()		--get all groups created by someone
 
     +getShowGroups()		--get the groups displayed at index
 
@@ -368,13 +368,12 @@ class M_space extends CI_Model{
         $this->db->where('uid', $uid); 
         $this->db->where('space_status',$space_status);
         $query = $this->db->get('zx_article_groups');
-        $query->result_array();
-        
         $numRows = $this->num_rows();
+        $result = $query->result_array();
         $query->free_result();
         if($numRows > 0){
             
-            return $query;
+            return $result;
 	} else {
 	    
 	    return 0;

@@ -116,13 +116,13 @@ class M_cms extends CI_Model{
 	$this->db->select('aid, uid, username, title, content, groupid, audit, audit_id, status, viewtimes');
         $this->db->where('aid',$aid);
 	$query = $this->db->get('zx_articles');
-        $query = $query->result_array();
+        $result = $query->result_array();
         
-        $numRows = $this->num_rows();
+        $numRows = $query->num_rows();
         $query->free_result();
 	if($numRows > 0){
             
-            return $query;
+            return $result;
 	} else {
 	    
 	    return 0;
@@ -143,13 +143,13 @@ class M_cms extends CI_Model{
         $this->db->limit($offset,$limit);
         
         $query = $this->db->get('zx_articles');
-        $query = $query->result_array();
+        $result = $query->result_array();
         
-        $numRows = $this->num_rows();
+        $numRows = $query->num_rows();
         $query->free_result();
         if($$numRows > 0){
             
-            return $query;
+            return $result;
 	} else {
 	    
 	    return 0;
@@ -170,13 +170,13 @@ class M_cms extends CI_Model{
         $this->db->limit($offset,$limit);
         
         $query = $this->db->get('zx_articles');
-        $query = $query->result_array();
+        $result = $query->result_array();
 
-        $numRows = $this->num_rows();
+        $numRows = $query->num_rows();
         $query->free_result();
         if($numRows > 0){
             
-            return $query;
+            return $result;
 	} else {
 	    
 	    return 0;
@@ -369,13 +369,12 @@ class M_cms extends CI_Model{
         $this->db->where('uid', $uid); 
         $this->db->where('status',$status);
         $query = $this->db->get('zx_article_groups');
-        $query->result_array();
         
         $numRows = $query->num_rows();
+        $result = $query->result_array();
         $query->free_result();
         if($numRows > 0){
-            
-            return $query;
+            return $result;
 	} else {
 	    
 	    return 0;

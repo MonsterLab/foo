@@ -18,7 +18,8 @@ class Admin extends CI_Controller{
         $this->load->model('M_talent','talent');
         $this->load->model('M_topic','topic');              
     }
-    
+ 
+    //************************基本操作**********************************************
     public function index(){
         $power = $this->admin->getPower();
         if($power < 1){
@@ -52,7 +53,16 @@ class Admin extends CI_Controller{
         redirect(base_url('admin/login/'));
     }
     
-
+    /**
+     * 视图和权限管理
+     * 
+     */
+    public function left(){
+        $this->load->view('admin/left');
+        return;
+    }
+    
+//*****************************征信库操作*****************************************
     /**
      * 批量导入征信编码
      */
@@ -86,10 +96,7 @@ class Admin extends CI_Controller{
         }# end of post  
     }
     
-    public function left(){
-        $this->load->view('admin/left');
-        return;
-    }
+//**************************CMS操作**********************************************
     
 }
 

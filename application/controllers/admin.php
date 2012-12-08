@@ -18,7 +18,8 @@ class Admin extends CI_Controller{
         $this->load->model('M_talent','talent');
         $this->load->model('M_topic','topic');              
     }
-    
+ 
+    //************************基本操作**********************************************
     public function index(){
         $power = $this->admin->getPower();
         if($power < 1){
@@ -52,7 +53,6 @@ class Admin extends CI_Controller{
         redirect(base_url('admin/login/'));
     }
     
-
     /**
      * 批量导入征信编码
      */
@@ -91,7 +91,9 @@ class Admin extends CI_Controller{
         return;
     }
     
-}
+//**************************CMS操作**********************************************
+    
+}# end of class
 
 
 

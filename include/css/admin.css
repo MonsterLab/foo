@@ -1,0 +1,133 @@
+/* 
+    Document   : admin.css
+    Created on : 2012-12-6, 15:42:54
+    Author     : zhang
+    Description:
+        Purpose of the stylesheet follows.
+*/
+*{
+    margin: 0;
+    padding: 0;
+}
+
+img{
+    border: none;
+}
+a{
+    text-decoration: none;
+}
+a:hover{
+    text-decoration: underline;
+}
+dl,ul{
+    list-style: none;
+}
+
+
+/*top begin*/
+#header-body{
+    background: #6294d6;
+}
+
+#header-l{
+    width: 50%;
+    height: 100%;
+    float: left;
+    line-height: 80px;
+    text-align: left;
+    padding: 0 0 0 10px;
+    font-size: 25px;
+}
+
+#header-r{
+    width: 30%;
+    height: 100%;
+    float: right;
+}
+#header-r a{
+    display: block;
+    width: 100%;
+    height: 50%;
+    float: right;
+    line-height: 40px;
+    padding: 0 40px 0 0;    
+    text-align: right;
+}
+/*top end*/
+
+
+/*menu begin*/
+#menu-body{
+    width: 100%;
+    height: 100%;
+    background:#bec5c4;
+    padding: 0 20px;
+}
+#menu{
+    padding: 20px 0;
+}
+#menu ul li dl dd{
+    padding: 5px 0 0 50px;
+}
+#menu ul li dl dt{
+    padding: 10px 0;
+}
+/*menu end*/
+
+/*create article begin*/
+#createArticle-body{
+    width: 100%;
+    height: 100%;
+    padding: 50px 20px;
+}
+
+#createArticle p{
+    padding: 10px 0 0 0;
+}
+
+#createArticle p label{
+    float: left;
+    min-height: 20px;
+    display: inline-block;
+    width: 100px;
+}
+#createArticle #sub{
+    display: inline-block;
+    width: 80px;
+    height: 20px;
+    float: left;
+    margin: 0 20px 0 100px;
+}
+#createArticle #reset{
+    display: inline-block;
+    width: 80px;
+    height: 20px;
+}
+/*create aricle end*/
+
+/*manage group begin*/
+#manageGroup-body{
+    width: 100%;
+    height: 100%;
+    padding: 0 0 10px 0;
+}
+#manageGroup h2{
+    background:#8ca9ea;
+    height: 100px;
+    line-height: 100px;
+    padding: 0 0 0 10px;
+}
+#manageGroup table{
+   padding: 40px 0 0 40px;
+}
+#manageGroup tr{
+    height: 30px;
+    line-height: 30px;
+}
+#manageGroup th{
+    width: 200px;
+}
+#manageGroup th,td{
+    text-align: left;
+}
+/*manage group end*/

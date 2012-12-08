@@ -134,9 +134,12 @@ class M_user_base extends CI_Model{
     * 
     * @param type $key                  //关键字，默认为空 ； 如果关键字为空，则全部查询
     * @param int $method                //选择搜索方法，默认0； 0用户名，1征信编码，2 征信库类别 ， 3 用户id
+    * @param int $limit 分页每页的显示条数
+    * @param int $offset 分页的开始位置
+    * 
     * @return array                     //成功返回数组，失败返回false
     */
-   public function search($key = '',$method = 0){
+   public function search($key = '',$method = 0,$limit = 10,$offset = 0){
        
        //若关键字不为空，设置查询条件
        if($key != ''){
@@ -157,6 +160,7 @@ class M_user_base extends CI_Model{
            $this->db->where($sqlQuery,$key);
        }
        
+       $this->db->limit($limit,$offset);
        $this->db->where('status',1);        //查询没有被弃用的用户
        $this->db->select('id,zx_code,sq_code,username,password,truename,position,phone,power,email');
        $dbResult = $this->db->get('zx_user_base');

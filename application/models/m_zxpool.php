@@ -60,13 +60,16 @@ class M_zxpool extends CI_Model{
     * 
     * 输入编码空则全部返回
     * @param type $zxCode
+    * @param type $$limit                   每页条数
+    * @param type $$offset                  偏移量
     * @return boolean
     */
-   public function searchCode($zxCode = ''){
+   public function searchCode($zxCode = '',$limit = 10,$offset = 0){
        if($zxCode != ''){
            $this->db->where('zx_code',$zxCode);
        }
        
+       $this->db->limit($limit,$offset);
        $this->db->select('id,zx_code,status');
        $dbResult = $this->db->get('zx_code');
        
@@ -174,10 +177,13 @@ class M_zxpool extends CI_Model{
    /**
     * 查询行业类型
     * @param type $key                      关键字
-    * @param type $method                   查方法默认0 ； 0 所属征信库类型，1 行业名  
+    * @param type $method                   查方法默认0 ； 0 所属征信库类型，1 行业名
+    * @param type $$limit                   每页条数
+    * @param type $$offset                  偏移量
+    *   
     * @return boolean                       
     */
-   public function searchIndustry($key = '',$method = 0){
+   public function searchIndustry($key = '',$method = 0,$limit = 20,$offset = 0){
        //若关键字不为空，设置查询条件
        if($key != ''){
            //设置查询方法
@@ -189,6 +195,7 @@ class M_zxpool extends CI_Model{
            }
        }
        $this->db->where('status',1);
+       $this->db->limit($limit,$offset);
        $this->db->select('id,industry_name,type');
        $dbResult = $this->db->get('zx_industry_type');
        
@@ -241,12 +248,12 @@ class M_zxpool extends CI_Model{
     * 添加上传扫描键类型
     * 
     * @param type $cuid                         添加人
-    * @param type $industry_name                上传扫描键类型名      
+    * @param type $file_name                    上传扫描键类型名      
     * @param type $type                         所属征信库类型，topic、medium、talent
     * @return int                               成功返回 1 ，失败 返回 0，上传扫描键类型名存在返回 -1
     */
-   public function addFileType($cuid,$file_type,$type){
-       $isExist = $this->checkIndustryName($file_type,$type);
+   public function addFileType($cuid,$file_name,$type){
+       $isExist = $this->checkFileType($file_name,$type);
        if($isExist){
            //行业名已经存在
            return -1;
@@ -254,10 +261,10 @@ class M_zxpool extends CI_Model{
        
        $sqlQuery = array(
            'cuid'=>$cuid,
-           'file_type'=>$file_type,
+           'file_name'=>$file_name,
            'type'=>$type
        );
-       $this->db->insert('zx_file_type',$sqlQuery);
+       $this->db->insert('zx_cert_file_type',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
            return 1;
@@ -276,7 +283,7 @@ class M_zxpool extends CI_Model{
    public function deleteFileType($fileTypeId){
        
        $this->db->where('id',$fileTypeId);
-       $this->db->update('zx_file_type',array('status'=>0));
+       $this->db->update('zx_cert_file_type',array('status'=>0));
        
        if($this->db->affected_rows() > 0){
            
@@ -296,17 +303,17 @@ class M_zxpool extends CI_Model{
     * @return int                               -1 名存在，0 失败 ，1 成功
     */
    public function updateFileType($fileTypeid,$fileType,$type){
-       $isExist = $this->checkFileType($fileType, $type);
+       $isExist = $this->checkFileType($fileType,$type);
        if($isExist){
            return -1;
        }
        
        $sqlQuery = array(
-           'file_type'=>$fileType,
+           'file_name'=>$fileType,
            'type'=>$type
        );
        $this->db->where('id',$fileTypeid);
-       $this->db->update('zx_file_type',$sqlQuery);
+       $this->db->update('zx_cert_file_type',$sqlQuery);
        
        if($this->db->affected_rows() > 0){
            
@@ -320,10 +327,13 @@ class M_zxpool extends CI_Model{
    /**
     * 查询扫描键类型
     * @param type $key                      关键字
-    * @param type $method                   查方法默认0 ； 0 所属征信库类型，1 行业名  
+    * @param type $method                   查方法默认0 ； 0 所属征信库类型，1 行业名
+    * @param type $$limit                   每页条数
+    * @param type $$offset                  偏移量
+    *   
     * @return boolean                       
     */
-   public function searchFileType($key = '',$method = 0){
+   public function searchFileType($key = '',$method = 0,$limit = 20,$offset = 0){
        //若关键字不为空，设置查询条件
        if($key != ''){
            //设置查询方法
@@ -331,12 +341,13 @@ class M_zxpool extends CI_Model{
                $this->db->where('type',$key);                  //按所属征信库类型查询
            }
            if($method == 1){
-               $this->db->where('file_type',$key);              //类型名
+               $this->db->where('file_name',$key);              //类型名
            }
        }
        $this->db->where('status',1);
-       $this->db->select('id,file_type,type');
-       $dbResult = $this->db->get('zx_file_type');
+       $this->db->limit($limit,$offset);
+       $this->db->select('id,file_name,type');
+       $dbResult = $this->db->get('zx_cert_file_type');
        
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){
@@ -359,10 +370,10 @@ class M_zxpool extends CI_Model{
     * @return boolean
     */
    private function checkFileType($_fileType,$_type){
-       $this->db->where('industry_name',$_fileType);
+       $this->db->where('file_name',$_fileType);
        $this->db->where('type',$_type);
        $this->db->select('id');
-       $dbResult = $this->db->get('zx_file_type');
+       $dbResult = $this->db->get('zx_cert_file_type');
        
        if($dbResult->num_rows() > 0){
            $dbResult->free_result();

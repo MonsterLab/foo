@@ -162,7 +162,7 @@ class M_user_base extends CI_Model{
        
        $this->db->limit($limit,$offset);
        $this->db->where('status',1);        //查询没有被弃用的用户
-       $this->db->select('id,zx_code,sq_code,username,password,truename,position,phone,type,email');
+       $this->db->select('id,zx_code,sq_code,username,password,truename,position,phone,email,type,space_id,audit,audit_id,cuid,ctime');
        $dbResult = $this->db->get('zx_user_base');
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){
@@ -204,6 +204,46 @@ class M_user_base extends CI_Model{
    }
 
 
+   /**
+    * 审核  客户基本信息
+    * 审核通过置audit 1 
+    * 审核未通过置audit -1 ，并且将status置0（删除）
+    * @param type $audit_id
+    * @param type $base_id
+    * @param type $isPass
+    * @return boolean
+    */
+   public function auditUserBase($audit_id,$base_id,$isPass = 0){
+       //1、根据审核情况作出处理,2、检查传入审核情况参数值是否正确
+       if($isPass == 0){                                    //未通过审核
+           $sqlQuery = array(
+                'audit_id'=>$audit_id,
+                'audit'=>$isPass,
+                'status'=>0                                 //审核未通过即删除    
+            );
+           
+       }  elseif($isPass == 1) {                            //通过审核
+           $sqlQuery = array(
+                'audit_id'=>$audit_id,
+                'audit'=>$isPass
+            );
+           
+       }  else {                                            
+           //审核情况参数错误
+           return FALSE;
+       }
+       
+       $this->db->where('id',$base_id);
+       $this->db->update('zx_user_base',$sqlQuery);
+       if($this->db->affected_rows() > 0){
+           
+           return TRUE;
+       }  else {
+           
+           return FALSE;
+       }
+   }
+   
    /**
     * 用户登录
     * 

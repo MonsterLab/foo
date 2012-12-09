@@ -148,7 +148,7 @@ class M_admin extends CI_Model{
        }
        
        $this->db->where('status',1);        //查询没有被弃用的用户
-       $this->db->select('id,username,truename,department,phone,power,email');
+       $this->db->select('id,username,truename,department,phone,power,email,cuid,ctime');
        $dbResult = $this->db->get('zx_admin',$limit,$offset);
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){

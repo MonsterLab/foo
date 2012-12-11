@@ -139,7 +139,7 @@ class M_medium extends CI_Model{
    public function searchCertBase($uid){
        $this->db->where('uid',$uid);
        $this->db->where('status',1);        //查询没有被弃用的用户
-       $this->db->select('id,uid,com_name,com_nature,com_phone,industry_id,zipcode,com_place,cert_begin,cert_end');
+       $this->db->select('id,uid,com_name,com_nature,com_phone,industry_id,zipcode,com_place,cert_begin,cert_end,audit,audit_id,cuid,ctime');
        $dbResult = $this->db->get('zx_medium_cert_base');
        if($dbResult->num_rows() > 0){
            $result = $dbResult->row_array();
@@ -244,7 +244,7 @@ class M_medium extends CI_Model{
     public function searchCertFile($uid){
         $this->db->where('uid',$uid);
         $this->db->where('status',1);
-        $this->db->select('id,file_type_id,file_name');
+        $this->db->select('id,file_type_id,file_name,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_medium_cert_file');
        
         if($dbResult->num_rows() > 0){
@@ -374,7 +374,7 @@ class M_medium extends CI_Model{
     public function searchCertContent($uid){
         $this->db->where('uid',$uid);
         $this->db->where('status',1);
-        $this->db->select('id,title,content');
+        $this->db->select('id,title,content,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_medium_cert_content');
        
         if($dbResult->num_rows() > 0){
@@ -415,7 +415,127 @@ class M_medium extends CI_Model{
    }
    
    
+   /**------------------------------审核信息----------------------------------**/
    
+   /**
+    * 审核 认证基本信息
+    * 审核通过置audit 1 
+    * 审核未通过置audit -1 ，并且将status置0（删除）
+    * @param type $audit_id
+    * @param type $base_id
+    * @param type $isPass
+    * @return boolean
+    */
+   public function auditCertBase($audit_id,$base_id,$isPass = 0){
+       //1、根据审核情况作出处理,2、检查传入审核情况参数值是否正确
+       if($isPass == 0){                                    //未通过审核
+           $sqlQuery = array(
+                'audit_id'=>$audit_id,
+                'audit'=>$isPass,
+                'status'=>0                                 //审核未通过即删除    
+            );
+           
+       }  elseif($isPass == 1) {                            //通过审核
+           $sqlQuery = array(
+                'audit_id'=>$audit_id,
+                'audit'=>$isPass
+            );
+           
+       }  else {                                            
+           //审核情况参数错误
+           return FALSE;
+       }
+       
+       $this->db->where('id',$base_id);
+       $this->db->update('zx_medium_cert_base',$sqlQuery);
+       if($this->db->affected_rows() > 0){
+           
+           return TRUE;
+       }  else {
+           
+           return FALSE;
+       }
+   }
+   
+   /**
+    * 审核 认证文件扫描键信息
+    * 审核通过置audit 1 
+    * 审核未通过置audit -1 ，并且将status置0（删除）
+    * @param type $audit_id
+    * @param type $base_id
+    * @param type $isPass
+    * @return boolean
+    */
+   public function auditCertFile($audit_id,$base_id,$isPass = 0){
+       //1、根据审核情况作出处理,2、检查传入审核情况参数值是否正确
+       if($isPass == 0){                                    //未通过审核
+           $sqlQuery = array(
+                'audit_id'=>$audit_id,
+                'audit'=>$isPass,
+                'status'=>0                                 //审核未通过即删除    
+            );
+           
+       }  elseif($isPass == 1) {                            //通过审核
+           $sqlQuery = array(
+                'audit_id'=>$audit_id,
+                'audit'=>$isPass
+            );
+           
+       }  else {                                            
+           //审核情况参数错误
+           return FALSE;
+       }
+       
+       $this->db->where('id',$base_id);
+       $this->db->update('zx_medium_cert_file',$sqlQuery);
+       if($this->db->affected_rows() > 0){
+           
+           return TRUE;
+       }  else {
+           
+           return FALSE;
+       }
+   }
+   
+   /**
+    * 审核  认证文字类信息
+    * 审核通过置audit 1 
+    * 审核未通过置audit -1 ，并且将status置0（删除）
+    * @param type $audit_id
+    * @param type $base_id
+    * @param type $isPass
+    * @return boolean
+    */
+   public function auditCertContent($audit_id,$base_id,$isPass = 0){
+       //1、根据审核情况作出处理,2、检查传入审核情况参数值是否正确
+       if($isPass == 0){                                    //未通过审核
+           $sqlQuery = array(
+                'audit_id'=>$audit_id,
+                'audit'=>$isPass,
+                'status'=>0                                 //审核未通过即删除    
+            );
+           
+       }  elseif($isPass == 1) {                            //通过审核
+           $sqlQuery = array(
+                'audit_id'=>$audit_id,
+                'audit'=>$isPass
+            );
+           
+       }  else {                                            
+           //审核情况参数错误
+           return FALSE;
+       }
+       
+       $this->db->where('id',$base_id);
+       $this->db->update('zx_medium_cert_content',$sqlQuery);
+       if($this->db->affected_rows() > 0){
+           
+           return TRUE;
+       }  else {
+           
+           return FALSE;
+       }
+   }
    
    
    

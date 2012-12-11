@@ -1,0 +1,4 @@
+Model_user_base
+-数据库无type字段
+-search不返回type
+-search方法sql有问题，无power字段

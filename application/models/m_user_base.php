@@ -134,9 +134,12 @@ class M_user_base extends CI_Model{
     * 
     * @param type $key                  //关键字，默认为空 ； 如果关键字为空，则全部查询
     * @param int $method                //选择搜索方法，默认0； 0用户名，1征信编码，2 征信库类别 ， 3 用户id
+    * @param int $limit 分页每页的显示条数
+    * @param int $offset 分页的开始位置
+    * 
     * @return array                     //成功返回数组，失败返回false
     */
-   public function search($key = '',$method = 0){
+   public function search($key = '',$method = 0,$limit = 10,$offset = 0){
        
        //若关键字不为空，设置查询条件
        if($key != ''){
@@ -157,8 +160,9 @@ class M_user_base extends CI_Model{
            $this->db->where($sqlQuery,$key);
        }
        
+       $this->db->limit($limit,$offset);
        $this->db->where('status',1);        //查询没有被弃用的用户
-       $this->db->select('id,zx_code,sq_code,username,password,truename,position,phone,power,email');
+       $this->db->select('id,zx_code,sq_code,username,password,truename,position,phone,email,type,space_id,audit,audit_id,cuid,ctime');
        $dbResult = $this->db->get('zx_user_base');
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){
@@ -200,6 +204,46 @@ class M_user_base extends CI_Model{
    }
 
 
+   /**
+    * 审核  客户基本信息
+    * 审核通过置audit 1 
+    * 审核未通过置audit -1 ，并且将status置0（删除）
+    * @param type $audit_id
+    * @param type $base_id
+    * @param type $isPass
+    * @return boolean
+    */
+   public function auditUserBase($audit_id,$base_id,$isPass = 0){
+       //1、根据审核情况作出处理,2、检查传入审核情况参数值是否正确
+       if($isPass == 0){                                    //未通过审核
+           $sqlQuery = array(
+                'audit_id'=>$audit_id,
+                'audit'=>$isPass,
+                'status'=>0                                 //审核未通过即删除    
+            );
+           
+       }  elseif($isPass == 1) {                            //通过审核
+           $sqlQuery = array(
+                'audit_id'=>$audit_id,
+                'audit'=>$isPass
+            );
+           
+       }  else {                                            
+           //审核情况参数错误
+           return FALSE;
+       }
+       
+       $this->db->where('id',$base_id);
+       $this->db->update('zx_user_base',$sqlQuery);
+       if($this->db->affected_rows() > 0){
+           
+           return TRUE;
+       }  else {
+           
+           return FALSE;
+       }
+   }
+   
    /**
     * 用户登录
     * 

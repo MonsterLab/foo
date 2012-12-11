@@ -147,10 +147,65 @@ class Fei_test extends CI_Controller{
     }
     
     public function searchIndustry(){
-        
+        //searchIndustry($key = '',$method = 0)
+        $result = $this->zxpool->searchIndustry('',0);
+        echo "<pre>";
+        print_r($result);
+        echo '</pre>';
+    }
+    
+    public function addFileType(){
+        //addFileType($cuid,$file_name,$type)
+        $result = $this->zxpool->addFileType(1,'营业执照','topic');
+        echo $result;
+    }
+
+    public function updateFileType(){
+        //updateFileType($fileTypeid,$fileType,$type)
+        $result = $this->zxpool->updateFileType(1,'营业执照2','medium');
+        echo $result;
+    }
+    
+    public function searchFileType(){
+        //searchIndustry($key = '',$method = 0)
+        $result = $this->zxpool->searchFileType('',0);
+        echo "<pre>";
+        print_r($result);
+        echo '</pre>';
+    }
+
+    /////////////////////////
+    public function createCertBase(){
+        //createCertBase($cuid,$uid,$com_name,$com_nature,$com_phone,$type,$zipcode,$com_place,$industry_id,$cert_begin,$cert_end)
+        $result = $this->topic->createCertBase(1,1,'同袍','青年','12369581234','topic','12301','东北','1','0','0');
+        echo $result;
     }
 
 
+    public function updateCertBase(){
+        //updateCertBase($baseId,$com_name,$com_nature,$com_phone,$zipcode,$com_place,$industry_id,$cert_begin,$cert_end)
+        $result = $this->topic->updateCertBase(1,'同袍234','青年2','22369581234','topic','12301','东北2','1','0','0');
+        echo $result;
+    }
+
+    public function searchCertBase(){
+        $result = $this->topic->searchCertBase(1);
+        echo "<pre>";
+        print_r($result);
+        echo '</pre>';
+    }
+    
+    public function addCertFile(){
+        //addCertFile($cuid,$uid,$file_type_id,$file_name)
+        $result = $this->topic->addCertFile(1,1,1,'asds.txt');
+        echo $result;
+    }
+    public function searchCertFile(){
+        $result = $this->topic->searchCertFile(1);
+        echo "<pre>";
+        print_r($result);
+        echo '</pre>';
+    }
     /**---------------------------------------------------**/
 }
 

@@ -47,8 +47,11 @@ class Search extends CI_Controller{
                 redirect(base_url('search/index'));
             }
             
+<<<<<<< HEAD
             //var_dump($fooUserBase);
             
+=======
+>>>>>>> a280863e4b1fce5553b56c2c7f40dd1e555d11d0
             $fooType = $fooUserBase['0']['type'];
             $fooUID = $fooUserBase['0']['id'];
             
@@ -90,16 +93,28 @@ class Search extends CI_Controller{
                 redirect(base_url('search/index'));
             }
             
+<<<<<<< HEAD
+=======
+            /*TODOs
+             * 下面的方法没有成功加载视图，休要填充数据后进行修正
+             */
+            
+>>>>>>> a280863e4b1fce5553b56c2c7f40dd1e555d11d0
             $fooType = $fooUserBase['0']['type'];
             $fooUID = $fooUserBase['0']['id'];
             
             //topic、medium、talent 
             if($fooType == 'topic'){
-                $fooTopic = $this->zt->searchCertBase($fooUID);
-                $data['com_name'] = $fooTopic['com_name'];
-                $data['test'] = $fooTopic;
+                $fooBase = $this->zt->searchCertBase($fooUID);
+                $fooContent = $this->zt->searchCertContent($fooUID);
+                $fooFile = $this->zt->searchCertFile($fooUID);
+
+                $data['fooBase'] = $fooBase;
+                $data['fooContent'] = $fooContent;
+                $data['fooFile'] = $fooFile;
             }
             if($fooType == 'medium'){
+<<<<<<< HEAD
                 $fooTopic = $this->zj->searchCertBase($fooUID);
                 $data['com_name'] = $fooTopic['com_name'];
             }
@@ -107,6 +122,25 @@ class Search extends CI_Controller{
                 $fooTopic = $this->rc->searchCertBase($fooUID);
                 $data['com_name'] = $fooTopic['cert_name'];
             }
+=======
+                $fooBase = $this->zj->searchCertBase($fooUID);
+                $fooContent = $this->zj->searchCertContent($fooUID);
+                $fooFile = $this->zj->searchCertFile($fooUID);
+
+                $data['fooBase'] = $fooBase;
+                $data['fooContent'] = $fooContent;
+                $data['fooFile'] = $fooFile;
+            }           
+            if($fooType == 'talent'){
+                $fooBase = $this->rc->searchCertBase($fooUID);
+                $fooContent = $this->rc->searchCertContent($fooUID);
+                $fooFile = $this->rc->searchCertFile($fooUID);
+
+                $data['fooBase'] = $fooBase;
+                $data['fooContent'] = $fooContent;
+                $data['fooFile'] = $fooFile;
+            }           
+>>>>>>> a280863e4b1fce5553b56c2c7f40dd1e555d11d0
             
             $this->load->view('search/step2res',$data);
             

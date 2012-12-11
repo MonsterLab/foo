@@ -110,33 +110,6 @@ dl,ul{
 }
 /*create aricle end*/
 
-/*manage group begin*/
-#manageGroup-body{
-    width: 100%;
-    height: 100%;
-    padding: 0 0 10px 0;
-}
-#manageGroup h2{
-    background:#8ca9ea;
-    height: 100px;
-    line-height: 100px;
-    padding: 0 0 0 10px;
-}
-#manageGroup table{
-   padding: 40px 0 0 40px;
-}
-#manageGroup tr{
-    height: 30px;
-    line-height: 30px;
-}
-#manageGroup th{
-    width: 200px;
-}
-#manageGroup th,td{
-    text-align: left;
-}
-/*manage group end*/
-
 /*manage article begin*/
 #manageArticle-body{
     width: 100%;
@@ -183,3 +156,82 @@ dl,ul{
     padding: 20px 0 0 0;
 }
 /*manage article end*/
+
+/*create group begin*/
+#createGroup-body{
+    width: 100%;
+    height: 100%;
+    padding: 0 0 10px 0;
+}
+#createGroup h2{
+    background:#8ca9ea;
+    height: 100px;
+    line-height: 100px;
+    padding: 0 0 0 10px;
+}
+#createGroup #content{
+    padding: 20px 0 0 60px;
+}
+#createGroup #content p{
+    margin-bottom: 20px;
+}
+#createGroup #content p select{
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    padding: 5px;
+    min-width: 160px;
+}
+#createGroup #content p{
+    min-height: 35px;
+    line-height: 35px;
+}
+#createGroup label{
+    display: inline-block;
+    width: 150px;
+    float: left;
+}
+#createGroup #group_url, #createGroup #group_name{
+    display: inline-block;
+    height: 35px;
+    line-height: 35px;
+}
+#createGroup #sub, #createGroup #res{
+    display: inline-block;
+    height: 35px;
+    line-height: 35px;
+    width: 80px;
+    
+}
+#createGroup #sub{
+    margin: 0 50px 0 150px;
+}
+/*create group end*/
+
+/*manage group begin*/
+#manageGroup-body{
+    width: 100%;
+    height: 100%;
+    padding: 0 0 10px 0;
+}
+#manageGroup h2{
+    background:#8ca9ea;
+    height: 100px;
+    line-height: 100px;
+    padding: 0 0 0 10px;
+}
+#manageGroup table{
+   padding: 40px 0 0 40px;
+}
+#manageGroup tr{
+    height: 30px;
+    line-height: 30px;
+}
+#manageGroup th{
+    width: 200px;
+}
+#manageGroup th,td{
+    text-align: left;
+}
+/*manage group end*/
+

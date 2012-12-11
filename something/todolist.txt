@@ -2,3 +2,6 @@ Model_user_base
 -数据库无type字段
 -search不返回type
 -search方法sql有问题，无power字段
+
+2012-12-11 fei：
+将zx_user_base中的space_id添加默认值为0

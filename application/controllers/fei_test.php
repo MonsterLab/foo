@@ -29,58 +29,14 @@ class Fei_test extends CI_Controller{
         }
     }
     
-    /**
-     * 批量导入征信编码
-     */
-    public function importCode(){
-        if($_POST){
-            if(!empty($_FILES['file']['name'])){
-                $tmp_name = $_FILES['file']['tmp_name'];
-                //读取整个文件
-                $resourse = file($tmp_name);                      
-                //按行遍历数据
-                foreach($resourse as $data){                                    
-                    $codeArray[] = str_replace("\n",'', $data);                //将数据中\n去除
-                }
-                //数据不为空则导入数据库
-                if(!empty($codeArray)){
-                    $result = $this->zxpool->createCode($codeArray);
-                    if($result){
-                        //成功导入
-                        
-                    }
-                }  else {
-                    //文件中数据为空
-                    
-                }
-                
-            }  else {
-                //未选择导入的文件
-                
-            }
-            
-        }  else {
-            
-            $this->load->view('fei_test/v_importCode.php');
-        }  
-    }
-    
     
     /**------------------以下为测试用-----------------------**/
-
-    
-
 
     
     public function index(){
         echo 'work';
     }
 
-    public function tlogin(){
-        $result = $this->admin->login('test','psw2');
-//        $result = $this->admin->getPower();
-        echo $result;
-    }
 
     public function createAdmin(){
         //create($cuid,$username,$password,$truename,$department,$phone,$power,$email)
@@ -116,6 +72,76 @@ class Fei_test extends CI_Controller{
             echo 0;
         }
     }
+/**----------------------------征信编码池管理----------------------------------------**/
+    /**
+     * 批量导入征信编码
+     */
+    public function importCode(){
+        if($_POST){
+            if(!empty($_FILES['file']['name'])){
+                $tmp_name = $_FILES['file']['tmp_name'];
+                //读取整个文件
+                $resourse = file($tmp_name);                      
+                //按行遍历数据
+                foreach($resourse as $data){
+                    //TODO:windows下边换行符是"\r\n"，记得换
+                    $fooData = str_replace("\n",'', $data);
+                    if(!preg_match("/^[0-9a-z]+$/",$fooData)){
+                        //TODO:数据中含有非数字字母
+                        return;
+                    }
+                    
+                    $codeArray[] = $fooData;                
+                }
+                //数据不为空则导入数据库
+                if(!empty($codeArray)){
+                    $result = $this->zxpool->createCode($codeArray);
+                    if($result){
+                        //成功导入
+                        echo "成功";
+                    }
+                }  else {
+                    //文件中数据为空
+                    
+                }
+                
+            }  else {
+                //未选择导入的文件
+                
+            }
+            
+        }  else {
+            
+            $this->load->view('fei_test/v_importCode.php');
+        }  
+    }
+    //TODO：没完成
+    public function exportCode(){
+        $result = $this->zxpool->searchCode();
+        if($result){
+            foreach ($result as $row){
+                $fooCodeArray[] = $row['zx_code'];
+            }
+            //TODO:windows下边换行符是"\r\n"，记得换
+            $fooCodeString = implode("\n",$fooCodeArray);
+            
+            chmod("/test/", 0777);
+            $fooFileName = "/test/data.txt";
+            mkdir($fooFileName);
+            
+            $fooHandle = fopen($fooFileName, 'w') or die('打开'.$fooFileName.'失败!');
+            $result = fwrite($fooHandle, $fooCodeString);
+            echo $result;
+            //echo nl2br($fooCodeString);
+            
+//            echo "<pre>";
+//            print_r($codeArray);
+//            echo '</pre>';
+            
+        }
+    }
+
+    
 
     public function useCode(){
         $result = $this->zxpool->useCode(1);
@@ -123,15 +149,14 @@ class Fei_test extends CI_Controller{
         
     }
     public function searchCode(){
-        $result = $this->zxpool->searchCode();
-        if($result){
-            echo "<pre>";
-            print_r($result);
-            echo '</pre>';
+        $data['zxcodes'] = $this->zxpool->searchCode();
+        if($data['zxcodes']){
+            $this->load->view('fei_test/v_searchCode',$data);
         }
         
     }
     
+    /**----------------------------------行业管理----------------------------------**/
     public function addIndustry(){
         //($cuid,$industry_name,$type)
         $result = $this->zxpool->addIndustry(1,'电子行业','topic');
@@ -207,6 +232,14 @@ class Fei_test extends CI_Controller{
         echo '</pre>';
     }
     /**---------------------------------------------------**/
+    
+    public function createUserBase(){
+        //create($cuid,$zx_code,$sq_code,$username,$password,$truename,$position,$phone,$email,$type)
+        $result = $this->userbase->create(1,'123','456','zhang','zhang','truezhang','position','13955564485','ss@email.com','topic');
+        echo $result;
+    }
+    
+    
 }
 
 

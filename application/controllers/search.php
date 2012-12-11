@@ -9,7 +9,7 @@ class Search extends CI_Controller{
         $this->load->model('M_user_base','jc');     //基础
         $this->load->model('M_talent','rc');        //人才
         $this->load->model('M_topic','zt');         //主体
-        $this->load->model('M_medium','zj');         //中介
+        $this->load->model('M_medium','zj');        //中介
     }
     
     public function index(){
@@ -47,10 +47,6 @@ class Search extends CI_Controller{
                 redirect(base_url('search/index'));
             }
             
-            /*TODOs
-             * search 方法不返回type，数据库中无type字段
-             */
-            
             //var_dump($fooUserBase);
             
             $fooType = $fooUserBase['0']['type'];
@@ -62,11 +58,11 @@ class Search extends CI_Controller{
                 $data['com_name'] = $fooTopic['com_name'];
             }
             if($fooType == 'medium'){
-                $fooTopic = $this->zt->searchCertBase($fooUID);
+                $fooTopic = $this->zj->searchCertBase($fooUID);
                 $data['com_name'] = $fooTopic['com_name'];
             }           
             if($fooType == 'talent'){
-                $fooTopic = $this->zt->searchCertBase($fooUID);
+                $fooTopic = $this->rc->searchCertBase($fooUID);
                 $data['com_name'] = $fooTopic['cert_name'];
             }           
             
@@ -81,7 +77,7 @@ class Search extends CI_Controller{
     public function step2(){
         $data = array(
             'zxcode' => 0,
-            'com_name' => 'known'            
+            'com_name' => 'known'
         );
         
         if($_POST){
@@ -94,10 +90,6 @@ class Search extends CI_Controller{
                 redirect(base_url('search/index'));
             }
             
-            /*TODOs
-             * search 方法不返回type，数据库中无type字段
-             */
-            
             $fooType = $fooUserBase['0']['type'];
             $fooUID = $fooUserBase['0']['id'];
             
@@ -108,13 +100,13 @@ class Search extends CI_Controller{
                 $data['test'] = $fooTopic;
             }
             if($fooType == 'medium'){
-                $fooTopic = $this->zt->searchCertBase($fooUID);
+                $fooTopic = $this->zj->searchCertBase($fooUID);
                 $data['com_name'] = $fooTopic['com_name'];
-            }           
+            }
             if($fooType == 'talent'){
-                $fooTopic = $this->zt->searchCertBase($fooUID);
+                $fooTopic = $this->rc->searchCertBase($fooUID);
                 $data['com_name'] = $fooTopic['cert_name'];
-            }           
+            }
             
             $this->load->view('search/step2res',$data);
             

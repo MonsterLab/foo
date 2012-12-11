@@ -49,8 +49,10 @@ class Page{
         if(isset($_GET['page'])){
             if($_GET['page'] > $this->totalPages){        //当输入的页大于总的页数时，等于总的页数
                 $this->limit = ($this->totalPages - 1) * $this->offset;
+                $this->limit = $this->limit > 0? $this->limit:0;
             } else {
                 $this->limit = ($_GET['page'] - 1) * $this->offset;
+                $this->limit = $this->limit > 0? $this->limit:0;
             }
         }
     }
@@ -87,8 +89,10 @@ class Page{
         if(isset($_GET['page'])){
             if($_GET['page'] > $this->totalPages){        //当输入的页大于总的页数时，等于总的页数
                 $this->currentPage = $this->totalPages;
+                $this->currentPage = $this->currentPage > 0 ? $this->currentPage : 0;
             } else {
                 $this->currentPage = $_GET['page'];
+                $this->currentPage = $this->currentPage > 0 ? $this->currentPage : 0;
             }
         }
         $this->last = $this->currentPage - 1;   //上一页        
@@ -111,20 +115,23 @@ class Page{
     
     /**
      * this method is used for making page list bar
+     * @param url $base_url the page you want to show the list
      * @return the page list bar
      */
     private function getPageBar(){
+        $url = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        $base_url = substr($url, 0, strpos($url, '?'));
         //共1条记录 本页1条记录 本页从1 - 1 条 1/1页 第一页 下一页 最后一页
         $result = '<div id="pageBar">';
-        $result .= '<form action="'.base_url('admin/manageArticle').'">';
+        $result .= '<form action="'.$base_url.'">';
         $result .= '共'.$this->allRows.'条记录  ';
         $result .= '本页'.$this->curPageCount.'条记录  ';
         $result .= '本页从'.$this->from.' - '.$this->to.' 条  ';
         $result .= $this->currentPage.'/'.$this->totalPages.'页  ';
-        $result .= '<a href="'.base_url('admin/manageArticle?page=1').'">第一页</a>  ';
-        $result .= '<a style="'.$this->lastStyle.'" href="'.base_url('admin/manageArticle?page='.$this->last.'').'">上一页</a>  ';
-        $result .= '<a style="'.$this->nextStyle.'" href="'.base_url('admin/manageArticle?page='.$this->next.'').'">下一页</a>  ';
-        $result .= '<a href="'.base_url('admin/manageArticle?page='.$this->totalPages.'').'">最后一页</a>  ';
+        $result .= '<a href="'.$base_url.'?page=1">第一页</a>  ';
+        $result .= '<a style="'.$this->lastStyle.'" href="'.$base_url.'?page='.$this->last.'">上一页</a>  ';
+        $result .= '<a style="'.$this->nextStyle.'" href="'.$base_url.'?page='.$this->next.'">下一页</a>  ';
+        $result .= '<a href="'.$base_url.'?page='.$this->totalPages.'">最后一页</a>  ';
         $result .= '<input type="text" name="page" size="1"/>';
         $result .= '<input type="submit" name="sub" value="GO"/>';
         $result .= '</form>';

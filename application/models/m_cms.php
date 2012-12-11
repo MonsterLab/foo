@@ -105,7 +105,7 @@ class M_cms extends CI_Model{
         if($result != null && $result != 0){
             return $result;
         } else {
-            return 0;
+            return array();
         }
     }
 
@@ -127,7 +127,7 @@ class M_cms extends CI_Model{
             return $result;
 	} else {
 	    
-	    return 0;
+	    return array();
 	}
     }
     
@@ -154,7 +154,7 @@ class M_cms extends CI_Model{
             return $result;
 	} else {
 	    
-	    return 0;
+	    return array();
 	}    
     }
     
@@ -183,7 +183,7 @@ class M_cms extends CI_Model{
             return $result;
 	} else {
 	    
-	    return 0;
+	    return array();
 	} 
         
     }
@@ -339,16 +339,16 @@ class M_cms extends CI_Model{
      * @param type $uid
      * @param type $group_name
      * @param type $group_url
-     * @param type $group_sumarry
+     * @param type $group_summary
      * @param type $groupfather_id
      * @return int
      */
-    public function createGroup($uid,$group_name, $group_url, $group_sumarry, $groupfather_id){
+    public function createGroup($uid,$group_name, $group_url, $group_summary, $groupfather_id){
         $sql= array(
             'uid' => $uid,
             'group_name' => $group_name,
             'group_url' => $group_url,
-            'group_sumarry' => $group_sumarry,
+            'group_sumarry' => $group_summary,
             'groupfather_id' => $groupfather_id
           );
        $insertId = $this->db->insert('zx_article_groups',$sql);
@@ -369,7 +369,7 @@ class M_cms extends CI_Model{
      * @return int
      */
     public function getAllGroups($uid, $status = 1){
-        $this->db->select("gid, group_name, group_sumarry");
+        $this->db->select("gid, group_name, groupfather_id");
         $this->db->where('uid', $uid); 
         $this->db->where('status',$status);
         $query = $this->db->get('zx_article_groups');
@@ -381,7 +381,7 @@ class M_cms extends CI_Model{
             return $result;
 	} else {
 	    
-	    return 0;
+	    return array();
 	} 
         
     }

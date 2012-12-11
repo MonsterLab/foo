@@ -163,7 +163,7 @@ class M_user_base extends CI_Model{
        $this->db->limit($limit,$offset);
        $this->db->where('status',1);        //查询没有被弃用的用户
        $this->db->select('id,zx_code,sq_code,username,password,truename,position,phone,email,type,space_id,audit,audit_id,cuid,ctime');
-       $dbResult = $this->db->get('zx_user_base');
+       $dbResult = $this->db->get('zx_user_base',$limit,$offset);
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){
                $result[] = $row;

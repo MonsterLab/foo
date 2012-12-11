@@ -1,4 +1,3 @@
-Model_user_base
--数据库无type字段
--search不返回type
--search方法sql有问题，无power字段
+Controller search
+    未成功加载视图，需要填充数据后修正
+

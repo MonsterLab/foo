@@ -56,8 +56,9 @@ class M_topic extends CI_Model{
            'zipcode'=>$zipcode,
            'com_place'=>$com_place,
            'cert_begin'=>$cert_begin,
-           'cert_end'=>$cert_end,
+           'cert_end'=>$cert_end
        );
+       
        $this->db->insert('zx_topic_cert_base',$sqlQuery);
        if($this->db->affected_rows() > 0){
            

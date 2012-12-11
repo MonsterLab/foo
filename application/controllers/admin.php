@@ -59,6 +59,9 @@ class Admin extends CI_Controller{
         return;
     }
     /**--------------------------------CRM管理-------------------------------------**/
+    /**
+     * 增加客户基本信息
+     */
     public function createUserBase(){
         if($_POST){
             $fooZxcode = trim($this->input->post('zxcode'));
@@ -71,15 +74,72 @@ class Admin extends CI_Controller{
             $fooEmail = trim($this->input->post('email'));
             $fooType = trim($this->input->post('type'));
             
-            $result = $this->userbase->create(1,$fooZxcode,$fooSqcode,$fooUsername,$fooPassword,$fooTruename,$fooPosition,$fooPhone,$fooEmail,$fooType);
-            echo $result;
+            if($fooZxcode == NULL || $fooSqcode == NULL || $fooUsername == NULL 
+                    || $fooPassword == NULL || $fooTruename == NULL || $fooPosition == NULL
+                    || $fooPhone == NULL || $fooEmail == NULL || $fooType == NULL){
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createUserBase',$data);
+                return;
+            }
+            //TODO:cuid
+            $fooResult = $this->userbase->create(1,$fooZxcode,$fooSqcode,$fooUsername,$fooPassword,$fooTruename,$fooPosition,$fooPhone,$fooEmail,$fooType);
+            if($fooResult == -1){
+                $data['flag'] = '用户登录名已存在！';
+            }elseif ($fooResult == 0) {
+                $data['flag'] = '添加失败！';
+            }elseif ($fooResult == 1) {
+                $data['flag'] = '添加成功!';
+            }
+            
+            $this->load->view('admin/v_createUserBase',$data);
             
         }  else {
-            $this->load->view('admin/v_createUserBase');
+            $data['flag'] = '';
+            $this->load->view('admin/v_createUserBase',$data);
         }
         
     }
 
+    /**
+     * 添加征信基本信息
+     */
+    public function createCertBase(){
+        //TODO:判断类型topic medium talent
+        $data['industrys'] = $this->zxpool->searchIndustry('topic');
+        
+        if($_POST){
+            $fooIndustryId = $this->input->post('industry');
+            $fooComname = trim($this->input->post('com_name'));
+            $fooComnature = trim($this->input->post('com_nature'));
+            $fooComphone = trim($this->input->post('com_phone'));
+            $fooZipcode = trim($this->input->post('zipcode'));
+            $fooComplace = trim($this->input->post('com_place'));
+            $fooCertBegin = trim($this->input->post('cert_begin'));          //将$fooCertBegin，$fooCertEnd转换为时间戳
+            $fooCertEnd = trim($this->input->post('cert_end'));
+            
+            if($fooIndustryId == NULL || $fooComname == NULL || $fooComnature == NULL 
+                    || $fooComphone == NULL || $fooZipcode == NULL || $fooComplace == NULL
+                    || $fooCertBegin == NULL || $fooCertEnd == NULL){
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createCertBase',$data);
+                return;
+            }
+            //TODO:cuid ， uid
+            //TODO:判断类型topic medium talent
+            $fooResult = $this->topic->createCertBase(1,1,$fooComname,$fooComnature,$fooComphone,$fooZipcode,$fooComplace,$fooIndustryId,$fooCertBegin,$fooCertEnd);
+            if($fooResult){
+                $data['flag'] = '添加成功！';
+            }  else {
+                $data['flag'] = '添加失败!';
+            }
+            
+            $this->load->view('admin/v_createCertBase',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_createCertBase',$data);
+        }
+    }
 
     public function searchUsers(){
         $fooUserBase = $this->userbase->search();
@@ -95,16 +155,7 @@ class Admin extends CI_Controller{
      * 上传扫描文件
      */
     public function addCertFile(){
-//        三种征信库
-//        if($_GET['type'] == 'topic'){
-//            $data['fileTypes'] = $this->zxpool->searchFileType('topic');
-//        }elseif ($_GET['type'] == 'medium') {
-//            $data['fileTypes'] = $this->zxpool->searchFileType('medium');
-//        }elseif ($_GET['type'] == 'talent') {
-//            $data['fileTypes'] = $this->zxpool->searchFileType('medium');
-//        }
-        //此处测试用
-        $data['fileTypes'] = $this->zxpool->searchFileType('topic');
+        $data['fileTypes'] = $this->zxpool->searchFileType('topic');             //此处topic测试用,可自行修改
         
         if($_POST){
             $fooFilename = trim($this->input->post('filename'));

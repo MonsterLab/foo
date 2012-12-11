@@ -78,13 +78,14 @@ class M_cms extends CI_Model{
      * get aricle or articles according to status
      * @param type $key
      * @param type $status
-     * @param type $method 
+     * @param type $method 0->getUserArticles(), 1->getArticle(), 2->getArticlesOfGroup()
      * @param type $limit
      * @param type $offset
      * @return int
      */
     public function search($key,$method,$status = 1,$limit=0,$offset = 5 ){
         $result = null;
+        
         switch ($method){
             case 0:
                 $uid = $key;
@@ -98,6 +99,7 @@ class M_cms extends CI_Model{
                 $groupid = $key;
                 $result = $this->getArticlesOfGroup($groupid, $limit, $offset, $status);
                 break;
+                
         }
         
         if($result != null && $result != 0){
@@ -113,7 +115,7 @@ class M_cms extends CI_Model{
      * @return int if the query is null ,ruturn 0 
      */
     private function getArticle($aid){		
-	$this->db->select('aid, uid, username, title, content, groupid, audit, audit_id, status, viewtimes');
+	$this->db->select('aid, uid, username, title, content, groupid, audit, audit_id, status, ctime, viewtimes');
         $this->db->where('aid',$aid);
 	$query = $this->db->get('zx_articles');
         $result = $query->result_array();
@@ -137,7 +139,7 @@ class M_cms extends CI_Model{
      * @return int
      */
     private function getUserArticles($uid,$limit,$offset, $status){
-        $this->db->select('aid, uid, username, title, groupid, audit, audit_id, status, viewtimes');
+        $this->db->select('aid, uid, username, title, groupid, audit, audit_id, status, ctime, viewtimes');
         $this->db->where('uid', $uid);
         $this->db->where('status', $status);
         $this->db->limit($offset,$limit);
@@ -164,14 +166,16 @@ class M_cms extends CI_Model{
      * @param type $status
      */
     private function getArticlesOfGroup($groupid, $limit, $offset, $status){
-        $this->db->select('aid, uid, username, title, groupid, audit, audit_id, status, viewtimes');
+        $this->db->select('aid, uid, username, title, groupid, audit, audit_id, status, ctime, viewtimes');
         $this->db->where('groupid', $groupid);
+        $this->db->where('groupid', 1);
         $this->db->where('status',$status);
-        $this->db->limit($offset,$limit);
+        if(!($limit == 'start' && $offset == 'end')){
+            $this->db->limit($offset,$limit);
+        }
         
         $query = $this->db->get('zx_articles');
         $result = $query->result_array();
-
         $numRows = $query->num_rows();
         $query->free_result();
         if($numRows > 0){

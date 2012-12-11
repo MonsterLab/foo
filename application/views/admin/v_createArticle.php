@@ -6,27 +6,41 @@
     </head>
     <body id="createArticle-body">
         <div id="createArticle">
-            <form action="" method="">
+            <form action="<?php echo base_url('admin/createArticle') ?>" method="post">
+                <?php 
+                    if(isset($flag)){
+                        echo '<p>'.$message.'</p>';
+                    }
+                    
+                    if(isset($flag) && $flag == 0){
+                        $titText = $title;
+                        $conText = $content;
+                    } else {
+                        $titText = '这里填写文章标题';
+                        $conText = '这里填写文章内容';
+                    }
+                ?>
                 <p>
                     <label for="groupid">文章分类</label>
-                    <select>
-                        <?php
-                            print_r($groups);
-//                            foreach ($groups as $group){
-//                                echo '<option'.$group->gid.'>'.$group->group_name.'</option>';
-//                            }
-                        
+                    <select name="gid">
+                        <?php 
+                            foreach ($groups as $row){
+                                if(isset($flag) && $gid == $row['gid']){
+                                    echo '<option selected="selected" value='.$row['gid'].'>'.$row['group_name'].'</option>';
+                                    continue;;
+                                }
+                                echo '<option value='.$row['gid'].'>'.$row['group_name'].'</option>';
+                            }
                         ?>
-    
                     </select>
                 </p>
                 <p>
                     <label for="title">文章标题</label>
-                    <input type="text" name="title" id ="title"value="这里填写文章标题"/>
+                    <input type="text" name="title" id ="title" value="<?php echo $titText;?>"/>
                 </p>
                 <p>
                     <label for="content">文章内容</label>
-                    <textarea rows="20" cols="80" name="content" value="这里填写文章内容"></textarea>
+                    <textarea rows="20" cols="80" name="content"><?php echo $conText;?></textarea>
                 </p>
                 <p>
                     <input type="submit" name="sub" id="sub" value="添加文章"/><input type="reset" name="reset" id="reset" value="重填"/>

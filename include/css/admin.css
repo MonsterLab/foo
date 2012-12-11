@@ -98,6 +98,11 @@ dl,ul{
     float: left;
     margin: 0 20px 0 100px;
 }
+#createArticle #title{
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+}
 #createArticle #reset{
     display: inline-block;
     width: 80px;
@@ -131,3 +136,50 @@ dl,ul{
     text-align: left;
 }
 /*manage group end*/
+
+/*manage article begin*/
+#manageArticle-body{
+    width: 100%;
+    height: 100%;
+    padding: 0 0 10px 0;
+}
+#manageArticle{
+    
+}
+#manageArticle #title{
+    background:#c1b5b5;
+}
+#manageArticle #title h2{
+    height: 25px;
+    line-height: 25px;
+    padding: 10px 0 0 30px;
+}
+#manageArticle #title ul{
+    padding: 10px 0 10px 60px;
+    font-size: 14px;
+    list-style:circle;
+}
+#manageArticle #content{
+    padding: 20px 0 0 60px;
+}
+#manageArticle #content p{
+    height: 45px;
+    line-height: 45px;
+    margin-bottom: 20px;
+}
+#manageArticle #content p select{
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    padding: 5px;
+    min-width: 160px;
+}
+
+#manageArticle #content table th{
+    text-align: left;
+    width:200px;
+}
+#manageArticle #content #pageBar{
+    padding: 20px 0 0 0;
+}
+/*manage article end*/

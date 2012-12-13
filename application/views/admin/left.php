@@ -6,7 +6,7 @@
     </head>
     <body id="menu-body">
         <div id="menu">
-            <ul>
+            <ul id="mainnav">
                 <li>
                     <dl>
                         <dt>用户管理</dt>
@@ -17,8 +17,27 @@
                 <li>
                     <dl>
                         <dt>综合信息管理</dt>
-                        <dd><a href="">栏目管理</a></dd>
-                        <dd><a href="<?php echo base_url('admin/manageArticle');?>" target="main">文章管理</a></dd>
+                        <dd>
+                            <a href="">栏目管理</a>
+                            <ul>
+                                <li><a href="<?php echo base_url('admin/createGroup');?>">添加栏目</a></li>
+                                <li><a href="<?php echo base_url('admin/manageGroup');?>">管理栏目</a></li>
+                            </ul>
+                        </dd>
+                        <dd>
+                            <a href="" target="main">文章管理</a>
+                            <ul>
+                                <li><a href="<?php echo base_url('admin/createArticle');?>">添加文章</a></li>
+                                <li><a href="<?php echo base_url('admin/manageArticle');?>">管理文章</a></li>
+                            </ul>
+                        </dd>
+                        <dd>
+                            <a href="" target="main">用户空间管理</a>
+                            <ul>
+                                <li><a href="">添加空间文章</a></li>
+                                <li><a href="">管理空间文章</a></li>
+                            </ul>
+                        </dd>
                     </dl>
                 </li>
                 <li>

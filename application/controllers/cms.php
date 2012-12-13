@@ -14,6 +14,7 @@ class Cms extends CI_Controller{
     }
     
     public function showList(){
+        
         $this->load->view('cms/showList');
     }
     

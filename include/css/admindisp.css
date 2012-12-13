@@ -92,15 +92,15 @@ dl,ul{
     width: 100%;
     height: 100%;
     background:#bec5c4;
-    padding: 0 20px;
+    padding: 0 5px;
 }
 #menu{
     padding: 20px 0;
 }
-#menu ul li dl dd{
-    padding: 5px 0 0 50px;
+#menu ul#mainnav li dl dd{
+    padding: 5px 0 0 20px;
 }
-#menu ul li dl dt{
+#menu ul#mainnav li dl dt{
     padding: 10px 0;
 }
 /*menu end*/

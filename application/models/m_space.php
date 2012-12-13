@@ -1,7 +1,7 @@
 <?php
 /**
  * 	
-    + create()                  --create article
+    + createS()                  --create article
 
     + search()                  --search article or articles of user or articles of a group
 
@@ -41,18 +41,17 @@ class M_space extends CI_Model{
     }
     
     /**
-     * the article model of cms begin
+     * the space model of cms begin
      * 
      */
     
     /**
      * 
-     * @param type $aid
-     * @param type $uid
-     * @param type $username
-     * @param type $title
-     * @param type $content
-     * @param type $groupid
+     * @param type $space_uid
+     * @param type $space_username
+     * @param type $space_title
+     * @param type $space_content
+     * @param type $space_groupid
      * @return int  1: insert article successful 0: insert fail
      */
     public function createS($space_uid , $space_username  , $space_title ,$space_content, $space_groupid){   
@@ -102,7 +101,7 @@ class M_space extends CI_Model{
         if($result != null && $result != 0){
             return $result;
         } else {
-            return 0;
+            return array();
         }
     }
 

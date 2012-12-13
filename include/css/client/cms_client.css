@@ -1,0 +1,137 @@
+/*
+this css is for cms clent
+*/
+*{
+    margin: 0;
+    padding: 0;
+}
+img{
+    border: none;
+}
+a{
+    text-decoration: none;
+}
+a:hover{
+    text-decoration: underline;
+}
+ul, ol{
+    list-style: none;
+}
+
+#line_10{
+    width: 100%;
+    height: 10px;
+    clear: both;
+}
+#header{
+    width: 1000px;
+    margin: 0 auto;
+}
+#header h1{
+    background:#decde0;
+    padding: 20px 50px;
+}
+
+#header ul{
+    padding: 20px  0 20px 60px;
+    background:#d9dfef;
+    margin: 0 0 10px 0;
+}
+
+#header ul li{
+    display: inline;
+}
+/*show article list begin*/
+
+
+
+#content{
+    width: 1000px;
+    margin: 0 auto;
+    clear: both
+}
+#infoList{
+    width: 698px;
+    min-height: 528px;
+    float: left;
+    border:1px solid #ccc;
+}
+
+#infoList h3{
+    height: 30px;
+    line-height: 30px;
+    padding: 0 0 0 10px;
+    font-size: 16px;
+    font-weight: normal;
+}
+
+#infoList ul{
+    min-height: 460px;
+    padding: 40px 20px 20px 50px;
+    list-style:disc;
+    background:#d9dfef;
+}
+#column1,#column2, #column3{
+    width: 290px;
+    height: 170px;
+    float: right;
+    margin: 0 0 10px 0;
+}
+
+#infoList ul li{
+    height: 15px;
+    line-height: 18px;
+    margin: 5px 0 0 0;
+    border-bottom: 1px solid #ccc;
+}
+
+#column1{
+    background: green;
+}
+#column2{
+    background: red;
+}
+#column3{
+    background: pink;
+    margin: 0;
+}
+
+#footer{
+    clear: both;
+    width: 1000px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    margin: 0 auto;
+    background: #ccc;
+}
+/*show article list end*/
+
+
+/*article begin
+    some style is shared with show aritcle list
+*/
+#article{
+    min-height: 440px;
+    padding: 30px;
+    background:#d9dfef;
+}
+
+/*article end*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

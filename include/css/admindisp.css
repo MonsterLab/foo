@@ -1,0 +1,106 @@
+/* 
+    Document   : admin.css
+    Created on : 2012-12-6, 15:42:54
+    Author     : zhang
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+img{
+    border: none;
+}
+a{
+    text-decoration: none;
+}
+a:hover{
+    text-decoration: underline;
+}
+dl,ul{
+    list-style: none;
+}
+
+#iftop{
+    width: 100%;
+    height: 100px;
+}
+
+#ifleft{
+    width: 18%;
+    height:530px;
+    float: left;
+    border: none;
+}
+
+#ifmain{
+    width: 81.5%;
+    height: 530px;
+    float: right;
+    border: none;
+    border-left: solid 2px #ccc;
+}
+
+#iffoot{
+    width: 100%;
+    height: 30px;
+    clear: both;
+}
+#footer{
+    height: 100%;
+    line-height: 30px;
+    font-size: 14px;
+    padding: 0 0 0 20px;
+}
+/*top begin*/
+#header-body{
+    background: #6294d6;
+}
+
+#header-l{
+    width: 50%;
+    height: 100%;
+    float: left;
+    line-height: 80px;
+    text-align: left;
+    padding: 0 0 0 10px;
+    font-size: 25px;
+}
+
+#header-r{
+    width: 30%;
+    height: 100%;
+    float: right;
+}
+#header-r a{
+    display: block;
+    width: 100%;
+    height: 50%;
+    float: right;
+    line-height: 40px;
+    padding: 0 40px 0 0;    
+    text-align: right;
+}
+/*top end*/
+
+
+/*menu begin*/
+#menu-body{
+    width: 100%;
+    height: 100%;
+    background:#bec5c4;
+    padding: 0 20px;
+}
+#menu{
+    padding: 20px 0;
+}
+#menu ul li dl dd{
+    padding: 5px 0 0 50px;
+}
+#menu ul li dl dt{
+    padding: 10px 0;
+}
+/*menu end*/

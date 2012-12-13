@@ -26,6 +26,7 @@ class Admin extends CI_Controller{
         if($power < 1){
             redirect(base_url("admin/login/"));
         }  else {
+            //$this->load->view('admin/index');
             $this->load->view('admin/index');
         }
     }
@@ -89,6 +90,21 @@ class Admin extends CI_Controller{
     
     public function left(){
         $this->load->view('admin/left');
+        return;
+    }
+    
+    public function top(){
+        $this->load->view('admin/top');
+        return;
+    }
+
+    public function main(){
+        $this->load->view('admin/main');
+        return;
+    }
+
+    public function bottom(){
+        $this->load->view('admin/footer');
         return;
     }
     

@@ -516,7 +516,6 @@ class Admin extends CI_Controller{
         $groupsHtml .= '<tr>
                             <th>文章栏目</th><th>上级分组</th><th colspan="2">操作</th>
                         </tr>';
-        print_r($groups);
         if($groups){
             foreach ($groups as $groupfather)
                 foreach ($groups as $groupChild){

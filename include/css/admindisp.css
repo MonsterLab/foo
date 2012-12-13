@@ -95,12 +95,15 @@ dl,ul{
     padding: 0 5px;
 }
 #menu{
-    padding: 20px 0;
+    padding: 10px 0;
 }
 #menu ul#mainnav li dl dd{
     padding: 5px 0 0 20px;
 }
 #menu ul#mainnav li dl dt{
     padding: 10px 0;
+}
+#menu ul#mainnav li dd ul{
+    padding: 5px 0 5px 20px;
 }
 /*menu end*/

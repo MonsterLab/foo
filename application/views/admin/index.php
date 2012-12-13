@@ -6,7 +6,7 @@
     </head>
     <body>
         <iframe src="<?php echo base_url('admin/top')?>" name="top" id="iftop" scrolling="NO" noresize ></iframe>
-        <iframe src="<?php echo base_url('admin/left')?>" name="left" id="ifleft" scrolling="NO" noresize></iframe>
+        <iframe src="<?php echo base_url('admin/left')?>" name="left" id="ifleft" scrolling="auto" noresize></iframe>
         <iframe src="<?php echo base_url('admin/main')?>" id="ifmain" name="main" scrolling="yes"></iframe>
         <iframe src="<?php echo base_url('admin/bottom');?>" id="iffoot" name="footer" scrolling="NO" noresize ></iframe>
     </body>

@@ -55,6 +55,131 @@ class Admin extends CI_Controller{
         redirect(base_url('admin/login/'));
     }
     
+    public function left(){
+        $this->load->view('admin/left');
+        return;
+    }
+    /**--------------------------------CRM管理-------------------------------------**/
+    /**
+     * 增加客户基本信息
+     */
+    public function createUserBase(){
+        if($_POST){
+            $fooZxcode = trim($this->input->post('zxcode'));
+            $fooSqcode = trim($this->input->post('sqcode'));
+            $fooUsername = trim($this->input->post('username'));
+            $fooPassword = trim($this->input->post('password'));
+            $fooTruename = trim($this->input->post('truename'));
+            $fooPosition = trim($this->input->post('position'));
+            $fooPhone = trim($this->input->post('phone'));
+            $fooEmail = trim($this->input->post('email'));
+            $fooType = trim($this->input->post('type'));
+            
+            if($fooZxcode == NULL || $fooSqcode == NULL || $fooUsername == NULL 
+                    || $fooPassword == NULL || $fooTruename == NULL || $fooPosition == NULL
+                    || $fooPhone == NULL || $fooEmail == NULL || $fooType == NULL){
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createUserBase',$data);
+                return;
+            }
+            //TODO:cuid
+            $fooResult = $this->userbase->create(1,$fooZxcode,$fooSqcode,$fooUsername,$fooPassword,$fooTruename,$fooPosition,$fooPhone,$fooEmail,$fooType);
+            if($fooResult == -1){
+                $data['flag'] = '用户登录名已存在！';
+            }elseif ($fooResult == 0) {
+                $data['flag'] = '添加失败！';
+            }elseif ($fooResult == 1) {
+                $data['flag'] = '添加成功!';
+            }
+            
+            $this->load->view('admin/v_createUserBase',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_createUserBase',$data);
+        }
+        
+    }
+
+    /**
+     * 添加征信基本信息
+     */
+    public function createCertBase(){
+        //TODO:判断类型topic medium talent
+        $data['industrys'] = $this->zxpool->searchIndustry('topic');
+        
+        if($_POST){
+            $fooIndustryId = $this->input->post('industry');
+            $fooComname = trim($this->input->post('com_name'));
+            $fooComnature = trim($this->input->post('com_nature'));
+            $fooComphone = trim($this->input->post('com_phone'));
+            $fooZipcode = trim($this->input->post('zipcode'));
+            $fooComplace = trim($this->input->post('com_place'));
+            $fooCertBegin = trim($this->input->post('cert_begin'));          //将$fooCertBegin，$fooCertEnd转换为时间戳
+            $fooCertEnd = trim($this->input->post('cert_end'));
+            
+            if($fooIndustryId == NULL || $fooComname == NULL || $fooComnature == NULL 
+                    || $fooComphone == NULL || $fooZipcode == NULL || $fooComplace == NULL
+                    || $fooCertBegin == NULL || $fooCertEnd == NULL){
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createCertBase',$data);
+                return;
+            }
+            //TODO:cuid ， uid
+            //TODO:判断类型topic medium talent
+            $fooResult = $this->topic->createCertBase(1,1,$fooComname,$fooComnature,$fooComphone,$fooZipcode,$fooComplace,$fooIndustryId,$fooCertBegin,$fooCertEnd);
+            if($fooResult){
+                $data['flag'] = '添加成功！';
+            }  else {
+                $data['flag'] = '添加失败!';
+            }
+            
+            $this->load->view('admin/v_createCertBase',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_createCertBase',$data);
+        }
+    }
+
+    public function searchUsers(){
+        $fooUserBase = $this->userbase->search();
+        if($fooUserBase){
+            echo "<pre>";
+            print_r($fooUserBase);
+            echo '</pre>';
+        }
+    }
+
+
+    /**
+     * 上传扫描文件
+     */
+    public function addCertFile(){
+        $data['fileTypes'] = $this->zxpool->searchFileType('topic');             //此处topic测试用,可自行修改
+        
+        if($_POST){
+            $fooFilename = trim($this->input->post('filename'));
+            $fooFile = $this->uploadpic('file');
+            
+            $fooResult = $this->topic->addCertFile(1,1,$fooFilename,$fooFile);
+            if($fooResult == -1){
+                $data['flag'] = '已经上传该类型证书！';
+            } elseif ($fooResult == 0){
+                $data['flag'] = '上传失败！';
+            } elseif ($fooResult == 1){
+                $data['flag'] = '上传成功！';
+            }
+            
+            $this->load->view('admin/v_addCertFile',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_addCertFile',$data);
+        }
+    }
+
+
     /**
      * 批量导入征信编码
      */
@@ -66,7 +191,14 @@ class Admin extends CI_Controller{
                 $resourse = file($tmp_name);                      
                 //按行遍历数据
                 foreach($resourse as $data){                                    
-                    $codeArray[] = str_replace("\n",'', $data);                //将数据中\n去除
+                    //TODO:windows下边换行符是"\r\n"，记得换
+                    $fooData = str_replace("\n",'', $data);
+                    if(!preg_match("/^[0-9a-z]+$/",$fooData)){
+                        //TODO:数据中含有非数字字母
+                        return;
+                    }
+                    
+                    $codeArray[] = $fooData;
                 }
                 //数据不为空则导入数据库
                 if(!empty($codeArray)){
@@ -85,12 +217,60 @@ class Admin extends CI_Controller{
                 
             }
             
-        }# end of post  
+        } else {
+            
+            $this->load->view('fei_test/v_importCode.php');
+        }    
     }
     
-    public function left(){
-        $this->load->view('admin/left');
-        return;
+    /**
+     * 上传方法
+     * @return string
+     */
+    private function uploadpic($file){
+        if(!empty($_FILES[$file]['name'])){
+             $uploaddir="include/images/";                                  //文件存储路径
+             $endname = substr(strrchr($_FILES[$file]['name'],'.'),1);       //截取上传图片的后缀名
+
+             $type=array("jpg","gif","bmp","jpeg","png");                         //图片类型数组  
+
+             //判断是否为以上类型
+             if(!in_array(strtolower($endname),$type)){                           //strtolower()转化为小写，         
+
+                 $text = implode("/", $type);                                     //$text = "jpg/gif/bmp/jpeg/png";
+
+                 $data['flag'] = '你只能上传以下类型的文件: '.$text.'！';
+                 $this->load->view('admin/v_addCertFile',$data);
+
+             }else{                                                               //是图片将给图片重命名
+
+                 $filename = explode(".", $_FILES[$file]['name']);           //将文件名以"."号为准，做一个数组
+
+                 $time = date("Y-m-d-H-i-s");                                       //当前上传时间
+
+                 $filename[0] = $time."_".rand(0, 9999);                           //将日期加文件名作为新文件名
+
+                 $newName = implode(".", $filename);                             //修改后的文件名
+
+                 $uploadfile_dir = $uploaddir.$newName;                          //文件保存路径
+
+
+                 if(move_uploaded_file($_FILES[$file]['tmp_name'],$uploadfile_dir)){
+                     chmod($uploadfile_dir, 0777);
+                     return $newName;
+
+                  }else{
+
+                     $data['flag'] = '文件上传失败!';
+                     $this->load->view('admin/v_addCertFile',$data);
+                 }
+            }
+        }  else {
+
+            $data['flag'] = '请上传文件!';
+            $this->load->view('admin/v_addCertFile',$data);
+        }
+
     }
     
     public function top(){
@@ -235,6 +415,11 @@ class Admin extends CI_Controller{
             $this->manageArticle();
         }
     }
+    
+    
+    
+    
+    
     
     /**
      * this method is used for creating a group of article

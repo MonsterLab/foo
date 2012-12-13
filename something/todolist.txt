@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 Model_user_base
 -数据库无type字段
 -search不返回type
 -search方法sql有问题，无power字段
+
+2012-12-11 fei：
+将zx_user_base中的space_id添加默认值为0
+=======
+Controller search
+    未成功加载视图，需要填充数据后修正
+
+>>>>>>> a280863e4b1fce5553b56c2c7f40dd1e555d11d0

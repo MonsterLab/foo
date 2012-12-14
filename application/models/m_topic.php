@@ -143,7 +143,9 @@ class M_topic extends CI_Model{
        $this->db->select('id,uid,com_name,com_nature,com_phone,industry_id,zipcode,com_place,cert_begin,cert_end,audit,audit_id,cuid,ctime');
        $dbResult = $this->db->get('zx_topic_cert_base');
        if($dbResult->num_rows() > 0){
-           $result = $dbResult->row_array();
+           foreach ($dbResult->result_array() as $row){
+                $result[] = $row;
+            }
            
            $dbResult->free_result();
            
@@ -428,7 +430,7 @@ class M_topic extends CI_Model{
     */
    public function auditCertBase($audit_id,$base_id,$isPass = 0){
        //1、根据审核情况作出处理,2、检查传入审核情况参数值是否正确
-       if($isPass == 0){                                    //未通过审核
+       if($isPass == -1){                                    //未通过审核
            $sqlQuery = array(
                 'audit_id'=>$audit_id,
                 'audit'=>$isPass,
@@ -468,7 +470,7 @@ class M_topic extends CI_Model{
     */
    public function auditCertFile($audit_id,$base_id,$isPass = 0){
        //1、根据审核情况作出处理,2、检查传入审核情况参数值是否正确
-       if($isPass == 0){                                    //未通过审核
+       if($isPass == -1){                                    //未通过审核
            $sqlQuery = array(
                 'audit_id'=>$audit_id,
                 'audit'=>$isPass,
@@ -508,7 +510,7 @@ class M_topic extends CI_Model{
     */
    public function auditCertContent($audit_id,$base_id,$isPass = 0){
        //1、根据审核情况作出处理,2、检查传入审核情况参数值是否正确
-       if($isPass == 0){                                    //未通过审核
+       if($isPass == -1){                                    //未通过审核
            $sqlQuery = array(
                 'audit_id'=>$audit_id,
                 'audit'=>$isPass,

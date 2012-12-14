@@ -257,7 +257,25 @@ class M_admin extends CI_Model{
            return FALSE;
        }
    }
-
+   
+   /**
+    * 获得管理员id
+    * @return boolean
+    */
+   public function getUID(){
+       if(isset($_SESSION['admin'])){
+           if(empty($_SESSION['admin']['id'])){
+               
+               return FALSE;
+           }  else {
+               
+               return $_SESSION['admin']['id'];
+           }          
+       }  else {       
+           
+           return FALSE;
+       }
+   }
 
    
 }

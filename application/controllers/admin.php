@@ -7,7 +7,7 @@ class Admin extends CI_Controller{
     public function __construct() {
         parent::__construct();
         
-        $this->load->helper('url');
+        $this->load->helper(array('url','form','html'));
         
         $this->load->model('M_admin','admin');
         $this->load->model('M_user_base','userbase');
@@ -142,26 +142,23 @@ class Admin extends CI_Controller{
         }
     }
 
-    public function searchUsers(){
-        $fooUserBase = $this->userbase->search();
-        if($fooUserBase){
-            echo "<pre>";
-            print_r($fooUserBase);
-            echo '</pre>';
-        }
-    }
-
-
     /**
      * 上传扫描文件
      */
     public function addCertFile(){
-        $data['fileTypes'] = $this->zxpool->searchFileType('topic');             //此处topic测试用,可自行修改
+        //TODO:
+        $data['fileTypes'] = $this->zxpool->searchFileType('topic');             //TODO:此处topic测试用,可自行修改
         
         if($_POST){
             $fooFilename = trim($this->input->post('filename'));
             $fooFile = $this->uploadpic('file');
             
+            if($fooFilename == null){
+                $data['flag'] = "请完善信息！";
+                $this->load->view('admin/v_addCertFile',$data);
+                return;
+            }
+            //TODO:
             $fooResult = $this->topic->addCertFile(1,1,$fooFilename,$fooFile);
             if($fooResult == -1){
                 $data['flag'] = '已经上传该类型证书！';
@@ -178,8 +175,253 @@ class Admin extends CI_Controller{
             $this->load->view('admin/v_addCertFile',$data);
         }
     }
+    
+    /**
+     * 添加认证文字信息
+     * 
+     */
+    public function addCertContent(){
+        if($_POST){
+            $fooTitle = trim($this->input->post('title'));
+            $fooContent = $this->input->post('content');
+            
+            if($fooTitle == NULL || $fooContent == NULL){
+                $data['flag'] = "请完善信息！";
+                $this->load->view('admin/v_addCertContent',$data);
+                return;
+            }
+            
+            $fooResult = $this->topic->addCertContent(1,1,$fooTitle,$fooContent);
+            if($fooResult == -1){
+                $data['flag'] = '已经存在此标题认证内容！';
+            } elseif ($fooResult == 0){
+                $data['flag'] = '提交失败！';
+            } elseif ($fooResult == 1){
+                $data['flag'] = '提交成功！';
+            }
+            
+            $this->load->view('admin/v_addCertContent',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_addCertContent',$data);
+        }
+    }
+
+    /**
+     * 审核信息
+     * @param type $uid                 客户id
+     * @param type $type                客户征信库类型
+     * @param type $tableType           所审核表类别
+     * @param type $tid                 所审核表id
+     * @param type $isPass              审核情况，-1未通过，1通过
+     */
+    public function audit($uid = 1,$type = 'topic',$tableType = '',$tid = 0,$isPass = 0){
+        //以下为根据审核情况对表审核
+        if($isPass == -1 || $isPass == 1){
+           $audit_id = $this->admin->getUID();                                  //获得审核人id
+           //对客户基本表审核
+           if($tableType == 'userbase'){
+               $fooResult = $this->userbase->auditUserBase($audit_id,$tid,$isPass);
+           }
+           //根据征信库类型分别对客户征信基本信息、征信扫描件信息、征信文字类信息进行审核
+           if($type == 'topic'){
+               if($tableType == 'certbase'){
+                    $fooResult = $this->topic->auditCertBase($audit_id,$tid,$isPass);
+                }elseif ($tableType == 'certfile') {
+                    $fooResult = $this->topic->auditCertFile($audit_id,$tid,$isPass);
+                }elseif ($tableType == 'certcontent') {
+                    $fooResult = $this->topic->auditCertContent($audit_id,$tid,$isPass);
+                }
+           }
+           if($type == 'medium'){
+               if($tableType == 'certbase'){
+                    $fooResult = $this->medium->auditCertBase($audit_id,$tid,$isPass);
+                }elseif ($tableType == 'certfile') {
+                    $fooResult = $this->medium->auditCertFile($audit_id,$tid,$isPass);
+                }elseif ($tableType == 'certcontent') {
+                    $fooResult = $this->medium->auditCertContent($audit_id,$tid,$isPass);
+                }
+           }
+           if($type == 'talent'){
+               if($tableType == 'certbase'){
+                    $fooResult = $this->talent->auditCertBase($audit_id,$tid,$isPass);
+                }elseif ($tableType == 'certfile') {
+                    $fooResult = $this->talent->auditCertFile($audit_id,$tid,$isPass);
+                }elseif ($tableType == 'certcontent') {
+                    $fooResult = $this->talent->auditCertContent($audit_id,$tid,$isPass);
+                }
+           }
+           
+           if(!$fooResult){
+               
+           }
+        }
+        //以下为 显示审核信息
+        $fooUserBases = $this->userbase->search($uid,3);                    //按id搜索,获得客户基本信息
+        
+        if($type == 'topic'){
+            $fooCertBases = $this->topic->searchCertBase($uid);             //获得认证基本信息
+            $fooCertFiles = $this->topic->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertContent = $this->topic->searchCertContent($uid);        //获得认证文字类信息
+        }
+        if($type == 'medium'){
+            $fooCertBases = $this->medium->searchCertBase($uid);
+            $fooCertFiles = $this->medium->searchCertFile($uid);
+            $fooCertContent = $this->medium->searchCertContent($uid);
+        }
+        if($type == 'talent'){
+            $fooCertBases = $this->talent->searchCertBase($uid);
+            $fooCertFiles = $this->talent->searchCertFile($uid);
+            $fooCertContent = $this->talent->searchCertContent($uid);
+        }
+        
+        $data['userBases'] = $fooUserBases;
+        $data['certBases'] = $fooCertBases;
+        $data['certFiles'] = $fooCertFiles;
+        $data['certContents'] = $fooCertContent;
+        
+        $data['uid'] = $uid;
+        $data['type'] = $type;
+        
+        $this->load->view('admin/v_audit',$data);
+    }
+    
+    /**
+     * 审核时显示征信扫描件信息、征信文字类信息
+     * 以下参数为审核时必须的，故传进来
+     * @param type $uid
+     * @param type $type
+     * @param type $tableType
+     * @param type $tid
+     */
+    public function showFileOrContent($uid,$type,$tableType,$tid){
+        $data['uid'] = $uid;
+        $data['type'] = $type;
+        $data['tableType'] = $tableType;
+        $data['tid'] = $tid;
+        
+        if($tableType == 'certfile'){
+            $data['fileName'] = $this->input->post('fileName');
+            $this->load->view('admin/v_showFile',$data);
+        }elseif ($tableType == 'certcontent') {
+            $data['title'] = $this->input->post('title');
+            $data['content'] = $this->input->post('content');
+            $this->load->view('admin/v_showContent',$data);
+        }
+        
+    }
+
+    /**
+     * 查询并显示客户
+     * @return type
+     */
+    public function searchUsers(){
+        $data['flag'] = '';
+        
+        if($_GET){
+            $fooTypeArray = array('topic','medium','talent');
+            if( !isset($_GET['type']) || !in_array($_GET['type'],$fooTypeArray)){
+                $data['flag'] = '参数错误！';
+                $this->load->view('admin/v_searchUsers');
+                return;
+            }
+            
+            $fooType = $_GET['type'];
+            $fooUserBase = $this->userbase->search($fooType,2);                     //按类库查询
+            
+            if($fooUserBase){
+                $data['userBases'] = $fooUserBase;
+            }  else {
+                $data['flag'] = '没有数据！';
+            }
+
+            //将类型传入视图
+            $data['type'] = $fooType;
+            $this->load->view('admin/v_searchUsers',$data);
+        }
+        
+        if($_POST){
+            $fooZxcode = trim($this->input->post('keySearch'));
+            $fooType = $this->input->post('type');
+            if($fooZxcode != NULL){
+                $fooUserBase = $this->userbase->search($fooZxcode,1);               //按征信编码查询
+            }  else {
+                $fooUserBase = $this->userbase->search($fooType,2);                 //按类库查询
+            }
+            
+            if($fooUserBase){
+                $fooUserBases = $this->forSearchUsers($fooType, $fooUserBase);
+                $data['userBases'] = $fooUserBases;
+            }  else {
+                $data['flag'] = '没有数据！';
+            }
+
+            //将类型传入视图
+            $data['type'] = $fooType;
+            $this->load->view('admin/v_searchUsers',$data);
+        }  else {
+            //TODO:测试用,测试时此处先当于上边$_GET处的功能
+            $fooType = 'topic';
+            
+            $fooUserBase = $this->userbase->search($fooType,2);                 //按类库查询
+            if($fooUserBase){
+                $fooUserBases = $this->forSearchUsers($fooType, $fooUserBase);
+                $data['userBases'] = $fooUserBases;
+                
+            }  else {
+                $data['flag'] = '没有数据！';
+            }
+
+            //将类型传入视图
+            $data['type'] = $fooType;
+            $this->load->view('admin/v_searchUsers',$data);
+        }
+        
+        
+        
+        
+    }
+
+    /**
+     * 将公司名加入数组中
+     * 完全是为查询客户服务，
+     * @param type $_type
+     * @param type $_userBases
+     * @return type
+     */
+    private function forSearchUsers($_type,$_userBases){
+        //查询公司名
+        if($_type == 'topic'){
+            foreach ($_userBases as $userBase){
+                $fooUID = $userBase['id'];
+                $fooCertBase = $this->topic->searchCertBase($fooUID);
+                $userBase['com_name'] = $fooCertBase[0]['com_name'];
+                $fooUserBases[] = $userBase;
+            }
+
+        } elseif ($_type == 'medium'){
+            foreach ($_userBases as $userBase){
+                $fooUID = $userBase['id'];
+                $fooCertBase = $this->medium->searchCertBase($fooUID);
+                $userBase['com_name'] = $fooCertBase[0]['com_name'];
+                $fooUserBases[] = $userBase;
+            }
+
+        } elseif ($_type == 'talent'){
+            foreach ($_userBases as $userBase){
+                $fooUID = $userBase['id'];
+                $fooCertBase = $this->talent->searchCertBase($fooUID);
+                $userBase['com_name'] = $fooCertBase[0]['com_name'];
+                $fooUserBases[] = $userBase;
+            }
+        }
+        
+        return $fooUserBases;
+    }
 
 
+    
     /**
      * 批量导入征信编码
      */

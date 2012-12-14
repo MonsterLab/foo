@@ -1,0 +1,78 @@
+*{
+	list-style:none;
+	color: #000000;
+	text-decoration: none;
+}
+body{
+	padding: 0;
+	margin: 0;
+}
+ul{
+	margin: 0;
+	padding: 0;
+}
+#main{
+	width: 970px;
+	height: 613px;
+	margin: 0 auto;
+}
+/*----------  top
+		
+---------------------  */
+#top{
+	height: 526px;
+	background: url("../../images/top.gif") no-repeat left center;
+}
+#top .form{
+	padding-top: 230px;
+	padding-left: 550px;
+}
+#top .minP label{
+	color: #FF0000; 
+	font-weight: bold ;
+}
+. minP{
+	height: 26px;
+	line-height: 26px;
+}
+#form label, #form span{
+	float:left;
+}
+#top .minP .button{
+	width: 52px;
+	height: 26px;
+	background: red url("../../images/button.gif") no-repeat left center;
+	border: none;
+}
+
+/*----------  bottom
+		
+---------------------  */
+#bottom{
+	height: 87px;
+	background:url("../../images/bottom.gif") no-repeat;	
+}
+#bottom  ul{
+	width: 885px;
+	height: 25px;
+	margin-left: 40px;
+	background: #AEB5BD;
+	border: 1px solid #000;
+}
+#bottom ul li{
+	float: left;
+	width: 72px;
+	font-size:14px;
+	line-height: 25px;
+	font-weight: bold;
+}
+#bottom ul .first{
+	margin-left: 60px;
+}
+#bottom ul .returnI{
+	margin-left: 30px;
+	width: 102px;
+}
+#bottom ul .returnI a{
+	color:#000099;
+}

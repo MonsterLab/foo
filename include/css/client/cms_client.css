@@ -55,6 +55,8 @@ ul, ol{
     min-height: 528px;
     float: left;
     border:1px solid #ccc;
+    position: relative;
+    background:#d9dfef;
 }
 
 #infoList h3{
@@ -63,26 +65,39 @@ ul, ol{
     padding: 0 0 0 10px;
     font-size: 16px;
     font-weight: normal;
+    background: #fff;
 }
 
 #infoList ul{
-    min-height: 460px;
+    min-height: 390px;
     padding: 40px 20px 20px 50px;
     list-style:disc;
-    background:#d9dfef;
 }
 #column1,#column2, #column3{
     width: 290px;
     height: 170px;
     float: right;
+}
+#column1,#column2{
     margin: 0 0 10px 0;
 }
-
 #infoList ul li{
     height: 15px;
     line-height: 18px;
-    margin: 5px 0 0 0;
+    margin: 10px 0 0 0;
     border-bottom: 1px solid #ccc;
+}
+
+#infoList ul li span{
+    display: inline-block;
+    float: right;
+    color: #000;
+    font-size: 14px;
+}
+
+#infoList #pageBar{
+    position: absolute;
+    bottom: 20px;
 }
 
 #column1{
@@ -117,6 +132,21 @@ ul, ol{
     background:#d9dfef;
 }
 
+#article h3{
+    text-align: center;
+    padding: 0 0 10px 0;
+    font-size: 18px;
+    background: #d9dfef;
+}
+
+#article p{
+    text-align: center;
+    font-size: 14px;
+}
+
+#article #arContent{
+    padding: 10px;
+}
 /*article end*/
 
 /*cms index begin*/

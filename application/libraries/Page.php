@@ -132,7 +132,7 @@ class Page{
         $result .= '<a style="'.$this->lastStyle.'" href="'.$base_url.'?page='.$this->last.'">上一页</a>  ';
         $result .= '<a style="'.$this->nextStyle.'" href="'.$base_url.'?page='.$this->next.'">下一页</a>  ';
         $result .= '<a href="'.$base_url.'?page='.$this->totalPages.'">最后一页</a>  ';
-        $result .= '<input type="text" name="page" size="1"/>';
+        $result .= '<input type="text" name="page" style="display:inline-block; width:50px;"/>';
         $result .= '<input type="submit" name="sub" value="GO"/>';
         $result .= '</form>';
         $result .= '</div>';

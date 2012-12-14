@@ -21,65 +21,11 @@
         </div>
         <div id="content">
             <div id="infoList">
-                <h3>首页 &gt;&gt; 教育资讯</h3>
-                <ul>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li> 
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li> 
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li>
-                    <li><a href="">dfdfdfdffffwfdewfsefs</a></li> 
-                    
-                        
-                </ul>
+                <h3><?php echo $guide;?></h3>
+                <?php 
+                    echo $articlesHtml;
+                    echo $pageBar;
+                ?>
             </div>
             <div id="column1">
                 sdfs

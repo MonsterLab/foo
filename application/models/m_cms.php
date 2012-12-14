@@ -167,8 +167,11 @@ class M_cms extends CI_Model{
      */
     private function getArticlesOfGroup($groupid, $limit, $offset, $status){
         $this->db->select('aid, uid, username, title, groupid, audit, audit_id, status, ctime, viewtimes');
-        $this->db->where('groupid', $groupid);
-        $this->db->where('groupid', 1);
+        if(is_array($groupid)){
+            $this->db->where_in('groupid', $groupid);
+        } else {
+            $this->db->where('groupid', $groupid);
+        }
         $this->db->where('status',$status);
         if(!($limit == 'start' && $offset == 'end')){
             $this->db->limit($offset,$limit);
@@ -187,6 +190,7 @@ class M_cms extends CI_Model{
 	} 
         
     }
+    
     
     /**
      * update particular article by aid ,but the metheod only can be used by supper user
@@ -384,6 +388,52 @@ class M_cms extends CI_Model{
 	    return array();
 	} 
         
+    }
+    
+    /**
+     * this method is used for getting a group info by it's gid
+     * @param type $gid
+     * @param type $status
+     * @return type
+     */
+    public function getGroupByGid($gid, $status = 1){
+        $this->db->select("gid, group_url, group_name, groupfather_id");
+        $this->db->where('status',$status);
+        $this->db->where('gid', $gid);
+        $query = $this->db->get('zx_article_groups');
+        
+        $numRows = $query->num_rows();
+        $result = $query->result_array();
+        $query->free_result();
+        if($numRows > 0){
+            return $result;
+	} else {
+	    
+	    return array();
+	} 
+    }
+    
+    /**
+     * this method is used for get the child groups by groupfahter_id
+     * @param type $groupfather_id
+     * @param type $status
+     * @return type
+     */
+    public function getGroupByGroupfather($groupfather_id, $status = 1){
+        $this->db->select("gid, group_url, group_name, groupfather_id");
+        $this->db->where('status',$status);
+        $this->db->where('groupfather_id', $groupfather_id);
+        $query = $this->db->get('zx_article_groups');
+        
+        $numRows = $query->num_rows();
+        $result = $query->result_array();
+        $query->free_result();
+        if($numRows > 0){
+            return $result;
+	} else {
+	    
+	    return array();
+	}
     }
 
     /**

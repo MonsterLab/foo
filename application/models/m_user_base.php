@@ -216,7 +216,7 @@ class M_user_base extends CI_Model{
     */
    public function auditUserBase($audit_id,$base_id,$isPass = 0){
        //1、根据审核情况作出处理,2、检查传入审核情况参数值是否正确
-       if($isPass == 0){                                    //未通过审核
+       if($isPass == -1){                                    //未通过审核
            $sqlQuery = array(
                 'audit_id'=>$audit_id,
                 'audit'=>$isPass,

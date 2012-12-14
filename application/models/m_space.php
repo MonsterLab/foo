@@ -7,7 +7,7 @@
 
     - getArticle()		--get a article by aid
 
-    - getUserAricles()   	--get articles of a user
+    - getUserSAricles()   	--get articles of a user
 
     - getAriclesOfGroup()	--get articles of a group
 
@@ -375,7 +375,7 @@ class M_space extends CI_Model{
             return $result;
 	} else {
 	    
-	    return 0;
+	    return array();
 	} 
         
     }

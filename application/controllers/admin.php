@@ -26,6 +26,7 @@ class Admin extends CI_Controller{
         if($power < 1){
             redirect(base_url("admin/login/"));
         }  else {
+            //$this->load->view('admin/index');
             $this->load->view('admin/index');
         }
     }
@@ -514,6 +515,20 @@ class Admin extends CI_Controller{
 
     }
     
+    public function top(){
+        $this->load->view('admin/top');
+        return;
+    }
+
+    public function main(){
+        $this->load->view('admin/main');
+        return;
+    }
+
+    public function bottom(){
+        $this->load->view('admin/footer');
+        return;
+    }
     
 //**************************CMS操作**********************************************
     /**
@@ -743,7 +758,6 @@ class Admin extends CI_Controller{
         $groupsHtml .= '<tr>
                             <th>文章栏目</th><th>上级分组</th><th colspan="2">操作</th>
                         </tr>';
-        print_r($groups);
         if($groups){
             foreach ($groups as $groupfather)
                 foreach ($groups as $groupChild){

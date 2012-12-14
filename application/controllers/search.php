@@ -104,6 +104,7 @@ class Search extends CI_Controller{
                 $data['fooFile'] = $fooFile;
             }
             if($fooType == 'medium'){
+
                 $fooBase = $this->zj->searchCertBase($fooUID);
                 $fooContent = $this->zj->searchCertContent($fooUID);
                 $fooFile = $this->zj->searchCertFile($fooUID);
@@ -121,6 +122,7 @@ class Search extends CI_Controller{
                 $data['fooContent'] = $fooContent;
                 $data['fooFile'] = $fooFile;
             }           
+
             
             $this->load->view('search/step2res',$data);
             

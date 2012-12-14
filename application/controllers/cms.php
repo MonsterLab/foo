@@ -5,4 +5,20 @@ class Cms extends CI_Controller{
         $this->load->model('M_cms','cms');
         $this->load->helper(array('url'));
     }
+    
+    /**
+     * this is a interface for common user
+     */
+    public function index(){
+        $this->load->view('cms/index');
+    }
+    
+    public function showList(){
+        
+        $this->load->view('cms/showList');
+    }
+    
+    public function article(){
+        $this->load->view('cms/article');
+    }
 }

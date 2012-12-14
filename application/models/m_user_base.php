@@ -36,7 +36,7 @@ class M_user_base extends CI_Model{
     * @param type $email                            E-mail
     * @param type $type                             客户征信类型 topic、medium、talent 
     * 
-    * @return int                                   成功返回 1，失败返回 0，用户名存在返回 -1
+    * @return int                                   成功返回 id，失败返回 0，用户名存在返回 -1
     */
    public function create($cuid,$zx_code,$sq_code,$username,$password,$truename,$position,$phone,$email,$type){
        $isExist = $this->checkUsername($username);
@@ -60,7 +60,7 @@ class M_user_base extends CI_Model{
        $this->db->insert('zx_user_base',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
-           return 1;
+           return $this->db->insert_id();
        }  else {
            
            return 0;

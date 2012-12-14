@@ -1,3 +1,6 @@
+<div>
+    <h2>添加认证扫描件信息</h2>
+</div>
 <?php
 //addCertFile($cuid,$uid,$file_type_id,$file_name)
     $base_url = base_url();
@@ -6,7 +9,7 @@
         exit();
     }
     
-    echo "<form action='{$base_url}index.php/admin/addCertFile' method='post' enctype='multipart/form-data'>";
+    echo "<form action='{$base_url}index.php/admin/addCertFile/{$type}/{$uid}' method='post' enctype='multipart/form-data'>";
     echo "证书名：";
     echo "<select name='filename'>";
     foreach ($fileTypes as $fileType){

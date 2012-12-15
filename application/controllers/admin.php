@@ -875,17 +875,26 @@ class Admin extends CI_Controller{
         $uid = 5;
         $status = 1;    // the group isn't deleted
         $groups = $this->cms->getAllGroups($uid, $status);
-        $groupsHtml = '<select name="groupid" id="groupid">';
+        
         $groupid = 0;
-        if($groups){
-            foreach ($groups as $group){
-                $groupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
-            }
-            
-            
+        if(isset($_GET['groupid'])){
+            $groupid = $_GET['groupid'];
+        } else {
             foreach ($groups as $row){
                 $groupid = $row['gid'];
                 break;
+            }
+        }
+        //TODO 
+        $groupid = 41;
+        $groupsHtml = '<select name="groupid" id="groupid">';
+        if($groups){
+            foreach ($groups as $group){
+                if($group['gid'] == $groupid){
+                    $groupsHtml .= '<option value="'.$group['gid'].'" selected="selected">'.$group['group_name'].'</option>';
+                    continue;;
+                }
+                $groupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
             }
         } else {
             $groupsHtml .= '<option value="0">没有分类</option>';
@@ -905,7 +914,7 @@ class Admin extends CI_Controller{
         $currentPage = $page->getCurrentPage();
         $articleHtml = '<table>';
         $articleHtml .= '<tr>
-                        <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th colspan="2">操作</th>
+                        <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th>状态</th><th colspan="2">操作</th>
                         </tr>';
         if($articles){
             foreach ($articles as $row){
@@ -920,8 +929,8 @@ class Admin extends CI_Controller{
                 } else if ($row['audit'] == -1){
                     $auditText = '审核未通过';
                 }
-                $articleHtml .= '<td><a href="'.base_url('admin/auditArticle?page='.$currentPage.'&aid='.$row['aid']).'">【'.$auditText.'】</a>';
-                $articleHtml .= '<a href="">【查看】</a>';
+                $articleHtml .= '<td>【'.$auditText.'】</td>';
+                $articleHtml .= '<td><a href="'.base_url('admin/viewArticle?page='.$currentPage.'&aid='.$row['aid']).'">【查看】</a>';
                 $articleHtml .= '<a href="">【修改】</a>';
                 $articleHtml .= '<a href="">【删除】</a>';
                 $articleHtml .= '</td>';
@@ -931,9 +940,19 @@ class Admin extends CI_Controller{
         $articleHtml .= '</table>';
         $data['groupsHtml'] = $groupsHtml;
         $data['pageBar'] = $pageBar;
-        $data['articleHtml'] = $articleHtml;    
+        $data['articleHtml'] = $articleHtml; 
         
-        $this->load->view('admin/v_manageArticle', $data);
+        if(isset($_GET['groupid'])){
+            $return = array(
+                'groupsHtml'=> $groupsHtml,
+                'pageBar'=>$pageBar,
+                'articleHtml'=> $articleHtml
+            );
+            $json = json_encode($return);
+            echo $json;
+        } else {        
+            $this->load->view('admin/v_manageArticle', $data);
+        }
     }
     
     /*
@@ -945,20 +964,47 @@ class Admin extends CI_Controller{
     public function auditArticle(){
         //TODO 权限的验证
         $aid = $_GET['aid'];
-        $audit = 1;
+        $audit = $this->input->post('audit');
         $uid = 5;   //TODO
         $audit_id = $uid;
         $result = $this->cms->updateAudit($aid, $audit, $audit_id);
         if($result){
-            $this->manageArticle();
+            $mess = '审核成功';
+            $this->viewArticle($mess);
         }
     }
     
-    
-    
-    
-    
-    
+    /**
+     * 
+     * @param type $mess the pram is used to transfer messege
+     */
+    public function viewArticle($mess = ''){
+        $aid = $_GET['aid'];
+        $method = 1;    //the method is get a article
+        $article = $this->cms->search($aid, $method);
+
+        $selectHtml = '<select name="audit" id="au">';
+        if($article[0]['audit'] == 0){
+            $selectHtml .= '<option value="0" selected="selected">未审核</option>';
+            $selectHtml .= '<option value="1">审核通过</option>';
+            $selectHtml .= '<option value="-1">审核不通过</option>';
+        } else if($article[0]['audit'] == 1) {
+            $selectHtml .= '<option value="1" selected="selected">审核通过</option>';
+            $selectHtml .= '<option value="-1">审核不通过</option>';
+        } else if($article[0]['audit'] == -1){
+            $selectHtml .= '<option value="1">审核通过</option>';
+            $selectHtml .= '<option value="-1" selected="selected">审核不通过</option>';
+        }
+        $selectHtml .= '</select>';
+        $data['selectHtml'] = $selectHtml;
+        $data['aid'] = $aid;
+        $data['article'] = $article;
+        $data['mess'] = $mess;
+        
+        $this->load->view('admin/v_viewArticle', $data);
+    }
+
+
     /**
      * this method is used for creating a group of article
      * 
@@ -1261,7 +1307,7 @@ class Admin extends CI_Controller{
             $pageBar = $page->getPage($articles);
             $articleHtml = '<table>';
             $articleHtml .= '<tr>
-                            <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th colspan="2">操作</th>
+                            <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th>状态</th><th colspan="2">操作</th>
                             </tr>';
             if(!empty($articles)){
                 foreach ($articles as $row){
@@ -1276,8 +1322,8 @@ class Admin extends CI_Controller{
                     } else if ($row['space_audit'] == -1){
                         $auditText = '审核未通过';
                     }
-                    $articleHtml .= '<td><a href="'.base_url('admin/auditArticle?space_aid='.$row['space_aid']).'">【'.$auditText.'】</a>';
-                    $articleHtml .= '<a href="">【查看】</a>';
+                    $articleHtml .= '<td>【'.$auditText.'】</td>';
+                    $articleHtml .= '<td><a href="'.base_url('admin/viewSArticle?space_aid='.$row['space_aid']).'">【查看】</a>';
                     $articleHtml .= '<a href="">【修改】</a>';
                     $articleHtml .= '<a href="">【删除】</a>';
                     $articleHtml .= '</td>';
@@ -1294,6 +1340,49 @@ class Admin extends CI_Controller{
             $m = 'manageSArticle';
             $this->userspaceList($m);
         }
+    }
+    
+        public function auditSArticle(){
+        //TODO 权限的验证
+        $space_aid = $_GET['space_aid'];
+        $space_audit = $this->input->post('space_audit');
+        $space_uid = 5;   //TODO
+        $space_audit_id = $space_uid;
+        $result = $this->space->updateSAudit($space_aid, $space_audit, $space_audit_id);
+        if($result){
+            $mess = '审核成功';
+            $this->viewSArticle($mess);
+        }
+    }
+    
+    /**
+     * 
+     * @param type $mess the pram is used to transfer messege
+     */
+    public function viewSArticle($mess = ''){
+        $space_aid = $_GET['space_aid'];
+        $method = 1;    //the method is get a article
+        $article = $this->space->searchS($space_aid, $method);
+        
+        $selectHtml = '<select name="space_audit" id="au">';
+        if($article[0]['space_audit'] == 0){
+            $selectHtml .= '<option value="0" selected="selected">未审核</option>';
+            $selectHtml .= '<option value="1">审核通过</option>';
+            $selectHtml .= '<option value="-1">审核不通过</option>';
+        } else if($article[0]['space_audit'] == 1) {
+            $selectHtml .= '<option value="1" selected="selected">审核通过</option>';
+            $selectHtml .= '<option value="-1">审核不通过</option>';
+        } else if($article[0]['space_audit'] == -1){
+            $selectHtml .= '<option value="1">审核通过</option>';
+            $selectHtml .= '<option value="-1" selected="selected">审核不通过</option>';
+        }
+        $selectHtml .= '</select>';
+        $data['selectHtml'] = $selectHtml;
+        $data['space_aid'] = $space_aid;
+        $data['article'] = $article;
+        $data['mess'] = $mess;
+        
+        $this->load->view('admin/v_viewSArticle', $data);
     }
     
 }# end of class

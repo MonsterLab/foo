@@ -17,7 +17,7 @@
 
     + updateStatus()		--update the status of a article
 
-    + updateAudit() 		--update the audit of a article
+    + updateSAudit() 		--update the audit of a article
 
     + updateViewTimes()		--update the viewTiems of a article
 
@@ -111,7 +111,9 @@ class M_space extends CI_Model{
      * @return int if the query is null ,ruturn 0 
      */
     private function getSArticle($space_aid){		
-	$this->db->select('space_aid, space_uid, space_username, space_title, space_content, space_groupid, space_checked, space_audit, space_audit_id, space_status, space_ctime, space_viewtimes');
+	$this->db->select('space_aid, space_uid, space_username, space_title, 
+            space_content, space_groupid, space_audit,
+            space_audit_id, space_status, space_ctime, space_viewtimes');
         $this->db->where('space_aid',$space_aid);       
 	$query = $this->db->get('zx_space_articles');
         $result = $query->result_array();
@@ -135,7 +137,9 @@ class M_space extends CI_Model{
      * @return int
      */
     private function getUserSArticles($space_uid,$limit,$offset, $space_status){
-        $this->db->select('space_aid, space_uid, space_username, space_title,  space_groupid, space_audit, space_audit_id, space_status, space_ctime, space_viewtimes');
+        $this->db->select('space_aid, space_uid, space_username, space_title,
+            space_groupid, space_audit, space_audit_id, space_status, 
+            space_ctime, space_viewtimes');
         $this->db->where('space_uid', $space_uid);
         $this->db->where('space_status', $space_status);
         if(!($limit == 'start' && $offset == 'end')){

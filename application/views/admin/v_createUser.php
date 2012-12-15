@@ -24,6 +24,7 @@
     
 <?php    
     echo "</select><br>";
+    echo "公司名："."<input type='text' name='cert_name' value='{$cert_name}'>"."<br>";
     echo "登录名："."<input type='text' name='username' value='{$username}'>"."<br>";
     echo "密码："."<input type='password' name='password' value='{$password}'>"."<br>";
     echo "授权码："."<input type='text' name='sqcode' value='{$sqcode}'>"."<br>";

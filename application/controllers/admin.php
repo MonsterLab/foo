@@ -186,57 +186,73 @@ class Admin extends CI_Controller{
         $data = array(
             'zxcode'=>$zxcode,
             'type'=>'',
+            'cert_name'=>'',
             'username'=>'',
             'password'=>'',
             'sqcode'=>'',
         );
         //修改，修改时显示原有数据
         if($uid > 0){
-            $fooUser = $this->userbase->search($uid,3);
+            $fooUserbase = $this->userbase->search($uid,3);         //查询用户基本信息
+            $fooUser = $this->searchComName($fooUserbase);          //将公司名查询出
             if($fooUser){
                 $data = array(
                     'username'=>$fooUser[0]['username'],
                     'password'=>$fooUser[0]['password'],
                     'sqcode'=>$fooUser[0]['sq_code'],
                 );
+                if($fooUser[0]['type'] == 'talent'){
+                    $data['cert_name'] = $fooUser[0]['cert_name'];
+                }  else {
+                    $data['cert_name'] = $fooUser[0]['com_name'];
+                }
             }
         }
         
         if($_POST){
             $fooCUID = $this->admin->getUID();
-            //$fooZxcode = trim($this->input->post('zxcode'));
             $fooType = trim($this->input->post('type'));
+            $fooCertname = trim($this->input->post('sert_name'));
             $fooUsername = trim($this->input->post('username'));
             $fooPassword = trim($this->input->post('password'));
             $fooSqcode = trim($this->input->post('sqcode'));
             
             //权限、使用人姓名、用户名、密码为必须，其它选填
-            if($fooUsername == NULL || $fooPassword == NULL || $fooSqcode == NULL){
+            if($fooUsername == NULL || $fooPassword == NULL || $fooSqcode == NULL||$fooCertname==NULL){
                 
                 $data['flag'] = '请完善信息！';
                 $this->load->view('admin/v_createUser',$data);
                 return;
             }
             
-            $fooResult = $this->userbase->create($fooCUID,$zxcode,$fooSqcode,$fooUsername,$fooPassword,'','','','',$fooType);
-            if($fooResult == -1){
+            $fooUID = $this->userbase->create($fooCUID,$zxcode,$fooSqcode,$fooUsername,$fooPassword,'','','','',$fooType);
+            if($fooUID == -1){
                 $data['flag'] = '用户登录名已存在！';
-            }elseif ($fooResult == 0) {
+            }elseif ($fooUID == 0) {
                 $data['flag'] = '添加失败！';
-            }elseif ($fooResult > 0) {
+            }elseif ($fooUID > 0) {
                 
-                //修改客户，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
-                if($uid > 0){
-                    $fooResult = $this->admin->delete($uid);
-                    if($fooResult){
-                        $data['flag'] = '修改成功！';
-                    }
-                    
-                }  else {
-                //新增客户,    
+                if($fooType == 'topic'){
+                    $fooResult = $this->topic->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }elseif ($fooType == 'medium') {
+                    $fooResult = $this->medium->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }elseif ($fooType == 'talent') {
+                    $fooResult = $this->talent->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }
+                
+                if($uid == 0){
+                    //新增客户,    
                     $fooResult = $this->zxpool->useCode($zxcode);                //使用征信编码
                     if($fooResult == 1){
                         $data['flag'] = '添加成功！';
+                    }
+                    
+                    
+                }  else {
+                    //修改客户，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
+                    $fooResult = $this->admin->delete($uid);
+                    if($fooResult){
+                        $data['flag'] = '修改成功！';
                     }
                 }
             }
@@ -282,10 +298,7 @@ class Admin extends CI_Controller{
             }elseif ($fooUID == 0) {
                 $data['flag'] = '添加失败！';
             }elseif ($fooUID > 0) {
-                $fooResult = $this->zxpool->useCode($fooZxcode);
-                if($fooResult == 1){
-                    redirect(base_url("admin/createCertBase/$fooType/$fooUID"));
-                }
+                redirect(base_url("admin/createCertBase/$fooType/$fooUID"));
                 
             }
             
@@ -641,13 +654,15 @@ class Admin extends CI_Controller{
                 $fooType = $userBase['type'];
                 if($fooType == 'topic'){
                     $fooCertBase = $this->topic->searchCertBase($fooUID);
+                    $userBase['cert_name'] = $fooCertBase[0]['com_name'];
                 }elseif ($fooType == 'medium') {
                     $fooCertBase = $this->topic->searchCertBase($fooUID);
+                    $userBase['cert_name'] = $fooCertBase[0]['com_name'];
                 }elseif ($fooType == 'talent') {
                     $fooCertBase = $this->topic->searchCertBase($fooUID);
+                    $userBase['cert_name'] = $fooCertBase[0]['cert_name'];
                 }
                 
-                $userBase['com_name'] = $fooCertBase[0]['com_name'];
                 $fooUserBases[] = $userBase;
             }
             

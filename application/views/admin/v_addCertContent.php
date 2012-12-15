@@ -7,9 +7,30 @@
         echo $flag;
         exit();
     }
-    
-    echo "<form action='{$base_url}index.php/admin/addCertContent/{$type}/{$uid}' method='post'>";
-    echo "认证题目：<input type='text' name='title' value=''><br>";
-    echo "认证内容：<textarea name='content' cols='35' rows='8'></textarea><br>";
-    echo "<input type='submit' name='submit' value='提交'>";
-    echo "</form>";
+?>  
+    <form action="{$base_url}index.php/admin/addCertContent/{$type}/{$uid}" method='post'>
+        <p>
+            <label for="title">认证题目:</label>
+            <input type='text' id="title" name='title' value=''><br>
+        </p>        
+        <p>
+            <label for="content">认证内容:</label>
+            <?
+                $conText = '在这里添加认证内容';
+                $this->load->helper('form_helper');
+                $data = array(
+                              'name'        => 'content',
+                              'id'          => 'content',
+                              'toolbarset'  => 'Default',
+                              'basepath'    => '/workspace/foo/include/fckeditor/',
+                              'width'       => '80%',
+                              'height'      => '500'
+                    );
+
+                echo form_fckeditor( $data,$conText); 
+            ?>
+        </p>
+        <p>
+            <input type='submit' name='submit' value='提交'>
+        </p>    
+    </form>

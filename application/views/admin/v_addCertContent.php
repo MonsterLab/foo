@@ -8,7 +8,8 @@
         exit();
     }
 ?>  
-    <form action="{$base_url}index.php/admin/addCertContent/{$type}/{$uid}" method='post'>
+
+    <form action="<?php echo base_url("admin/addCertContent/$type/{$uid}") ?>" method='post'>
         <p>
             <label for="title">认证题目:</label>
             <input type='text' id="title" name='title' value=''><br>

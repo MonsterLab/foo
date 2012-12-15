@@ -17,7 +17,7 @@
 
     + updateStatus()		--update the status of a article
 
-    + updateAudit() 		--update the audit of a article
+    + updateSAudit() 		--update the audit of a article
 
     + updateViewTimes()		--update the viewTiems of a article
 
@@ -111,7 +111,9 @@ class M_space extends CI_Model{
      * @return int if the query is null ,ruturn 0 
      */
     private function getSArticle($space_aid){		
-	$this->db->select('space_aid, space_uid, space_username, space_title, space_content, space_groupid, space_checked, space_audit, space_audit_id, space_status, space_ctime, space_viewtimes');
+	$this->db->select('space_aid, space_uid, space_username, space_title, 
+            space_content, space_groupid, space_audit,
+            space_audit_id, space_status, space_ctime, space_viewtimes');
         $this->db->where('space_aid',$space_aid);       
 	$query = $this->db->get('zx_space_articles');
         $result = $query->result_array();
@@ -135,7 +137,9 @@ class M_space extends CI_Model{
      * @return int
      */
     private function getUserSArticles($space_uid,$limit,$offset, $space_status){
-        $this->db->select('space_aid, space_uid, space_username, space_title,  space_groupid, space_audit, space_audit_id, space_status, space_ctime, space_viewtimes');
+        $this->db->select('space_aid, space_uid, space_username, space_title,
+            space_groupid, space_audit, space_audit_id, space_status, 
+            space_ctime, space_viewtimes');
         $this->db->where('space_uid', $space_uid);
         $this->db->where('space_status', $space_status);
         if(!($limit == 'start' && $offset == 'end')){
@@ -163,20 +167,24 @@ class M_space extends CI_Model{
      */
     private function getSArticlesOfGroup($space_groupid, $limit, $offset, $space_status){
         $this->db->select('space_aid, space_uid, space_username, space_title,  space_groupid, space_audit, space_audit_id, space_status, space_ctime, space_viewtimes');
-        $this->db->where('space_groupid', $space_groupid);
+        if(is_array($space_groupid)){
+            $this->db->where_in('space_groupid', $space_groupid);
+        } else {
+            $this->db->where('space_groupid', $space_groupid);
+        }
         $this->db->where('space_status',$space_status);
         if(!($limit == 'start' && $offset == 'end')){
             $this->db->limit($offset,$limit);
         }
         
         $query = $this->db->get('zx_space_articles');
-        $query->result_array();
+        $result = $query->result_array();
         
-        $numRows = $this->num_rows();
+        $numRows = $query->num_rows();
         $query->free_result();
         if($numRows > 0){
             
-            return $query;
+            return $result;
 	} else {
 	    
 	    return 0;
@@ -380,6 +388,52 @@ class M_space extends CI_Model{
 	    return array();
 	} 
         
+    }
+    
+        /**
+     * this method is used for getting a group info by it's gid
+     * @param type $gid
+     * @param type $status
+     * @return type
+     */
+    public function getGroupByGid($space_gid, $space_status = 1){
+        $this->db->select("space_gid, space_group_url, space_group_name, space_groupfather_id");
+        $this->db->where('space_status',$space_status);
+        $this->db->where('space_gid', $space_gid);
+        $query = $this->db->get('zx_space_article_groups');
+        
+        $numRows = $query->num_rows();
+        $result = $query->result_array();
+        $query->free_result();
+        if($numRows > 0){
+            return $result;
+	} else {
+	    
+	    return array();
+	} 
+    }
+    
+        /**
+     * this method is used for get the child groups by groupfahter_id
+     * @param type $space_groupfather_id
+     * @param type $space_status
+     * @return type
+     */
+    public function getGroupByGroupfather($space_groupfather_id, $space_status = 1){
+        $this->db->select("space_gid, space_group_url, space_group_name, space_groupfather_id");
+        $this->db->where('space_status',$space_status);
+        $this->db->where('space_groupfather_id', $space_groupfather_id);
+        $query = $this->db->get('zx_space_article_groups');
+        
+        $numRows = $query->num_rows();
+        $result = $query->result_array();
+        $query->free_result();
+        if($numRows > 0){
+            return $result;
+	} else {
+	    
+	    return array();
+	}
     }
 
     /**

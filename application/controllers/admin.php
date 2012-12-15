@@ -543,6 +543,8 @@ class Admin extends CI_Controller{
     /**
      * 查询并显示客户
      * 此处供纳税主体、中介机构、财税人才和客户管理四处查询使用
+     * $type = ''时客户管理使用
+     * $type != ''时三种征信库使用
      * @return type
      */
     public function searchUsers($type = ''){
@@ -593,7 +595,11 @@ class Admin extends CI_Controller{
 
             //将类型传入视图
             $data['type'] = $type;
-            $this->load->view('admin/v_searchUsers',$data);
+            if($type != ''){
+                $this->load->view('admin/v_searchUsers',$data);
+            }  else {
+                $this->load->view('admin/v_manageUsers',$data);
+            }
 
         }  else {
 
@@ -611,7 +617,12 @@ class Admin extends CI_Controller{
 
             //将类型传入视图
             $data['type'] = $type;
-            $this->load->view('admin/v_searchUsers',$data);
+            if($type != ''){
+                $this->load->view('admin/v_searchUsers',$data);
+            }  else {
+                $this->load->view('admin/v_manageUsers',$data);
+            }
+            
         }
             
     }

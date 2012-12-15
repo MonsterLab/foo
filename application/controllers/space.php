@@ -13,12 +13,12 @@ class Space extends CI_Controller{
         $this->load->view('space/index');
     }
     
-    public function article($space_uid, $aid){
+    public function article($space_uid, $space_groupid, $aid){
         //TODO nav
         $method = 1;    //the method is get a article
         $article = $this->space->searchS($aid, $method);
         $gid = $article[0]['space_groupid'];
-        $guide = $this->getGuideByGid($gid);
+        $guide = $this->getGuideByGid($space_uid, $gid);
         $data['article'] = $article;
         $data['guide'] = $guide;
         $this->load->view('space/article', $data);

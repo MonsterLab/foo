@@ -1411,6 +1411,91 @@ class Admin extends CI_Controller{
         $this->load->view('admin/v_viewSArticle', $data);
     }
     
+    /**
+     * this method is used for creating a group of article
+     * 
+     */
+    public function createSGroup(){
+        //TODO 权限的验证
+        $uid = 5;
+        $status = 1;    // the group isn't deleted
+        if(isset($_POST['sub'])){
+            $groupfather_id = trim($_POST['groupfather_id']);
+            $group_name = trim($_POST['group_name']);
+            $group_url = trim($_POST['group_url']);
+            $group_summary = trim($_POST['group_summary']);
+            $result = 0;
+            if($groupfather_id == -1 || empty($group_name) || empty($group_url) || empty($group_summary)){
+                $result = 0;
+            } else {
+                $result = $this->space->createSGroup($uid,$group_name, $group_url, $group_summary, $groupfather_id);
+            }
+            
+            $groups = $this->cms->getAllSGroups($uid, $status);
+            
+            $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
+            $groupsHtml .= '<option value="-1">请选择一个分类</option>';
+            if($groups){
+                foreach ($groups as $group){
+                    if(isset($_POST['sub'])){
+                        if($group['space_gid'] == $_POST['space_groupfather_id']){
+                            $groupsHtml .= '<option selected="selected" value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
+                            continue;
+                        }
+                    }
+                    $groupsHtml .= '<option value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
+                }
+            }
+
+            $groupsHtml .= ' </select>';
+            $data['groupsHtml'] = $groupsHtml;
+            
+            if($result){
+                $data['flag'] = 1;
+                $data['message'] = '添加成功';    
+                
+                $this->load->view('admin/v_createSGroup', $data);
+            } else {
+                $data['flag'] = 0;
+                $data['message'] = '添加失败<br/>必须选择分类，必须填写完整
+                    ';
+                $data['groupfather_id'] = $groupfather_id;
+                $data['group_name'] = $group_name;
+                $data['group_url'] = $group_url;
+                $data['group_summary'] = $group_summary;                
+                
+                $this->load->view('admin/v_createSGroup', $data);
+            }
+        } else {
+            $groups = $this->space->getAllSGroups($uid, $status);
+            if(count($groups) == 0){
+                $group_name = '首页';
+                $group_url = 'sy';
+                $group_summary = '这是所有文章分类的父类，不能被删除';
+                $groupfather_id = -1;
+                $result = $this->space->createSGroup($uid,$group_name, $group_url, $group_summary, $groupfather_id);
+                $groups = $this->space->getAllSGroups($uid, $status);
+            }
+            $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
+            $groupsHtml .= '<option value="-1">请选择一个分类</option>';
+            if($groups){
+                foreach ($groups as $group){
+                    if(isset($_POST['sub'])){
+                        if($group['space_gid'] == $_POST['space_groupfather_id']){
+                            $groupsHtml .= '<option selected="selected" value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
+                            continue;
+                        }
+                    }
+                    $groupsHtml .= '<option value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
+                }
+            }
+
+            $groupsHtml .= ' </select>';
+            $data['groupsHtml'] = $groupsHtml;
+            $this->load->view('admin/v_createSGroup', $data);
+        }
+    }
+    
 }# end of class
 
 

@@ -1373,7 +1373,7 @@ class Admin extends CI_Controller{
             $search = $_POST['search'];
             switch ($search){
                 case 'username':
-                    $username = $key;
+                    $username = trim($key);
                     $method = 0;        //search users by username
                     $userspaceList = $this->userbase->search($username, $method);
                     $allRows = count($userspaceList);
@@ -1383,7 +1383,7 @@ class Admin extends CI_Controller{
                     $userspaceList = $this->userbase->search($username, $method, $offset, $limit);
                     break;
                 case 'zx_code':
-                    $zx_code = $key;
+                    $zx_code = trim($key);
                     $method = 1;        //search users by zx_code
                     $userspaceList = $this->userbase->search($zx_code, $method);
                     $allRows = count($userspaceList);
@@ -1393,7 +1393,14 @@ class Admin extends CI_Controller{
                     $userspaceList = $this->userbase->search($zx_code, $method, $offset, $limit);
                     break;
                 case 'type':
-                    $type = $key;
+                    $type = trim($key);
+                    if($type == '纳税主体征信库'){
+                        $type = 'topic';
+                    } else if($type == '中介机构征信库'){
+                        $type = 'medium';
+                    } else if($type == '财税个人征信库'){
+                        $type = 'talent';
+                    }
                     $method = 2;        //search users by type 
                     $userspaceList = $this->userbase->search($type, $method);
                     $allRows = count($userspaceList);
@@ -1415,8 +1422,15 @@ class Admin extends CI_Controller{
                     $userlistHtml .= '<tr>';
                     $userlistHtml .= '<td><a href="'.base_url('admin/'.$m).'?uid='.$row['id'].'">'.$row['username'].'</a></td>';
                     $userlistHtml .= '<td>'.$row['zx_code'].'</td>';
-                    //TODO TYPE
-                    $userlistHtml .= '';
+                    $type = $row['type'];
+                    if($type == 'topic'){
+                        $type = '纳税主体征信库';
+                    } else if($type == 'medium'){
+                        $type = '中介机构征信库';
+                    } else if($type == 'talent'){
+                        $type = '财税个人征信库';
+                    }
+                    $userlistHtml .= '<td>'.$type.'</td>';
                     $pass = $row['space_id'] > 0 ? '是' : '否';
                     $userlistHtml .= '<td>'.$pass.'</td>';
                     $userlistHtml .= '</tr>';
@@ -1441,14 +1455,22 @@ class Admin extends CI_Controller{
             $pageBar = $page->getPage($userspaceList);
             $userlistHtml = '<table>
                                 <tr>
-                                    <th>用户名</th><th>征信编码</th><th>是否开通空间</th>
+                                    <th>用户名</th><th>征信编码</th><th>征信库类型</th><th>是否开通空间</th>
                                 </tr>';                
-            
             if(!empty($userspaceList)){
                 foreach ($userspaceList as $row){
                     $userlistHtml .= '<tr>';
                     $userlistHtml .= '<td><a href="'.base_url('admin/'.$m).'?uid='.$row['id'].'">'.$row['username'].'</a></td>';
                     $userlistHtml .= '<td>'.$row['zx_code'].'</td>';
+                    $type = $row['type'];
+                    if($type == 'topic'){
+                        $type = '纳税主体征信库';
+                    } else if($type == 'medium'){
+                        $type = '中介机构征信库';
+                    } else if($type == 'talent'){
+                        $type = '财税个人征信库';
+                    }
+                    $userlistHtml .= '<td>'.$type.'</td>';
                     $pass = $row['space_id'] > 0 ? '是' : '否';
                     $userlistHtml .= '<td>'.$pass.'</td>';
                     $userlistHtml .= '</tr>';

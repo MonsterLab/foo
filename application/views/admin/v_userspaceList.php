@@ -6,7 +6,7 @@
     </head>
     <body id=userspaceList-body">
         <div id="userspaceList">   
-            <form action="" method="post">
+            <form action="<?php echo base_url('admin/createSArticle');?>" method="post">
                 <p>
                     <h3>搜索用户</h3>
                     <label for="username">按用户名查询</label>

@@ -18,18 +18,27 @@
         }
 
 
-    //    echo "<pre>";
-    //    print_r($admins);
-    //    echo "</pre>";
-
         $html = "<table>";
         $html .= "<tr><th width='150'>管理用户名</th><th width='150'>使用人</th><th width='150'>部门</th><th width='150'>权限</th><th width='150'>创建时间</th><th width='150'>操作</th></tr>";
         foreach ($admins as $admin){
+            if($admin['power'] == 11){
+                $state = '客服';
+            }
+            if($admin['power'] == 12){
+                $state = '平台管理';
+            }
+            if($admin['power'] == 13){
+                $state = '录入';
+            }
+            if($admin['power'] == 14){
+                $state = '审核';
+            }
+            
             $html .= "<tr>";
             $html .= "<td align='center'>{$admin['username']}</td>";
             $html .= "<td align='center'>{$admin['truename']}</td>";
             $html .= "<td align='center'>{$admin['department']}</td>";
-            $html .= "<td align='center'>{$admin['power']}</td>";
+            $html .= "<td align='center'>{$state}</td>";
             $html .= "<td align='center'>{$admin['ctime']}</td>";
             $html .= "<td align='center'><a href='{$base_url}admin/createAdmin/{$admin['id']}/'><input type='button' value='修改'></a>   ";
             $html .= "<a href='{$base_url}admin/deleteAdmin/{$admin['id']}/'><input type='button' value='删除'></a></td>";

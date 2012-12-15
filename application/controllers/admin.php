@@ -185,57 +185,73 @@ class Admin extends CI_Controller{
         $data = array(
             'zxcode'=>$zxcode,
             'type'=>'',
+            'cert_name'=>'',
             'username'=>'',
             'password'=>'',
             'sqcode'=>'',
         );
         //修改，修改时显示原有数据
         if($uid > 0){
-            $fooUser = $this->userbase->search($uid,3);
+            $fooUserbase = $this->userbase->search($uid,3);         //查询用户基本信息
+            $fooUser = $this->searchComName($fooUserbase);          //将公司名查询出
             if($fooUser){
                 $data = array(
                     'username'=>$fooUser[0]['username'],
                     'password'=>$fooUser[0]['password'],
                     'sqcode'=>$fooUser[0]['sq_code'],
                 );
+                if($fooUser[0]['type'] == 'talent'){
+                    $data['cert_name'] = $fooUser[0]['cert_name'];
+                }  else {
+                    $data['cert_name'] = $fooUser[0]['com_name'];
+                }
             }
         }
         
         if($_POST){
             $fooCUID = $this->admin->getUID();
-            //$fooZxcode = trim($this->input->post('zxcode'));
             $fooType = trim($this->input->post('type'));
+            $fooCertname = trim($this->input->post('sert_name'));
             $fooUsername = trim($this->input->post('username'));
             $fooPassword = trim($this->input->post('password'));
             $fooSqcode = trim($this->input->post('sqcode'));
             
             //权限、使用人姓名、用户名、密码为必须，其它选填
-            if($fooUsername == NULL || $fooPassword == NULL || $fooSqcode == NULL){
+            if($fooUsername == NULL || $fooPassword == NULL || $fooSqcode == NULL||$fooCertname==NULL){
                 
                 $data['flag'] = '请完善信息！';
                 $this->load->view('admin/v_createUser',$data);
                 return;
             }
             
-            $fooResult = $this->userbase->create($fooCUID,$zxcode,$fooSqcode,$fooUsername,$fooPassword,'','','','',$fooType);
-            if($fooResult == -1){
+            $fooUID = $this->userbase->create($fooCUID,$zxcode,$fooSqcode,$fooUsername,$fooPassword,'','','','',$fooType);
+            if($fooUID == -1){
                 $data['flag'] = '用户登录名已存在！';
-            }elseif ($fooResult == 0) {
+            }elseif ($fooUID == 0) {
                 $data['flag'] = '添加失败！';
-            }elseif ($fooResult > 0) {
+            }elseif ($fooUID > 0) {
                 
-                //修改客户，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
-                if($uid > 0){
-                    $fooResult = $this->admin->delete($uid);
-                    if($fooResult){
-                        $data['flag'] = '修改成功！';
-                    }
-                    
-                }  else {
-                //新增客户,    
+                if($fooType == 'topic'){
+                    $fooResult = $this->topic->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }elseif ($fooType == 'medium') {
+                    $fooResult = $this->medium->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }elseif ($fooType == 'talent') {
+                    $fooResult = $this->talent->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }
+                
+                if($uid == 0){
+                    //新增客户,    
                     $fooResult = $this->zxpool->useCode($zxcode);                //使用征信编码
                     if($fooResult == 1){
                         $data['flag'] = '添加成功！';
+                    }
+                    
+                    
+                }  else {
+                    //修改客户，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
+                    $fooResult = $this->admin->delete($uid);
+                    if($fooResult){
+                        $data['flag'] = '修改成功！';
                     }
                 }
             }
@@ -281,10 +297,7 @@ class Admin extends CI_Controller{
             }elseif ($fooUID == 0) {
                 $data['flag'] = '添加失败！';
             }elseif ($fooUID > 0) {
-                $fooResult = $this->zxpool->useCode($fooZxcode);
-                if($fooResult == 1){
-                    redirect(base_url("admin/createCertBase/$fooType/$fooUID"));
-                }
+                redirect(base_url("admin/createCertBase/$fooType/$fooUID"));
                 
             }
             
@@ -542,6 +555,8 @@ class Admin extends CI_Controller{
     /**
      * 查询并显示客户
      * 此处供纳税主体、中介机构、财税人才和客户管理四处查询使用
+     * $type = ''时客户管理使用
+     * $type != ''时三种征信库使用
      * @return type
      */
     public function searchUsers($type = ''){
@@ -592,7 +607,11 @@ class Admin extends CI_Controller{
 
             //将类型传入视图
             $data['type'] = $type;
-            $this->load->view('admin/v_searchUsers',$data);
+            if($type != ''){
+                $this->load->view('admin/v_searchUsers',$data);
+            }  else {
+                $this->load->view('admin/v_manageUsers',$data);
+            }
 
         }  else {
 
@@ -610,7 +629,12 @@ class Admin extends CI_Controller{
 
             //将类型传入视图
             $data['type'] = $type;
-            $this->load->view('admin/v_searchUsers',$data);
+            if($type != ''){
+                $this->load->view('admin/v_searchUsers',$data);
+            }  else {
+                $this->load->view('admin/v_manageUsers',$data);
+            }
+            
         }
             
     }
@@ -629,13 +653,15 @@ class Admin extends CI_Controller{
                 $fooType = $userBase['type'];
                 if($fooType == 'topic'){
                     $fooCertBase = $this->topic->searchCertBase($fooUID);
+                    $userBase['cert_name'] = $fooCertBase[0]['com_name'];
                 }elseif ($fooType == 'medium') {
                     $fooCertBase = $this->topic->searchCertBase($fooUID);
+                    $userBase['cert_name'] = $fooCertBase[0]['com_name'];
                 }elseif ($fooType == 'talent') {
                     $fooCertBase = $this->topic->searchCertBase($fooUID);
+                    $userBase['cert_name'] = $fooCertBase[0]['cert_name'];
                 }
                 
-                $userBase['com_name'] = $fooCertBase[0]['com_name'];
                 $fooUserBases[] = $userBase;
             }
             
@@ -874,17 +900,26 @@ class Admin extends CI_Controller{
         $uid = 5;
         $status = 1;    // the group isn't deleted
         $groups = $this->cms->getAllGroups($uid, $status);
-        $groupsHtml = '<select name="groupid" id="groupid">';
+        
         $groupid = 0;
-        if($groups){
-            foreach ($groups as $group){
-                $groupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
-            }
-            
-            
+        if(isset($_GET['groupid'])){
+            $groupid = $_GET['groupid'];
+        } else {
             foreach ($groups as $row){
                 $groupid = $row['gid'];
                 break;
+            }
+        }
+        //TODO 
+        $groupid = 41;
+        $groupsHtml = '<select name="groupid" id="groupid">';
+        if($groups){
+            foreach ($groups as $group){
+                if($group['gid'] == $groupid){
+                    $groupsHtml .= '<option value="'.$group['gid'].'" selected="selected">'.$group['group_name'].'</option>';
+                    continue;;
+                }
+                $groupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
             }
         } else {
             $groupsHtml .= '<option value="0">没有分类</option>';
@@ -904,7 +939,7 @@ class Admin extends CI_Controller{
         $currentPage = $page->getCurrentPage();
         $articleHtml = '<table>';
         $articleHtml .= '<tr>
-                        <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th colspan="2">操作</th>
+                        <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th>状态</th><th colspan="2">操作</th>
                         </tr>';
         if($articles){
             foreach ($articles as $row){
@@ -919,8 +954,8 @@ class Admin extends CI_Controller{
                 } else if ($row['audit'] == -1){
                     $auditText = '审核未通过';
                 }
-                $articleHtml .= '<td><a href="'.base_url('admin/auditArticle?page='.$currentPage.'&aid='.$row['aid']).'">【'.$auditText.'】</a>';
-                $articleHtml .= '<a href="">【查看】</a>';
+                $articleHtml .= '<td>【'.$auditText.'】</td>';
+                $articleHtml .= '<td><a href="'.base_url('admin/viewArticle?page='.$currentPage.'&aid='.$row['aid']).'">【查看】</a>';
                 $articleHtml .= '<a href="">【修改】</a>';
                 $articleHtml .= '<a href="">【删除】</a>';
                 $articleHtml .= '</td>';
@@ -930,9 +965,19 @@ class Admin extends CI_Controller{
         $articleHtml .= '</table>';
         $data['groupsHtml'] = $groupsHtml;
         $data['pageBar'] = $pageBar;
-        $data['articleHtml'] = $articleHtml;    
+        $data['articleHtml'] = $articleHtml; 
         
-        $this->load->view('admin/v_manageArticle', $data);
+        if(isset($_GET['groupid'])){
+            $return = array(
+                'groupsHtml'=> $groupsHtml,
+                'pageBar'=>$pageBar,
+                'articleHtml'=> $articleHtml
+            );
+            $json = json_encode($return);
+            echo $json;
+        } else {        
+            $this->load->view('admin/v_manageArticle', $data);
+        }
     }
     
     /*
@@ -944,20 +989,47 @@ class Admin extends CI_Controller{
     public function auditArticle(){
         //TODO 权限的验证
         $aid = $_GET['aid'];
-        $audit = 1;
+        $audit = $this->input->post('audit');
         $uid = 5;   //TODO
         $audit_id = $uid;
         $result = $this->cms->updateAudit($aid, $audit, $audit_id);
         if($result){
-            $this->manageArticle();
+            $mess = '审核成功';
+            $this->viewArticle($mess);
         }
     }
     
-    
-    
-    
-    
-    
+    /**
+     * 
+     * @param type $mess the pram is used to transfer messege
+     */
+    public function viewArticle($mess = ''){
+        $aid = $_GET['aid'];
+        $method = 1;    //the method is get a article
+        $article = $this->cms->search($aid, $method);
+
+        $selectHtml = '<select name="audit" id="au">';
+        if($article[0]['audit'] == 0){
+            $selectHtml .= '<option value="0" selected="selected">未审核</option>';
+            $selectHtml .= '<option value="1">审核通过</option>';
+            $selectHtml .= '<option value="-1">审核不通过</option>';
+        } else if($article[0]['audit'] == 1) {
+            $selectHtml .= '<option value="1" selected="selected">审核通过</option>';
+            $selectHtml .= '<option value="-1">审核不通过</option>';
+        } else if($article[0]['audit'] == -1){
+            $selectHtml .= '<option value="1">审核通过</option>';
+            $selectHtml .= '<option value="-1" selected="selected">审核不通过</option>';
+        }
+        $selectHtml .= '</select>';
+        $data['selectHtml'] = $selectHtml;
+        $data['aid'] = $aid;
+        $data['article'] = $article;
+        $data['mess'] = $mess;
+        
+        $this->load->view('admin/v_viewArticle', $data);
+    }
+
+
     /**
      * this method is used for creating a group of article
      * 
@@ -1260,7 +1332,7 @@ class Admin extends CI_Controller{
             $pageBar = $page->getPage($articles);
             $articleHtml = '<table>';
             $articleHtml .= '<tr>
-                            <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th colspan="2">操作</th>
+                            <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th>状态</th><th colspan="2">操作</th>
                             </tr>';
             if(!empty($articles)){
                 foreach ($articles as $row){
@@ -1275,8 +1347,8 @@ class Admin extends CI_Controller{
                     } else if ($row['space_audit'] == -1){
                         $auditText = '审核未通过';
                     }
-                    $articleHtml .= '<td><a href="'.base_url('admin/auditArticle?space_aid='.$row['space_aid']).'">【'.$auditText.'】</a>';
-                    $articleHtml .= '<a href="">【查看】</a>';
+                    $articleHtml .= '<td>【'.$auditText.'】</td>';
+                    $articleHtml .= '<td><a href="'.base_url('admin/viewSArticle?space_aid='.$row['space_aid']).'">【查看】</a>';
                     $articleHtml .= '<a href="">【修改】</a>';
                     $articleHtml .= '<a href="">【删除】</a>';
                     $articleHtml .= '</td>';
@@ -1293,6 +1365,49 @@ class Admin extends CI_Controller{
             $m = 'manageSArticle';
             $this->userspaceList($m);
         }
+    }
+    
+        public function auditSArticle(){
+        //TODO 权限的验证
+        $space_aid = $_GET['space_aid'];
+        $space_audit = $this->input->post('space_audit');
+        $space_uid = 5;   //TODO
+        $space_audit_id = $space_uid;
+        $result = $this->space->updateSAudit($space_aid, $space_audit, $space_audit_id);
+        if($result){
+            $mess = '审核成功';
+            $this->viewSArticle($mess);
+        }
+    }
+    
+    /**
+     * 
+     * @param type $mess the pram is used to transfer messege
+     */
+    public function viewSArticle($mess = ''){
+        $space_aid = $_GET['space_aid'];
+        $method = 1;    //the method is get a article
+        $article = $this->space->searchS($space_aid, $method);
+        
+        $selectHtml = '<select name="space_audit" id="au">';
+        if($article[0]['space_audit'] == 0){
+            $selectHtml .= '<option value="0" selected="selected">未审核</option>';
+            $selectHtml .= '<option value="1">审核通过</option>';
+            $selectHtml .= '<option value="-1">审核不通过</option>';
+        } else if($article[0]['space_audit'] == 1) {
+            $selectHtml .= '<option value="1" selected="selected">审核通过</option>';
+            $selectHtml .= '<option value="-1">审核不通过</option>';
+        } else if($article[0]['space_audit'] == -1){
+            $selectHtml .= '<option value="1">审核通过</option>';
+            $selectHtml .= '<option value="-1" selected="selected">审核不通过</option>';
+        }
+        $selectHtml .= '</select>';
+        $data['selectHtml'] = $selectHtml;
+        $data['space_aid'] = $space_aid;
+        $data['article'] = $article;
+        $data['mess'] = $mess;
+        
+        $this->load->view('admin/v_viewSArticle', $data);
     }
     
 }# end of class

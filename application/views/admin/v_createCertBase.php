@@ -16,13 +16,16 @@
         echo "<option value='{$industry['id']}'>{$industry['industry_name']}</option>";
     }
     echo "</select><br>";
-    echo "公司名称："."<input type='text' name='com_name' value=''>"."<br>";
-    echo "单位性质："."<input type='text' name='com_nature' value=''>"."<br>";
-    echo "公司电话："."<input type='text' name='com_phone' value=''>"."<br>";
-    echo "邮政编码："."<input type='text' name='zipcode' value=''>"."<br>";
-    echo "公司所在地："."<input type='text' name='com_place' value=''>"."<br>";
-    echo "征信开始时间："."<input type='text' name='cert_begin' value=''>"."<br>";
-    echo "征信结束时间："."<input type='text' name='cert_end' value=''>"."<br>";
-    echo "<input type='submit' name='submit' value='提交'>";
+    echo "公司名称："."<input type='text' name='com_name' value='{$certBases[0]['com_name']}'>"."<br>";
+    echo "单位性质："."<input type='text' name='com_nature' value='{$certBases[0]['com_nature']}'>"."<br>";
+    echo "公司电话："."<input type='text' name='com_phone' value='{$certBases[0]['com_phone']}'>"."<br>";
+    echo "邮政编码："."<input type='text' name='zipcode' value='{$certBases[0]['zipcode']}'>"."<br>";
+    echo "公司所在地："."<input type='text' name='com_place' value='{$certBases[0]['com_place']}'>"."<br>";
+    echo "征信开始时间："."<input type='text' name='cert_begin' value='{$certBases[0]['cert_begin']}'>"."<br>";
+    echo "征信结束时间："."<input type='text' name='cert_end' value='{$certBases[0]['cert_end']}'>"."<br>";
+    if($noneShow2){
+        echo "<input type='submit' name='submit' value='提交'>";
+    }
+    
     
     echo "</form>";

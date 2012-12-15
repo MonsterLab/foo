@@ -3,20 +3,19 @@
 </div>
 
 <?php
-//create($cuid,$zx_code,$sq_code,$username,$password,$truename,$position,$phone,$email,$type)
     $base_url = base_url();
     if($flag != ''){
         exit($flag);
     }
-        
-    echo "<form action='{$base_url}admin/createUserBase/{$type}/{$zxcode}' method ='post'>";
-    echo "征信编码：$zxcode<br>";
-    echo "授权密码："."<input type='text' name='sqcode' value=''>"."<br>";
-    echo "登录名："."<input type='text' name='username' value=''>"."<br>";
-    echo "登录密码："."<input type='password' name='password' value=''>"."<br>";
-    echo "征联系人："."<input type='text' name='truename' value=''>"."<br>";
-    echo "联系人职位："."<input type='text' name='position' value=''>"."<br>";
-    echo "联系人电话："."<input type='text' name='phone' value=''>"."<br>";
-    echo "联系人E-mail："."<input type='text' name='email' value=''>"."<br>";
-    echo "<input type='submit' name='submit' value='提交'>";
-    echo "</form>";
+?>        
+<form action="<?php echo base_url("admin/createUserBase/{$uid}/{$zxcode}") ?>" method ='post'>
+    征信编码：<?= $zxcode?><br>
+    联系人：<input type='text' name='truename' value='<?php echo $userBases[0]['truename']?>'><br>
+    联系人职位：<input type='text' name='position' value='<?php echo $userBases[0]['position']?>'><br>
+    联系人电话：<input type='text' name='phone' value='<?php echo $userBases[0]['phone']?>'><br>
+    联系人E-mail：<input type='text' name='email' value='<?php echo $userBases[0]['email']?>'><br>
+    
+    <?php if($noneShow1){?>
+    <input type='submit' name='submit' value='提交'>
+    <?php }?>
+</form>

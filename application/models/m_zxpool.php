@@ -98,7 +98,7 @@ class M_zxpool extends CI_Model{
     */
    public function addIndustry($cuid,$industry_name,$type){
        //检验$type是否在规定之中
-       if(!in_array($type,array('topic','medium','talents'))){
+       if(!in_array($type,array('topic','medium','talent'))){
            return -2;
        }
        $isExist = $this->checkIndustry(0,$industry_name,$type);
@@ -222,6 +222,7 @@ class M_zxpool extends CI_Model{
    private function checkIndustry($currentId,$_industryName,$_type){
        $this->db->where('industry_name',$_industryName);
        $this->db->where('type',$_type);
+       $this->db->where('status',1);
        $this->db->select('id');
        $dbResult = $this->db->get('zx_industry_type');
        
@@ -372,6 +373,7 @@ class M_zxpool extends CI_Model{
    private function checkFileType($_fileType,$_type){
        $this->db->where('file_name',$_fileType);
        $this->db->where('type',$_type);
+       $this->db->where('status',1);
        $this->db->select('id');
        $dbResult = $this->db->get('zx_cert_file_type');
        

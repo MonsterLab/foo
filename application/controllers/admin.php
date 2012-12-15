@@ -61,6 +61,84 @@ class Admin extends CI_Controller{
     }
     
     /**-----------------------------管理员、客户管理------------------------------------**/
+    public function createAdmin($adminId = 0){
+        
+        //默认为直接添加，即不存在原有数据
+        $data = array(
+            'username'=>'',
+            'password'=>'',
+            'truename'=>'',
+            'department'=>'',
+            'phone'=>'',
+            'email'=>'',
+            'power'=>'',
+        );
+        //修改，修改时显示原有数据
+        if($adminId > 0){
+            $fooAdmin = $this->admin->search($adminId,3);
+            if($fooAdmin){
+                $data = array(
+                    'username'=>$fooAdmin[0]['username'],
+                    'password'=>$fooAdmin[0]['password'],
+                    'truename'=>$fooAdmin[0]['truename'],
+                    'department'=>$fooAdmin[0]['department'],
+                    'phone'=>$fooAdmin[0]['phone'],
+                    'email'=>$fooAdmin[0]['email'],
+                    'power'=>$fooAdmin[0]['power'],
+                );
+            }
+        }
+        
+        if($_POST){
+            $fooCUID = $this->admin->getUID();
+            $fooUsername = trim($this->input->post('username'));
+            $fooPassword = trim($this->input->post('password'));
+            $fooTruename = trim($this->input->post('truename'));
+            $fooDepartment = trim($this->input->post('department'));
+            $fooPhone = trim($this->input->post('phone'));
+            $fooEmail = trim($this->input->post('email'));
+            $fooPower = trim($this->input->post('power'));
+            
+            //权限、使用人姓名、用户名、密码为必须，其它选填
+            if($fooUsername == NULL || $fooPassword == NULL || $fooTruename == NULL 
+                    || $fooPower == NULL){
+                
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createAdmin',$data);
+                return;
+            }
+            
+            $fooResult = $this->admin->create($fooCUID,$fooUsername,$fooPassword,$fooTruename,$fooDepartment,$fooPhone,$fooEmail,$fooPower);
+            if($fooResult == -1){
+                $data['flag'] = '用户登录名已存在！';
+            }elseif ($fooResult == 0) {
+                $data['flag'] = '添加失败！';
+            }elseif ($fooResult == 1) {
+                $data['flag'] = '添加成功！';
+                
+                //修改，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
+                if($adminId > 0){
+                    $fooResult = $this->admin->delete($adminId);
+                    if($fooResult){
+                        $data['flag'] = '修改成功！';
+                    }
+                }
+            }
+            
+            $this->load->view('admin/v_createAdmin',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_createAdmin',$data);
+        }
+    }
+    public function deleteAdmin($uid){
+        $fooResult = $this->admin->delete($uid);
+        if($fooResult){
+            redirect(base_url('admin/searchAdmins'));
+        }
+    }
+
     public function searchAdmins(){
         $data = array(
             'flag'=>'',

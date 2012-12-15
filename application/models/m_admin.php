@@ -30,10 +30,11 @@ class M_admin extends CI_Model{
     * @param type $department               //部门
     * @param type $phone                    //电话
     * @param type $email                    //E-mail
+    * $power                                //11客服 12 平台管理 13 录入 14 审核 99超管 
     * 
     * @return boolean                       //成功返回 1，失败返回 0，用户名存在返回 -1
     */
-   public function create($cuid,$username,$password,$truename,$department,$phone,$power,$email){
+   public function create($cuid,$username,$password,$truename,$department,$phone,$email,$power){
        $isExist = $this->checkUsername($username);
        if($isExist){
            //用户名存在，返回-1
@@ -148,7 +149,7 @@ class M_admin extends CI_Model{
        }
        
        $this->db->where('status',1);        //查询没有被弃用的用户
-       $this->db->select('id,username,truename,department,phone,power,email,cuid,ctime');
+       $this->db->select('id,username,password,truename,department,phone,power,email,cuid,ctime');
        $dbResult = $this->db->get('zx_admin',$limit,$offset);
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){

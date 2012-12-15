@@ -817,7 +817,6 @@ class Admin extends CI_Controller{
                 $method = 3;    //search user by uid
                 $res = $this->userbase->search($space_uid, $method);
                 $space_username = $res[0]['username'];
-                print_r($res);
                 $result = $this->space->createS($space_uid ,$space_username  ,$space_title, $space_content, $space_groupid);
 
                 if($result){

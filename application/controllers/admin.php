@@ -1424,7 +1424,7 @@ class Admin extends CI_Controller{
             $search = $_POST['search'];
             switch ($search){
                 case 'username':
-                    $username = $key;
+                    $username = trim($key);
                     $method = 0;        //search users by username
                     $userspaceList = $this->userbase->search($username, $method);
                     $allRows = count($userspaceList);
@@ -1434,7 +1434,7 @@ class Admin extends CI_Controller{
                     $userspaceList = $this->userbase->search($username, $method, $offset, $limit);
                     break;
                 case 'zx_code':
-                    $zx_code = $key;
+                    $zx_code = trim($key);
                     $method = 1;        //search users by zx_code
                     $userspaceList = $this->userbase->search($zx_code, $method);
                     $allRows = count($userspaceList);
@@ -1444,7 +1444,14 @@ class Admin extends CI_Controller{
                     $userspaceList = $this->userbase->search($zx_code, $method, $offset, $limit);
                     break;
                 case 'type':
-                    $type = $key;
+                    $type = trim($key);
+                    if($type == '纳税主体征信库'){
+                        $type = 'topic';
+                    } else if($type == '中介机构征信库'){
+                        $type = 'medium';
+                    } else if($type == '财税个人征信库'){
+                        $type = 'talent';
+                    }
                     $method = 2;        //search users by type 
                     $userspaceList = $this->userbase->search($type, $method);
                     $allRows = count($userspaceList);
@@ -1466,8 +1473,15 @@ class Admin extends CI_Controller{
                     $userlistHtml .= '<tr>';
                     $userlistHtml .= '<td><a href="'.base_url('admin/'.$m).'?uid='.$row['id'].'">'.$row['username'].'</a></td>';
                     $userlistHtml .= '<td>'.$row['zx_code'].'</td>';
-                    //TODO TYPE
-                    $userlistHtml .= '';
+                    $type = $row['type'];
+                    if($type == 'topic'){
+                        $type = '纳税主体征信库';
+                    } else if($type == 'medium'){
+                        $type = '中介机构征信库';
+                    } else if($type == 'talent'){
+                        $type = '财税个人征信库';
+                    }
+                    $userlistHtml .= '<td>'.$type.'</td>';
                     $pass = $row['space_id'] > 0 ? '是' : '否';
                     $userlistHtml .= '<td>'.$pass.'</td>';
                     $userlistHtml .= '</tr>';
@@ -1492,14 +1506,22 @@ class Admin extends CI_Controller{
             $pageBar = $page->getPage($userspaceList);
             $userlistHtml = '<table>
                                 <tr>
-                                    <th>用户名</th><th>征信编码</th><th>是否开通空间</th>
+                                    <th>用户名</th><th>征信编码</th><th>征信库类型</th><th>是否开通空间</th>
                                 </tr>';                
-            
             if(!empty($userspaceList)){
                 foreach ($userspaceList as $row){
                     $userlistHtml .= '<tr>';
                     $userlistHtml .= '<td><a href="'.base_url('admin/'.$m).'?uid='.$row['id'].'">'.$row['username'].'</a></td>';
                     $userlistHtml .= '<td>'.$row['zx_code'].'</td>';
+                    $type = $row['type'];
+                    if($type == 'topic'){
+                        $type = '纳税主体征信库';
+                    } else if($type == 'medium'){
+                        $type = '中介机构征信库';
+                    } else if($type == 'talent'){
+                        $type = '财税个人征信库';
+                    }
+                    $userlistHtml .= '<td>'.$type.'</td>';
                     $pass = $row['space_id'] > 0 ? '是' : '否';
                     $userlistHtml .= '<td>'.$pass.'</td>';
                     $userlistHtml .= '</tr>';
@@ -1626,6 +1648,119 @@ class Admin extends CI_Controller{
         $data['mess'] = $mess;
         
         $this->load->view('admin/v_viewSArticle', $data);
+    }
+    
+    /**
+     * this method is used for creating a group of article
+     * 
+     */
+    public function createSGroup(){
+        //TODO 权限的验证
+        $uid = 5;
+        $status = 1;    // the group isn't deleted
+        if(isset($_POST['sub'])){
+            $groupfather_id = trim($_POST['groupfather_id']);
+            $group_name = trim($_POST['group_name']);
+            $group_url = trim($_POST['group_url']);
+            $group_summary = trim($_POST['group_summary']);
+            $result = 0;
+            if($groupfather_id == -1 || empty($group_name) || empty($group_url) || empty($group_summary)){
+                $result = 0;
+            } else {
+                $result = $this->space->createSGroup($uid,$group_name, $group_url, $group_summary, $groupfather_id);
+            }
+            $groups = $this->space->getAllSGroups($uid, $status);
+            $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
+            $groupsHtml .= '<option value="-1">请选择一个分类</option>';
+            if($groups){
+                foreach ($groups as $group){
+                    if(isset($_POST['sub'])){
+                        if($group['space_gid'] == $_POST['groupfather_id']){
+                            $groupsHtml .= '<option selected="selected" value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
+                            continue;
+                        }
+                    }
+                    $groupsHtml .= '<option value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
+                }
+            }
+
+            $groupsHtml .= ' </select>';
+            $data['groupsHtml'] = $groupsHtml;
+            
+            if($result){
+                $data['flag'] = 1;
+                $data['message'] = '添加成功';    
+                
+                $this->load->view('admin/v_createSGroup', $data);
+            } else {
+                $data['flag'] = 0;
+                $data['message'] = '添加失败<br/>必须选择分类，必须填写完整
+                    ';
+                $data['groupfather_id'] = $groupfather_id;
+                $data['group_name'] = $group_name;
+                $data['group_url'] = $group_url;
+                $data['group_summary'] = $group_summary;                
+                
+                $this->load->view('admin/v_createSGroup', $data);
+            }
+        } else {
+            $groups = $this->space->getAllSGroups($uid, $status);
+            if(count($groups) == 0){
+                $group_name = '首页';
+                $group_url = 'sy';
+                $group_summary = '这是所有文章分类的父类，不能被删除';
+                $groupfather_id = -1;
+                $result = $this->space->createSGroup($uid,$group_name, $group_url, $group_summary, $groupfather_id);
+                $groups = $this->space->getAllSGroups($uid, $status);
+            }
+            $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
+            $groupsHtml .= '<option value="-1">请选择一个分类</option>';
+            if($groups){
+                foreach ($groups as $group){
+                    if(isset($_POST['sub'])){
+                        if($group['space_gid'] == $_POST['space_groupfather_id']){
+                            $groupsHtml .= '<option selected="selected" value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
+                            continue;
+                        }
+                    }
+                    $groupsHtml .= '<option value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
+                }
+            }
+
+            $groupsHtml .= ' </select>';
+            $data['groupsHtml'] = $groupsHtml;
+            $this->load->view('admin/v_createSGroup', $data);
+        }
+    }
+    
+    public function manageSGroup(){
+        //TODO 权限的验证
+        //TODOsss
+        $uid = 5;
+        $status = 1;    // the group isn't deleted
+        $groups = $this->space->getAllSGroups($uid, $status);
+        $groupsHtml = '<table>';
+        $groupsHtml .= '<tr>
+                            <th>文章栏目</th><th>上级分组</th><th colspan="2">操作</th>
+                        </tr>';
+        if($groups){
+            foreach ($groups as $groupfather)
+                foreach ($groups as $groupChild){
+                    if($groupChild['space_groupfather_id'] == $groupfather['space_gid']){
+                        $groupsHtml .= '<tr>';
+                        $groupsHtml .= '<td>'.$groupChild['space_group_name'].'</td>';
+                        $groupsHtml .= '<td>'.$groupfather['space_group_name'].'</td>';
+                        $groupsHtml .= '<td><a href="">修改</td>';
+                        $groupsHtml .= '<td><a href="">删除</a></td>';
+                        $groupsHtml .= '</tr>';
+                    }
+                }
+        } else {
+            $groupsHtml .= '<tr>没有分组</tr>';
+        }
+        $groupsHtml .= '</table>';
+        $data['groupsHtml'] = $groupsHtml;        
+        $this->load->view('admin/v_manageGroup', $data);
     }
     
 }# end of class

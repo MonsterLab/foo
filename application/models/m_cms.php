@@ -142,6 +142,7 @@ class M_cms extends CI_Model{
         $this->db->select('aid, uid, username, title, groupid, audit, audit_id, status, ctime, viewtimes');
         $this->db->where('uid', $uid);
         $this->db->where('status', $status);
+        $this->db->order_by("ctime", "desc"); 
         $this->db->limit($offset,$limit);
         
         $query = $this->db->get('zx_articles');
@@ -176,6 +177,7 @@ class M_cms extends CI_Model{
         if(!($limit == 'start' && $offset == 'end')){
             $this->db->limit($offset,$limit);
         }
+        $this->db->order_by("ctime", "desc"); 
         
         $query = $this->db->get('zx_articles');
         $result = $query->result_array();
@@ -376,6 +378,7 @@ class M_cms extends CI_Model{
         $this->db->select("gid, group_name, groupfather_id");
         $this->db->where('uid', $uid); 
         $this->db->where('status',$status);
+        $this->db->order_by("gid", "desc"); 
         $query = $this->db->get('zx_article_groups');
         
         $numRows = $query->num_rows();

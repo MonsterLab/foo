@@ -721,7 +721,7 @@ class Admin extends CI_Controller{
         $groupid = 0;
         if($groups){
             foreach ($groups as $group){
-                $groupsHtml .= '<option groupid="'.$group['gid'].'">'.$group['group_name'].'</option>';
+                $groupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
             }
             
             
@@ -730,7 +730,7 @@ class Admin extends CI_Controller{
                 break;
             }
         } else {
-            $groupsHtml .= '<option groupid="0">没有分类</option>';
+            $groupsHtml .= '<option value="0">没有分类</option>';
         }
         $groupsHtml .= ' </select>';
         $limit = 'start';
@@ -912,6 +912,231 @@ class Admin extends CI_Controller{
         $groupsHtml .= '</table>';
         $data['groupsHtml'] = $groupsHtml;        
         $this->load->view('admin/v_manageGroup', $data);
+    }
+    
+    
+    /************************************space******************************************/
+    /**
+     * this method is used for create article for super user
+     */
+    public function createSArticle(){ 
+        if(isset($_GET['uid'])){        //if the admin click a user 
+            $uid = $_GET['uid'];
+            //TODO 根据用户id写文章
+            //the uid should use session transfer
+            //TODO 用户是否可以自定义分组，如果不可以，则不能要uid这个字段，因为任何用户
+            //登录都不是管理员，也就是说没有分组
+            //$space_uid = 5;
+            
+            $space_status = 1;
+            $uidadmin = 5;// the user who has created the groups of user space
+            $space_groups = $this->space->getAllSGroups($uidadmin, $space_status);
+            $data['space_groups'] = $space_groups;
+            $data['uid'] = $uid;
+            if(isset($_POST['sub'])){
+                $space_groupid = $this->input->post('space_gid');
+                $space_title = $this->input->post('space_title');
+                $space_content = $this->input->post('space_content'); 
+                $space_uid = $uid;
+                $method = 3;    //search user by uid
+                $res = $this->userbase->search($space_uid, $method);
+                $space_username = $res[0]['username'];
+                print_r($res);
+                $result = $this->space->createS($space_uid ,$space_username  ,$space_title, $space_content, $space_groupid);
+
+                if($result){
+                    $data['flag'] = 1;
+                    $data['message'] = '添加成功';    
+
+                    $this->load->view('admin/v_createSArticle', $data);
+                } else {
+                    $data['flag'] = 0;
+                    $data['message'] = '添加失败';
+                    $data['gid'] = $groupid;
+                    $data['title'] = $title;
+                    $data['content'] = $content;
+
+                    $this->load->view('admin/v_createSArticle', $data);
+                }
+
+            } else { //if the admin don't position at a user            
+                $this->load->view('admin/v_createSArticle', $data);
+            }
+            
+        } else {
+            $m = 'createSArticle';
+            $this->userspaceList($m);
+        }       
+    }
+    
+    /**
+     * it's a private function, used to list all users
+     */
+    private function userspaceList($m = 'manageSArticle'){
+        if(isset($_POST['sub'])){       //if the admin choose to search
+            $key = $_POST['key'];
+            $search = $_POST['search'];
+            switch ($search){
+                case 'username':
+                    $username = $key;
+                    $method = 0;        //search users by username
+                    $userspaceList = $this->userbase->search($username, $method);
+                    $allRows = count($userspaceList);
+                    $page = new Page($allRows);
+                    $limit = $page->getLimit(); //the start position        
+                    $offset = $page->getOffset();//the offset of count
+                    $userspaceList = $this->userbase->search($username, $method, $offset, $limit);
+                    break;
+                case 'zx_code':
+                    $zx_code = $key;
+                    $method = 1;        //search users by zx_code
+                    $userspaceList = $this->userbase->search($zx_code, $method);
+                    $allRows = count($userspaceList);
+                    $page = new Page($allRows);
+                    $limit = $page->getLimit(); //the start position        
+                    $offset = $page->getOffset();//the offset of count
+                    $userspaceList = $this->userbase->search($zx_code, $method, $offset, $limit);
+                    break;
+                case 'type':
+                    $type = $key;
+                    $method = 2;        //search users by type 
+                    $userspaceList = $this->userbase->search($type, $method);
+                    $allRows = count($userspaceList);
+                    $page = new Page($allRows);
+                    $limit = $page->getLimit(); //the start position        
+                    $offset = $page->getOffset();//the offset of count
+                    $userspaceList = $this->userbase->search($type, $method, $offset, $limit);
+                    break;
+            }
+            
+            $pageBar = $page->getPage($userspaceList);
+            $userlistHtml = '<table>
+                                <tr>
+                                    <th>用户名</th><th>征信编码</th><th>征信库类型</th><th>是否开通空间</th>
+                                </tr>';                
+            
+            if(!empty($userspaceList)){
+                foreach ($userspaceList as $row){
+                    $userlistHtml .= '<tr>';
+                    $userlistHtml .= '<td><a href="'.base_url('admin/'.$m).'?uid='.$row['id'].'">'.$row['username'].'</a></td>';
+                    $userlistHtml .= '<td>'.$row['zx_code'].'</td>';
+                    //TODO TYPE
+                    $userlistHtml .= '';
+                    $pass = $row['space_id'] > 0 ? '是' : '否';
+                    $userlistHtml .= '<td>'.$pass.'</td>';
+                    $userlistHtml .= '</tr>';
+                }
+            }
+            
+            $userlistHtml .= '</table>';
+            
+            
+            $data['pageBar'] = $pageBar;
+            $data['userlistHtml'] = $userlistHtml;
+            
+            $this->load->view('admin/v_userspaceList', $data);
+        } else {    //if the admin don't choose to search 
+            $userspaceList = $this->userbase->search();
+            $allRows = count($userspaceList);
+            $page = new Page($allRows);
+            $limit = $page->getLimit(); //the start position        
+            $offset = $page->getOffset();//the offset of count
+            //use the default value for searching ,just require offset and limit
+            $userspaceList = $this->userbase->search('', 0, $offset, $limit);
+            $pageBar = $page->getPage($userspaceList);
+            $userlistHtml = '<table>
+                                <tr>
+                                    <th>用户名</th><th>征信编码</th><th>是否开通空间</th>
+                                </tr>';                
+            
+            if(!empty($userspaceList)){
+                foreach ($userspaceList as $row){
+                    $userlistHtml .= '<tr>';
+                    $userlistHtml .= '<td><a href="'.base_url('admin/'.$m).'?uid='.$row['id'].'">'.$row['username'].'</a></td>';
+                    $userlistHtml .= '<td>'.$row['zx_code'].'</td>';
+                    $pass = $row['space_id'] > 0 ? '是' : '否';
+                    $userlistHtml .= '<td>'.$pass.'</td>';
+                    $userlistHtml .= '</tr>';
+                }
+            }
+            
+            $userlistHtml .= '</table>';
+            
+            
+            $data['pageBar'] = $pageBar;
+            $data['userlistHtml'] = $userlistHtml;
+            
+            $this->load->view('admin/v_userspaceList', $data);
+        }
+    }
+    
+    public function manageSArticle(){
+        if(isset($_GET['uid'])){    //if click the username in list
+            
+            $uidadmin = 5;// the user who has created the groups of user space
+            $space_status = 1;
+            $space_groups = $this->space->getAllSGroups($uidadmin, $space_status);
+            $groupsHtml = '<select name="space_groupid" id="groupid">';
+            if(!empty($space_groups)){
+                foreach ($space_groups as $group){
+                    $groupsHtml .= '<option value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
+                }
+//
+//
+//                foreach ($space_groups as $row){
+//                    $groupid = $row['space_gid'];
+//                    break;
+//                }
+            } else {
+                $groupsHtml .= '<option value="0">没有分类</option>';
+            }
+            $groupsHtml .= ' </select>';
+            $space_uid = $_GET['uid'];
+            $method = 0;    //this represents getUserSArticles()
+            $limit = 'start';
+            $offset= 'end';
+            
+            $articles = $this->space->searchS($space_uid, $method, $space_status, $limit, $offset);
+            $page = new Page(count($articles));
+            $limit = $page->getLimit();
+            $offset = $page->getOffset();
+            $articles = $this->space->searchS($space_uid, $method, $space_status, $limit, $offset);
+            $pageBar = $page->getPage($articles);
+            $articleHtml = '<table>';
+            $articleHtml .= '<tr>
+                            <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th colspan="2">操作</th>
+                            </tr>';
+            if(!empty($articles)){
+                foreach ($articles as $row){
+                    $articleHtml .= '<tr>';
+                    $articleHtml .= '<td>'.$row['space_title'].'('.$row['space_viewtimes'].')</a></td>';
+                    $articleHtml .= '<td>'.$row['space_username'].'</td>';
+                    $articleHtml .= '<td>'.$row['space_ctime'].'</td>';
+                    if($row['space_audit'] == 0){
+                        $auditText = '未审核';                
+                    } else if ($row['space_audit'] == 1){
+                        $auditText = '审核通过';
+                    } else if ($row['space_audit'] == -1){
+                        $auditText = '审核未通过';
+                    }
+                    $articleHtml .= '<td><a href="'.base_url('admin/auditArticle?space_aid='.$row['space_aid']).'">【'.$auditText.'】</a>';
+                    $articleHtml .= '<a href="">【查看】</a>';
+                    $articleHtml .= '<a href="">【修改】</a>';
+                    $articleHtml .= '<a href="">【删除】</a>';
+                    $articleHtml .= '</td>';
+                    $articleHtml .= '</tr>';
+                }
+            }
+            $articleHtml .= '</table>';
+            $data['groupsHtml'] = $groupsHtml;
+            $data['pageBar'] = $pageBar;
+            $data['articleHtml'] = $articleHtml;
+            
+            $this->load->view('admin/v_manageSArticle', $data);
+        } else {    // else if(isset($_GET['uid']))
+            $m = 'manageSArticle';
+            $this->userspaceList($m);
+        }
     }
     
 }# end of class

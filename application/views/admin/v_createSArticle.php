@@ -6,7 +6,7 @@
     </head>
     <body id="createArticle-body">
         <div id="createArticle">
-            <form action="<?php echo base_url('admin/createArticle') ?>" method="post">
+            <form action="<?php echo base_url('admin/createSArticle?uid='.$uid) ?>" method="post">
                 <?php 
                     if(isset($flag)){
                         echo '<p>'.$message.'</p>';
@@ -22,25 +22,25 @@
                 ?>
                 <p>
                     <label for="groupid">文章分类</label>
-                    <select name="gid">
+                    <select name="space_gid">
                         <?php 
-                            foreach ($groups as $row){
-                                if(isset($flag) && $gid == $row['gid']){
-                                    echo '<option selected="selected" value='.$row['gid'].'>'.$row['group_name'].'</option>';
+                            foreach ($space_groups as $row){
+                                if(isset($flag) && $gid == $row['space_gid']){
+                                    echo '<option selected="selected" value='.$row['space_gid'].'>'.$row['space_group_name'].'</option>';
                                     continue;;
                                 }
-                                echo '<option value='.$row['gid'].'>'.$row['group_name'].'</option>';
+                                echo '<option value='.$row['space_gid'].'>'.$row['space_group_name'].'</option>';
                             }
                         ?>
                     </select>
                 </p>
                 <p>
                     <label for="title">文章标题</label>
-                    <input type="text" name="title" id ="title" value="<?php echo $titText;?>"/>
+                    <input type="text" name="space_title" id ="title" value="<?php echo $titText;?>"/>
                 </p>
                 <p>
                     <label for="content">文章内容</label>
-                    <textarea rows="20" cols="80" name="content"><?php echo $conText;?></textarea>
+                    <textarea rows="20" cols="80" name="space_content"><?php echo $conText;?></textarea>
                 </p>
                 <p>
                     <input type="submit" name="sub" id="sub" value="添加文章"/><input type="reset" name="reset" id="reset" value="重填"/>

@@ -1596,15 +1596,13 @@ class Admin extends CI_Controller{
             } else {
                 $result = $this->space->createSGroup($uid,$group_name, $group_url, $group_summary, $groupfather_id);
             }
-            
-            $groups = $this->cms->getAllSGroups($uid, $status);
-            
+            $groups = $this->space->getAllSGroups($uid, $status);
             $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
             $groupsHtml .= '<option value="-1">请选择一个分类</option>';
             if($groups){
                 foreach ($groups as $group){
                     if(isset($_POST['sub'])){
-                        if($group['space_gid'] == $_POST['space_groupfather_id']){
+                        if($group['space_gid'] == $_POST['groupfather_id']){
                             $groupsHtml .= '<option selected="selected" value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
                             continue;
                         }
@@ -1660,6 +1658,36 @@ class Admin extends CI_Controller{
             $data['groupsHtml'] = $groupsHtml;
             $this->load->view('admin/v_createSGroup', $data);
         }
+    }
+    
+    public function manageSGroup(){
+        //TODO 权限的验证
+        //TODOsss
+        $uid = 5;
+        $status = 1;    // the group isn't deleted
+        $groups = $this->space->getAllSGroups($uid, $status);
+        $groupsHtml = '<table>';
+        $groupsHtml .= '<tr>
+                            <th>文章栏目</th><th>上级分组</th><th colspan="2">操作</th>
+                        </tr>';
+        if($groups){
+            foreach ($groups as $groupfather)
+                foreach ($groups as $groupChild){
+                    if($groupChild['space_groupfather_id'] == $groupfather['space_gid']){
+                        $groupsHtml .= '<tr>';
+                        $groupsHtml .= '<td>'.$groupChild['space_group_name'].'</td>';
+                        $groupsHtml .= '<td>'.$groupfather['space_group_name'].'</td>';
+                        $groupsHtml .= '<td><a href="">修改</td>';
+                        $groupsHtml .= '<td><a href="">删除</a></td>';
+                        $groupsHtml .= '</tr>';
+                    }
+                }
+        } else {
+            $groupsHtml .= '<tr>没有分组</tr>';
+        }
+        $groupsHtml .= '</table>';
+        $data['groupsHtml'] = $groupsHtml;        
+        $this->load->view('admin/v_manageGroup', $data);
     }
     
 }# end of class

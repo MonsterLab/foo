@@ -8,7 +8,7 @@
         <div id="createGroup">
             <h2>添加一个新的文章分组</h2>
             <div id="content">
-                <form action="<?php echo base_url('admin/createGroup'); ?>" method="post">
+                <form action="<?php echo base_url('admin/createSGroup'); ?>" method="post">
                     <?php 
                         if(isset($flag)){
                             echo '<p>'.$message.'</p>';

@@ -7,8 +7,8 @@
     <body id="header-body">
         <div id="header-l">征信管理平台</div>
         <div id="header-r">
-            <a href="">首页</a>
-            <a href="">退出</a>
+            <a href="<?php echo base_url()?>">首页</a>
+            <a href="<?php echo base_url('admin/logout');?>">退出</a>
         </div>
     </body>
 </html>

@@ -5,8 +5,8 @@
     </head>
     <body>
         <form method="post" action="#">
-            <input type="text" name="username" />
-            <input type="text" name="userpassword" />
+            用户名：<input type="text" name="username" />
+            密码：<input type="password" name="userpassword" />
             <input type="submit" value="登录" />
         </form>
     </body>

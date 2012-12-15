@@ -26,6 +26,12 @@ class Cms extends CI_Controller{
         $this->load->view('cms/article', $data);
     }
     
+    public function echoMenu(){
+        //TODO
+        //logic
+        //$this->load->xxxx
+    }
+    
     public function showList($group_url ='', $gid = 0){
         //TODO nav
         //make a nav for the group

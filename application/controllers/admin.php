@@ -23,12 +23,11 @@ class Admin extends CI_Controller{
     //************************基本操作**********************************************
     public function index(){
         $power = $this->admin->getPower();
-//        if($power < 1){
-//            redirect(base_url("admin/login/"));
-//        }  else {
-            //$this->load->view('admin/index');
+        if($power < 1){
+            redirect(base_url("admin/login/"));
+        }  else {
             $this->load->view('admin/index');
-//        }
+        }
     }
     
     public function login(){

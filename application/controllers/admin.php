@@ -181,7 +181,6 @@ class Admin extends CI_Controller{
     }
 
     public function createUser($zxcode = 0 ,$uid = 0){
-        
         //默认为直接添加，即不存在原有数据
         $data = array(
             'zxcode'=>$zxcode,
@@ -197,15 +196,13 @@ class Admin extends CI_Controller{
             $fooUser = $this->searchComName($fooUserbase);          //将公司名查询出
             if($fooUser){
                 $data = array(
+                    'zxcode'=>$zxcode,
+                    'type'=>$fooUser[0]['type'],
                     'username'=>$fooUser[0]['username'],
                     'password'=>$fooUser[0]['password'],
                     'sqcode'=>$fooUser[0]['sq_code'],
+                    'cert_name'=>$fooUser[0]['cert_name']
                 );
-                if($fooUser[0]['type'] == 'talent'){
-                    $data['cert_name'] = $fooUser[0]['cert_name'];
-                }  else {
-                    $data['cert_name'] = $fooUser[0]['com_name'];
-                }
             }
         }
         
@@ -781,6 +778,53 @@ class Admin extends CI_Controller{
         
     }
     
+    public function showUserInfos($zxcode){
+        $data = array(
+            'flag'=>'',
+            'zxcode' => 0,
+            'com_name' => 'known'
+        );
+        
+        $fooUserBase = $this->userbase->search($zxcode,1);
+
+        if($fooUserBase == FALSE){
+            $data['flag'] = '没有数据！';
+            $this->load->view('admin/v_showUserInfos',$data);
+            return;
+        }
+        
+        $fooType = $fooUserBase['0']['type'];
+        $fooUID = $fooUserBase['0']['id'];
+
+        //topic、medium、talent 
+        if($fooType == 'topic'){
+            $fooBase = $this->topic->searchCertBase($fooUID);
+            $fooContent = $this->topic->searchCertContent($fooUID);
+            $fooFile = $this->topic->searchCertFile($fooUID);
+
+        }
+        if($fooType == 'medium'){
+
+            $fooBase = $this->medium->searchCertBase($fooUID);
+            $fooContent = $this->medium->searchCertContent($fooUID);
+            $fooFile = $this->medium->searchCertFile($fooUID);
+
+        }           
+        if($fooType == 'talent'){
+            $fooBase = $this->talent->searchCertBase($fooUID);
+            $fooContent = $this->talent->searchCertContent($fooUID);
+            $fooFile = $this->talent->searchCertFile($fooUID);
+
+        }           
+
+        $data['userBases'] = $fooUserBase;
+        $data['certBases'] = $fooBase;
+        $data['certContents'] = $fooContent;
+        $data['certFiles'] = $fooFile;
+
+        $this->load->view('admin/v_showUserInfos',$data);
+            
+    }
 
     /**
      * 批量导入征信编码

@@ -24,7 +24,7 @@
         if($zxcode['status'] == 1){
             $state = '已使用';
             $handle = '查看信息';
-            $link = "";
+            $link = base_url("admin/showUserInfos/{$zxcode['zx_code']}/");
         }elseif ($zxcode['status'] == 0) {
             $state = '未使用';
             $handle = '添加客户';

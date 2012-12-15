@@ -29,7 +29,7 @@
             }
             $html .= "<tr>";
             $html .= "<td align='center'>{$userBase['zx_code']}</td>";
-            $html .= "<td align='center'>{$userBase['com_name']}</td>";
+            $html .= "<td align='center'>{$userBase['cert_name']}</td>";
             $html .= "<td align='center'>{$fooType}</td>";
             $html .= "<td align='center'>{$userBase['ctime']}</td>";
             $html .= "<td align='center'><a href='{$base_url}admin/createUser/{$userBase['id']}/'><input type='button' value='修改'></a>";

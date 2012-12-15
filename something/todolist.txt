@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 Model_user_base
 -数据库无type字段
 -search不返回type
@@ -8,8 +7,10 @@ Model_user_base
 将zx_user_base中的space_id添加默认值为0
 2012-12-14 fei:
 将zx_medium_cert_base中place字段改为com_place;添加字段com_phone char(20) not null
-=======
+2012-12-15 fei:
+将zx_talent_cert_base添加 uid int字段
+
 Controller search
     未成功加载视图，需要填充数据后修正
 
->>>>>>> a280863e4b1fce5553b56c2c7f40dd1e555d11d0
+

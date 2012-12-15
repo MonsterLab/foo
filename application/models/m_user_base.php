@@ -60,6 +60,8 @@ class M_user_base extends CI_Model{
        $this->db->insert('zx_user_base',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
+           
+           
            return $this->db->insert_id();
        }  else {
            

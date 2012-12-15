@@ -44,9 +44,9 @@
                     <dl>
                         <dt>征信库管理</dt>
                         <dd><a href="">征信编码池管理</a></dd>
-                        <dd><a href="">纳税主体征信库</a></dd>
-                        <dd><a href="">中介机构征信库</a></dd>
-                        <dd><a href="">财税个人征信库</a></dd>
+                        <dd><a href="<?= base_url('admin/searchUsers/topic')?>" target="main">纳税主体征信库</a></dd>
+                        <dd><a href="<?= base_url('admin/searchUsers/medium')?>" target="main">中介机构征信库</a></dd>
+                        <dd><a href="<?= base_url('admin/searchUsers/talent')?>" target="main">财税个人征信库</a></dd>
                         <dd><a href="">具体征信项目设置</a></dd>
                         <dd><a href="">行业分类设置</a></dd>
                     </dl>

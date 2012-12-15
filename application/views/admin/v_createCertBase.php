@@ -1,10 +1,14 @@
+<div>
+    <h2>添加认证基本信息</h2>
+</div>
+
 <?php
     $base_url = base_url();
     if($flag != ''){
         exit($flag);
     }
     //$cuid,$uid,$com_name,$com_nature,$com_phone,$zipcode,$com_place,$industry_id,$cert_begin,$cert_end  
-    echo "<form action='{$base_url}admin/createCertBase' method ='post'>";
+    echo "<form action='{$base_url}admin/createCertBase/{$type}/{$uid}' method ='post'>";
     
     echo "行业类别：";
     echo "<select name = 'industry'>";

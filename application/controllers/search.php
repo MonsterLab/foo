@@ -6,10 +6,10 @@ class Search extends CI_Controller{
         
         $this->load->helper('url');
        
-        $this->load->model('M_user_base','jc');     //基础
-        $this->load->model('M_talent','rc');        //人才
-        $this->load->model('M_topic','zt');         //主体
-        $this->load->model('M_medium','zj');        //中介
+        $this->load->model('M_user_base','userbase');       //基础
+        $this->load->model('M_talent','talent');            //人才
+        $this->load->model('M_topic','topic');              //主体
+        $this->load->model('M_medium','medium');            //中介
     }
     
     public function index(){
@@ -35,109 +35,152 @@ class Search extends CI_Controller{
     
     public function step1(){
         $data = array(
+            'flag'=>'',
             'zxcode' => 0,
             'com_name' => 'unknown'            
         );
         
         if($_POST){
-            $data['zxcode'] = $this->input->post('zxcode');
-            $fooUserBase = $this->jc->search($data['zxcode'],1);
+            $fooZxcode = $this->input->post('zxcode');
+            if($fooZxcode == NULL){
+                $data['flag'] = '请完善信息！';
+                $this->load->view('search/step1',$data);
+                return;
+            }
+            $fooUserBase = $this->userbase->search($fooZxcode,1);
+            //var_dump($fooUserBase);
             
             if($fooUserBase == FALSE){
-                redirect(base_url('search/index'));
+                $data['flag'] = '客户不存在！';
+                $this->load->view('search/step1',$data);
+                return;
             }
             
-
-            $fooType = $fooUserBase['0']['type'];
-            $fooUID = $fooUserBase['0']['id'];
+            $fooType = $fooUserBase['0']['type'];           //被查询客户的征信库类型
+            $fooUID = $fooUserBase['0']['id'];              //被查询客户的id
             
             //topic、medium、talent 
             if($fooType == 'topic'){
-                $fooTopic = $this->zt->searchCertBase($fooUID);
-                $data['com_name'] = $fooTopic['com_name'];
+                $fooResult = $this->topic->searchCertBase($fooUID);
             }
             if($fooType == 'medium'){
-                $fooTopic = $this->zj->searchCertBase($fooUID);
-                $data['com_name'] = $fooTopic['com_name'];
+                $fooResult = $this->medium->searchCertBase($fooUID);
             }           
             if($fooType == 'talent'){
-                $fooTopic = $this->rc->searchCertBase($fooUID);
-                $data['com_name'] = $fooTopic['cert_name'];
+                $fooResult = $this->talent->searchCertBase($fooUID);
             }           
             
+            
+            $fooUserBase[0]['com_name'] = $fooResult[0]['com_name'];
+            
+            $data['userBases'] = $fooUserBase;
+            $data['zxcode'] = $fooZxcode;
             $this->load->view('search/step2',$data);
             
-            return;
+            
+        }  else {#end of post
+            
+            $this->load->view('search/step1',$data);
         }
-        
-        $this->load->view('search/step1');
     }
     
     public function step2(){
         $data = array(
+            'flag'=>'',
             'zxcode' => 0,
             'com_name' => 'known'
         );
         
         if($_POST){
             $data['zxcode'] = $this->input->post('zxcode');
-            $data['sqcode'] = $this->input->post('sqcode');
+            $data['sqcode'] = trim($this->input->post('sqcode'));
             
-            $fooUserBase = $this->jc->search($data['zxcode'],1);
+            if($data['sqcode'] == NULL){
+                $data['flag'] = '请完善信息！';
+                $this->load->view('search/step2',$data);
+                return;
+            }
+            $fooUserBase = $this->userbase->search($data['zxcode'],1);
             
             if($fooUserBase == FALSE){
                 redirect(base_url('search/index'));
             }
-            
-
+            $fooSqcode = $fooUserBase[0]['sq_code'];
             $fooType = $fooUserBase['0']['type'];
             $fooUID = $fooUserBase['0']['id'];
             
+            if($fooSqcode != $data['sqcode']){
+                $data['flag'] = '授权码错误！';
+                $this->load->view('search/step2',$data);
+                return;
+            }
             //topic、medium、talent 
             if($fooType == 'topic'){
-                $fooBase = $this->zt->searchCertBase($fooUID);
-                $fooContent = $this->zt->searchCertContent($fooUID);
-                $fooFile = $this->zt->searchCertFile($fooUID);
+                $fooBase = $this->topic->searchCertBase($fooUID);
+                $fooContent = $this->topic->searchCertContent($fooUID);
+                $fooFile = $this->topic->searchCertFile($fooUID);
 
-                $data['fooBase'] = $fooBase;
-                $data['fooContent'] = $fooContent;
-                $data['fooFile'] = $fooFile;
             }
             if($fooType == 'medium'){
 
-                $fooBase = $this->zj->searchCertBase($fooUID);
-                $fooContent = $this->zj->searchCertContent($fooUID);
-                $fooFile = $this->zj->searchCertFile($fooUID);
+                $fooBase = $this->medium->searchCertBase($fooUID);
+                $fooContent = $this->medium->searchCertContent($fooUID);
+                $fooFile = $this->medium->searchCertFile($fooUID);
 
-                $data['fooBase'] = $fooBase;
-                $data['fooContent'] = $fooContent;
-                $data['fooFile'] = $fooFile;
             }           
             if($fooType == 'talent'){
-                $fooBase = $this->rc->searchCertBase($fooUID);
-                $fooContent = $this->rc->searchCertContent($fooUID);
-                $fooFile = $this->rc->searchCertFile($fooUID);
+                $fooBase = $this->talent->searchCertBase($fooUID);
+                $fooContent = $this->talent->searchCertContent($fooUID);
+                $fooFile = $this->talent->searchCertFile($fooUID);
 
-                $data['fooBase'] = $fooBase;
-                $data['fooContent'] = $fooContent;
-                $data['fooFile'] = $fooFile;
             }           
 
+            $data['userBases'] = $fooUserBase;
+            $data['certBases'] = $fooBase;
+            $data['certContents'] = $fooContent;
+            $data['certFiles'] = $fooFile;
             
             $this->load->view('search/step2res',$data);
             
-            return;
+        }  else {
+            
+            redirect(base_url('search/index'));
         }
+    }
+    
+    public function show(){
+        echo "asd";
+    }
+
+    public function showUserInfos(){
         
-            $this->load->view('search/step2');
+        if($fooType == 'topic'){
+            $fooBase = $this->topic->searchCertBase($fooUID);
+            $fooContent = $this->topic->searchCertContent($fooUID);
+            $fooFile = $this->topic->searchCertFile($fooUID);
+
         }
-        
-        
-    
-    
-    
-    
-    
+        if($fooType == 'medium'){
+
+            $fooBase = $this->medium->searchCertBase($fooUID);
+            $fooContent = $this->medium->searchCertContent($fooUID);
+            $fooFile = $this->medium->searchCertFile($fooUID);
+
+        }           
+        if($fooType == 'talent'){
+            $fooBase = $this->talent->searchCertBase($fooUID);
+            $fooContent = $this->talent->searchCertContent($fooUID);
+            $fooFile = $this->talent->searchCertFile($fooUID);
+
+        }           
+
+        $data['userBases'] = $fooUserBase;
+        $data['certBases'] = $fooBase;
+        $data['certContents'] = $fooContent;
+        $data['certFiles'] = $fooFile;
+
+        $this->load->view('search/step2res',$data);
+    }
     
 }
 

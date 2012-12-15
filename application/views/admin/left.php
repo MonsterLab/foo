@@ -34,8 +34,8 @@
                         <dd>
                             <a href="" target="main">用户空间管理</a>
                             <ul>
-                                <li><a href="<?php echo base_url('space/createSArticle');?>" target="main">添加空间文章</a></li>
-                                <li><a href="">管理空间文章</a></li>
+                                <li><a href="<?php echo base_url('admin/createSArticle');?>" target="main">添加空间文章</a></li>
+                                <li><a href="<?php echo base_url('admin/manageSArticle');?>" target="main">管理空间文章</a></li>
                             </ul>
                         </dd>
                     </dl>

@@ -40,7 +40,19 @@
                 </p>
                 <p>
                     <label for="content">文章内容</label>
-                    <textarea rows="20" cols="80" name="space_content"><?php echo $conText;?></textarea>
+                    <?
+                        $this->load->helper('form_helper');
+                        $data = array(
+                                      'name'        => 'content',
+                                      'id'          => 'content',
+                                      'toolbarset'  => 'Default',
+                                      'basepath'    => '/workspace/foo/include/fckeditor/',
+                                      'width'       => '80%',
+                                      'height'      => '500'
+                            );
+
+                        echo form_fckeditor( $data,$conText); 
+                    ?>
                 </p>
                 <p>
                     <input type="submit" name="sub" id="sub" value="添加文章"/><input type="reset" name="reset" id="reset" value="重填"/>

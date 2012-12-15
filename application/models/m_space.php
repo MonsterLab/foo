@@ -372,9 +372,11 @@ class M_space extends CI_Model{
      * @param type $uid
      * @return int
      */
-    public function getAllSGroups($uid, $space_status = 1){
+    public function getAllSGroups($uid = 0, $space_status = 1){
         $this->db->select("space_gid, space_group_name, space_group_sumarry");
-        $this->db->where('uid', $uid); 
+        if($uid != 0){
+            $this->db->where('uid', $uid); 
+        }
         $this->db->where('space_status',$space_status);
         $query = $this->db->get('zx_space_article_groups');
         $numRows = $query->num_rows();

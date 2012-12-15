@@ -427,7 +427,7 @@ class Admin extends CI_Controller{
             }
             
             if($fooResult){
-                redirect(base_url("admin/addCertFile/$type/$uid"));
+                redirect(base_url("admin/showLuruView/$uid"));
             }  else {
                 $data['flag'] = '添加失败!';
             }
@@ -475,7 +475,7 @@ class Admin extends CI_Controller{
             } elseif ($fooResult == 0){
                 $data['flag'] = '上传失败！';
             } elseif ($fooResult == 1){
-                redirect(base_url("admin/addCertContent/$type/$uid"));
+                redirect(base_url("admin/showLuruView/$uid"));
             }
             
             $this->load->view('admin/v_addCertFile',$data);
@@ -517,7 +517,7 @@ class Admin extends CI_Controller{
             } elseif ($fooResult == 0){
                 $data['flag'] = '提交失败！';
             } elseif ($fooResult == 1){
-                $data['flag'] = '添加成功！';
+                redirect(base_url("admin/showLuruView/$uid"));
             }
             
             $this->load->view('admin/v_addCertContent',$data);
@@ -786,6 +786,7 @@ class Admin extends CI_Controller{
      * 批量导入征信编码
      */
     public function importCode(){
+        $data['flag'] = '';
         if($_POST){
             if(!empty($_FILES['file']['name'])){
                 $tmp_name = $_FILES['file']['tmp_name'];
@@ -797,6 +798,8 @@ class Admin extends CI_Controller{
                     $fooData = str_replace("\n",'', $data);
                     if(!preg_match("/^[0-9a-z]+$/",$fooData)){
                         //TODO:数据中含有非数字字母
+                        $data['flag'] = '文件数据格式错误！';
+                        $this->load->view('admin/v_importCode',$data);
                         return;
                     }
                     
@@ -807,21 +810,25 @@ class Admin extends CI_Controller{
                     $result = $this->zxpool->createCode($codeArray);
                     if($result){
                         //成功导入
-                        
+                        $data['flag'] = '成功导入！';
                     }
+                    
                 }  else {
                     //文件中数据为空
-                    
+                    $data['flag'] = '文件中数据为空！';
                 }
+                
+                $this->load->view('admin/v_importCode',$data);
                 
             }  else {
                 //未选择导入的文件
-                
+                $data['flag'] = '请选择文件！';
+                $this->load->view('admin/v_importCode',$data);
             }
             
         } else {
             
-            $this->load->view('fei_test/v_importCode.php');
+            $this->load->view('admin/v_importCode',$data);
         }    
     }
     

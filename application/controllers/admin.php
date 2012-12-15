@@ -212,7 +212,7 @@ class Admin extends CI_Controller{
         if($_POST){
             $fooCUID = $this->admin->getUID();
             $fooType = trim($this->input->post('type'));
-            $fooCertname = trim($this->input->post('sert_name'));
+            $fooCertname = trim($this->input->post('cert_name'));
             $fooUsername = trim($this->input->post('username'));
             $fooPassword = trim($this->input->post('password'));
             $fooSqcode = trim($this->input->post('sqcode'));
@@ -271,34 +271,114 @@ class Admin extends CI_Controller{
     /**
      * 增加客户基本信息
      */
-    public function createUserBase($fooType,$fooZxcode){
+    
+    public function showLuruView($uid){
+        $fooUserBases = $this->userbase->search($uid,3);            //按id查询
+        $fooZxcode = $fooUserBases[0]['zx_code'];
+        $fooType = $fooUserBases[0]['type'];
+        
+        $data['industrys'] = $this->zxpool->searchIndustry($fooType);
+        $data['fileTypes'] = $this->zxpool->searchFileType($fooType);
+        
+        if($fooType == 'topic'){
+            $fooCertBases = $this->topic->searchCertBase($uid);             //获得认证基本信息
+            $fooCertFiles = $this->topic->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertContent = $this->topic->searchCertContent($uid);        //获得认证文字类信息
+        }
+        if($fooType == 'medium'){
+            $fooCertBases = $this->medium->searchCertBase($uid);
+            $fooCertFiles = $this->medium->searchCertFile($uid);
+            $fooCertContent = $this->medium->searchCertContent($uid);
+        }
+        if($fooType == 'talent'){
+            $fooCertBases = $this->talent->searchCertBase($uid);
+            $fooCertFiles = $this->talent->searchCertFile($uid);
+            $fooCertContent = $this->talent->searchCertContent($uid);
+        }
+        
+        
+//        if(!$fooCertBases){
+//            $fooCertBases[0] = array(
+//                'com_name'=>'',
+//                'com_nature'=>'',
+//                'com_phone'=>'',
+//                'industry_id'=>'',
+//                'zipcode'=>'',
+//                'com_place'=>'',
+//                'cert_begin'=>'',
+//                'cert_end'=>''
+//            );
+//        }
+        
+        
+        $data['userBases'] = $fooUserBases;
+        $data['certBases'] = $fooCertBases;
+        $data['certFiles'] = $fooCertFiles;
+        $data['certContents'] = $fooCertContent;
+        
+        
+        $data['uid'] = $uid;
+        $data['zxcode'] = $fooZxcode;
         $data['type'] = $fooType;
+        $data['flag'] = '';
+        $data['noneShow1'] = 1;
+        $data['noneShow2'] = 1;
+        $data['noneShow3'] = 1;
+        $data['noneShow4'] = 1;
+        
+        if($fooUserBases[0]['truename'] != NULL){
+            $data['noneShow1'] = 0;
+        }
+        if($fooCertBases){
+            $data['noneShow2'] = 0;
+        }
+        if($fooCertFiles){
+            $data['noneShow3'] = 0;
+        }
+        if($fooCertContent){
+            $data['noneShow4'] = 0;
+        }
+        
+        $this->load->view('admin/v_createUserBase',$data);
+        $this->load->view('admin/v_createCertBase',$data);
+        $this->load->view('admin/v_addCertFile',$data);
+        $this->load->view('admin/v_addCertContent',$data);
+        
+    }
+    
+    public function createUserBase($uid,$fooZxcode){
+        //$data['type'] = $fooType;
+        $data['uid'] = $uid;
         $data['zxcode'] = $fooZxcode;
         if($_POST){
-            $fooSqcode = trim($this->input->post('sqcode'));
-            $fooUsername = trim($this->input->post('username'));
-            $fooPassword = trim($this->input->post('password'));
             $fooTruename = trim($this->input->post('truename'));
             $fooPosition = trim($this->input->post('position'));
             $fooPhone = trim($this->input->post('phone'));
             $fooEmail = trim($this->input->post('email'));
             
-            if($fooSqcode == NULL || $fooUsername == NULL 
-                    || $fooPassword == NULL || $fooTruename == NULL || $fooPosition == NULL
-                    || $fooPhone == NULL || $fooEmail == NULL || $fooType == NULL){
+            if($fooTruename == NULL || $fooPosition == NULL
+                    || $fooPhone == NULL || $fooEmail == NULL){
                 $data['flag'] = '请完善信息！';
                 $this->load->view('admin/v_createUserBase',$data);
                 return;
             }
-            $fooCUID = $this->admin->getUID();
-            $fooUID = $this->userbase->create($fooCUID,$fooZxcode,$fooSqcode,$fooUsername,$fooPassword,$fooTruename,$fooPosition,$fooPhone,$fooEmail,$fooType);
             
-            if($fooUID == -1){
+            $fooUserBase = $this->userbase->search($uid,3);            //按id查询
+            $fooSqcode = $fooUserBase[0]['sq_code'];
+            $fooUsername = $fooUserBase[0]['username'];
+            $fooPassword = $fooUserBase[0]['password'];
+            $fooZxcode = $fooUserBase[0]['zx_code'];
+            $fooType = $fooUserBase[0]['type'];
+            
+            
+            $fooResult = $this->userbase->update($uid,$fooZxcode,$fooSqcode,$fooPassword,$fooTruename,$fooPosition,$fooPhone,$fooEmail,$fooType);
+            
+            if($fooResult == -1){
                 $data['flag'] = '用户登录名已存在！';
-            }elseif ($fooUID == 0) {
+            }elseif ($fooResult == 0) {
                 $data['flag'] = '添加失败！';
-            }elseif ($fooUID > 0) {
-                redirect(base_url("admin/createCertBase/$fooType/$fooUID"));
+            }elseif ($fooResult == 1) {
+                redirect(base_url("admin/showLuruView/$uid"));
                 
             }
             
@@ -317,7 +397,6 @@ class Admin extends CI_Controller{
     public function createCertBase($type = '',$uid = 0){
         $data['type'] = $type;
         $data['uid'] = $uid;
-        //判断类型topic medium talent
         $data['industrys'] = $this->zxpool->searchIndustry($type);
         
         if($_POST){
@@ -703,7 +782,6 @@ class Admin extends CI_Controller{
     }
     
 
-
     /**
      * 批量导入征信编码
      */
@@ -748,6 +826,39 @@ class Admin extends CI_Controller{
     }
     
     /**
+     * 添加征信项目类型,比如营业执照、组织机构代码...
+     */
+    public function addFileType(){
+        $data['flag'] = '';
+        if($_POST){
+            $fooType = trim($this->input->post('type'));
+            $fooFilename = trim($this->input->post('filename'));
+            if($fooFilename == NULL){
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_addFileType',$data);
+                return;
+            }
+            
+            $fooCUID = $this->admin->getUID();
+            $fooResult = $this->zxpool->addFileType($fooCUID,$fooFilename,$fooType);
+            
+            if($fooResult == -1){
+                $data['flag'] = '此标题已经存！';
+            } elseif ($fooResult == 0){
+                $data['flag'] = '提交失败！';
+            } elseif ($fooResult == 1){
+                $data['flag'] = '添加成功！';
+            }
+            
+            $this->load->view('admin/v_addFileType',$data);
+            
+        }  else {
+            $this->load->view('admin/v_addFileType',$data);
+        }
+    }
+
+
+    /**
      * 搜索征信项目类型,比如营业执照、组织机构代码...
      */
     public function searchFileType(){
@@ -774,16 +885,71 @@ class Admin extends CI_Controller{
         $this->load->view('admin/v_searchFileType',$data);
     }
 
+    /**
+     * 删除征信项目类型,比如营业执照、组织机构代码...
+     * @param type $fid
+     */
+    public function deleteFileType($fid){
+        $fooResult = $this->zxpool->deleteFileType($fid);
+        if($fooResult){
+            redirect(base_url('admin/searchFileType'));
+        }
+    }
+    
+    public function addIndustry(){
+        $data['flag'] = '';
+        if($_POST){
+            $fooType = trim($this->input->post('type'));
+            $fooFilename = trim($this->input->post('industryName'));
+            if($fooFilename == NULL){
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_addIndustry',$data);
+                return;
+            }
+            
+            $fooCUID = $this->admin->getUID();
+            $fooResult = $this->zxpool->addIndustry($fooCUID,$fooFilename,$fooType);
+            
+            if($fooResult == -1){
+                $data['flag'] = '此标题已经存！';
+            } elseif ($fooResult == 0){
+                $data['flag'] = '提交失败！';
+            } elseif ($fooResult == 1){
+                $data['flag'] = '添加成功！';
+            }
+            
+            $this->load->view('admin/v_addIndustry',$data);
+            
+        }  else {
+            $this->load->view('admin/v_addIndustry',$data);
+        }
+    }
 
     /**
      * 查看行业类别
      */
     public function searchIndustry(){
-        //searchIndustry($key = '',$method = 0)
-        $result = $this->zxpool->searchIndustry('',0);
-        echo "<pre>";
-        print_r($result);
-        echo '</pre>';
+        $data = array(
+            'flag'=>'',
+            'head'=>'征信项目设置'
+        );
+        if($_POST){
+            $fooType = $this->input->post('type');
+            if($fooType == 'topic' || $fooType == 'medium' || $fooType == 'talent'){
+                $fooIndustrys = $this->zxpool->searchIndustry($fooType,0);          //按所属类型查询
+            }
+            
+        }  else {
+            $fooIndustrys = $this->zxpool->searchIndustry('topic',0);
+        }
+        
+        if($fooIndustrys){
+            $data['industrys'] = $fooIndustrys;
+        }  else {
+            $data['flag'] = '没有数据！';
+        }
+        
+        $this->load->view('admin/v_searchIndustry',$data);
     }
     
     

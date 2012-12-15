@@ -20,15 +20,17 @@
     foreach ($zxcodes as $zxcode){
         if($zxcode['status'] == 1){
             $state = '已使用';
-            $handle = '查看';
+            $handle = '查看信息';
+            $link = "";
         }elseif ($zxcode['status'] == 0) {
             $state = '未使用';
-            $handle = '使用';
+            $handle = '添加客户';
+            $link = base_url("admin/createUser/{$zxcode['zx_code']}");
         }
         $html .= "<tr>";
         $html .= "<td align='center'>{$zxcode['zx_code']}</td>";
         $html .= "<td align='center'>{$state}</td>";
-        $html .= "<td align='center'><a href='#'>$handle</a></td>";
+        $html .= "<td align='center'><a href='{$link}'><input type='button' value='{$handle}'></a></td>";
         $html .= "</tr>";
     }
     echo $html;

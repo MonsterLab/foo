@@ -36,5 +36,3 @@
     echo "<input type='submit' name='submit' value='提交'>";
     echo "</form>";
 ?>
-
-    <?php echo $power==14 ? 'selected' : ''; ?>

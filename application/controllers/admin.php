@@ -132,6 +132,11 @@ class Admin extends CI_Controller{
             $this->load->view('admin/v_createAdmin',$data);
         }
     }
+    
+    /**
+     * 删除管理用户
+     * @param type $uid
+     */
     public function deleteAdmin($uid){
         $fooResult = $this->admin->delete($uid);
         if($fooResult){
@@ -139,6 +144,9 @@ class Admin extends CI_Controller{
         }
     }
 
+    /**
+     * 查询管理用户
+     */
     public function searchAdmins(){
         $data = array(
             'flag'=>'',
@@ -172,6 +180,74 @@ class Admin extends CI_Controller{
         }
     }
 
+    public function createUser($zxcode = 0 ,$uid = 0){
+        
+        //默认为直接添加，即不存在原有数据
+        $data = array(
+            'zxcode'=>$zxcode,
+            'type'=>'',
+            'username'=>'',
+            'password'=>'',
+            'sqcode'=>'',
+        );
+        //修改，修改时显示原有数据
+        if($uid > 0){
+            $fooUser = $this->userbase->search($uid,3);
+            if($fooUser){
+                $data = array(
+                    'username'=>$fooUser[0]['username'],
+                    'password'=>$fooUser[0]['password'],
+                    'sqcode'=>$fooUser[0]['sq_code'],
+                );
+            }
+        }
+        
+        if($_POST){
+            $fooCUID = $this->admin->getUID();
+            //$fooZxcode = trim($this->input->post('zxcode'));
+            $fooType = trim($this->input->post('type'));
+            $fooUsername = trim($this->input->post('username'));
+            $fooPassword = trim($this->input->post('password'));
+            $fooSqcode = trim($this->input->post('sqcode'));
+            
+            //权限、使用人姓名、用户名、密码为必须，其它选填
+            if($fooUsername == NULL || $fooPassword == NULL || $fooSqcode == NULL){
+                
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createUser',$data);
+                return;
+            }
+            
+            $fooResult = $this->userbase->create($fooCUID,$zxcode,$fooSqcode,$fooUsername,$fooPassword,'','','','',$fooType);
+            if($fooResult == -1){
+                $data['flag'] = '用户登录名已存在！';
+            }elseif ($fooResult == 0) {
+                $data['flag'] = '添加失败！';
+            }elseif ($fooResult > 0) {
+                
+                //修改客户，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
+                if($uid > 0){
+                    $fooResult = $this->admin->delete($uid);
+                    if($fooResult){
+                        $data['flag'] = '修改成功！';
+                    }
+                    
+                }  else {
+                //新增客户,    
+                    $fooResult = $this->zxpool->useCode($zxcode);                //使用征信编码
+                    if($fooResult == 1){
+                        $data['flag'] = '添加成功！';
+                    }
+                }
+            }
+            
+            $this->load->view('admin/v_createUser',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_createUser',$data);
+        }
+    }
 
 
 
@@ -206,7 +282,11 @@ class Admin extends CI_Controller{
             }elseif ($fooUID == 0) {
                 $data['flag'] = '添加失败！';
             }elseif ($fooUID > 0) {
-                redirect(base_url("admin/createCertBase/$fooType/$fooUID"));
+                $fooResult = $this->zxpool->useCode($fooZxcode);
+                if($fooResult == 1){
+                    redirect(base_url("admin/createCertBase/$fooType/$fooUID"));
+                }
+                
             }
             
             $this->load->view('admin/v_createUserBase',$data);

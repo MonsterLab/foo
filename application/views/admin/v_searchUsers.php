@@ -7,7 +7,7 @@
 //        //TODO： 此处应该根据权限判断是否显示
 //        if($type == ''){      
 //    ?>
-        <h4><a href="<?= base_url('admin/createUser')?>">添加新客户</a></h4>
+        <h4><a href="<?= base_url('admin/searchCode')?>">添加新客户</a></h4>
     <?php //}?>
     
     <?php 
@@ -34,7 +34,9 @@
             $html .= "<td align='center'>{$userBase['zx_code']}</td>";
             $html .= "<td align='center'>{$userBase['com_name']}</td>";
             $html .= "<td align='center'>{$userBase['ctime']}</td>";
-            $html .= "<td align='center'><a href='{$base_url}admin/createUserBase/{$userBase['type']}/{$userBase['zx_code']}'>录入</a>  <a href='{$base_url}admin/audit/{$userBase['id']}/{$type}/'>审核</a></td>";
+            $html .= "<td align='center'><a href='{$base_url}admin/createUser/{$userBase['id']}/'><input type='button' value='修改'></a>";
+            $html .= "<a href='{$base_url}admin/createUserBase/{$userBase['type']}/{$userBase['zx_code']}'><input type='button' value='录入'></a>";  
+            $html .= "<a href='{$base_url}admin/audit/{$userBase['id']}/{$type}/'><input type='button' value='审核'></a></td>";
             $html .= "</tr>";
         }
         echo $html;

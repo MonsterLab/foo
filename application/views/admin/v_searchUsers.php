@@ -1,5 +1,5 @@
 <div>
-    <h2>纳税主体征信库管理</h2>
+    <h2><?= $head;?></h2>
 </div>
 
 <?php
@@ -26,7 +26,7 @@
         $html .= "<td align='center'>{$userBase['zx_code']}</td>";
         $html .= "<td align='center'>{$userBase['com_name']}</td>";
         $html .= "<td align='center'>{$userBase['ctime']}</td>";
-        $html .= "<td align='center'><a href='{$base_url}admin/createUserBase/$type/{$userBase['zx_code']}'>录入</a>  <a href='{$base_url}admin/audit/{$userBase['id']}/{$type}/'>审核</a></td>";
+        $html .= "<td align='center'><a href='{$base_url}admin/createUserBase/{$userBase['type']}/{$userBase['zx_code']}'>录入</a>  <a href='{$base_url}admin/audit/{$userBase['id']}/{$type}/'>审核</a></td>";
         $html .= "</tr>";
     }
     echo $html;

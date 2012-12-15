@@ -121,8 +121,8 @@ class M_admin extends CI_Model{
     * 
     * @param type $key          关键字，默认为空 ； 如果关键字为空，则全部查询
     * @param int $method        选择搜索方法，默认0； 0用户名，1真实姓名，2部门，3id
-    * @param int $limit 分页每页的显示条数
-    * @param int $offset 分页的开始位置
+    * @param int $limit         分页每页的显示条数
+    * @param int $offset        分页的开始位置
     * 
     * @return array             成功返回数组，失败返回false
     */

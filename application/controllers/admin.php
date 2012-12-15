@@ -59,6 +59,198 @@ class Admin extends CI_Controller{
         $this->load->view('admin/left');
         return;
     }
+    
+    /**-----------------------------管理员、客户管理------------------------------------**/
+    public function createAdmin($adminId = 0){
+        
+        //默认为直接添加，即不存在原有数据
+        $data = array(
+            'username'=>'',
+            'password'=>'',
+            'truename'=>'',
+            'department'=>'',
+            'phone'=>'',
+            'email'=>'',
+            'power'=>'',
+        );
+        //修改，修改时显示原有数据
+        if($adminId > 0){
+            $fooAdmin = $this->admin->search($adminId,3);
+            if($fooAdmin){
+                $data = array(
+                    'username'=>$fooAdmin[0]['username'],
+                    'password'=>$fooAdmin[0]['password'],
+                    'truename'=>$fooAdmin[0]['truename'],
+                    'department'=>$fooAdmin[0]['department'],
+                    'phone'=>$fooAdmin[0]['phone'],
+                    'email'=>$fooAdmin[0]['email'],
+                    'power'=>$fooAdmin[0]['power'],
+                );
+            }
+        }
+        
+        if($_POST){
+            $fooCUID = $this->admin->getUID();
+            $fooUsername = trim($this->input->post('username'));
+            $fooPassword = trim($this->input->post('password'));
+            $fooTruename = trim($this->input->post('truename'));
+            $fooDepartment = trim($this->input->post('department'));
+            $fooPhone = trim($this->input->post('phone'));
+            $fooEmail = trim($this->input->post('email'));
+            $fooPower = trim($this->input->post('power'));
+            
+            //权限、使用人姓名、用户名、密码为必须，其它选填
+            if($fooUsername == NULL || $fooPassword == NULL || $fooTruename == NULL 
+                    || $fooPower == NULL){
+                
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createAdmin',$data);
+                return;
+            }
+            
+            $fooResult = $this->admin->create($fooCUID,$fooUsername,$fooPassword,$fooTruename,$fooDepartment,$fooPhone,$fooEmail,$fooPower);
+            if($fooResult == -1){
+                $data['flag'] = '用户登录名已存在！';
+            }elseif ($fooResult == 0) {
+                $data['flag'] = '添加失败！';
+            }elseif ($fooResult == 1) {
+                $data['flag'] = '添加成功！';
+                
+                //修改，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
+                if($adminId > 0){
+                    $fooResult = $this->admin->delete($adminId);
+                    if($fooResult){
+                        $data['flag'] = '修改成功！';
+                    }
+                }
+            }
+            
+            $this->load->view('admin/v_createAdmin',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_createAdmin',$data);
+        }
+    }
+    
+    /**
+     * 删除管理用户
+     * @param type $uid
+     */
+    public function deleteAdmin($uid){
+        $fooResult = $this->admin->delete($uid);
+        if($fooResult){
+            redirect(base_url('admin/searchAdmins'));
+        }
+    }
+
+    /**
+     * 查询管理用户
+     */
+    public function searchAdmins(){
+        $data = array(
+            'flag'=>'',
+            'head'=>'管理用户管理'
+        );
+        if($_POST){
+            $fooKeySearch = trim($this->input->post('keySearch'));
+            if($fooKeySearch == NULL){
+                $fooAdmins = $this->admin->search();
+            }  else {
+                $fooAdmins = $this->admin->search($fooKeySearch,0);         //按管理用户名搜索
+            }
+            
+            if($fooAdmins){
+                $data['admins'] = $fooAdmins;
+            }  else {
+                $data['flag'] = '没有数据！';
+            }
+            
+            $this->load->view('admin/v_searchAdmin',$data);
+            
+        }  else {
+            $fooAdmins = $this->admin->search();
+            if($fooAdmins){
+                $data['admins'] = $fooAdmins;
+            }  else {
+                $data['flag'] = '没有数据！';
+            }
+            
+            $this->load->view('admin/v_searchAdmin',$data);
+        }
+    }
+
+    public function createUser($zxcode = 0 ,$uid = 0){
+        
+        //默认为直接添加，即不存在原有数据
+        $data = array(
+            'zxcode'=>$zxcode,
+            'type'=>'',
+            'username'=>'',
+            'password'=>'',
+            'sqcode'=>'',
+        );
+        //修改，修改时显示原有数据
+        if($uid > 0){
+            $fooUser = $this->userbase->search($uid,3);
+            if($fooUser){
+                $data = array(
+                    'username'=>$fooUser[0]['username'],
+                    'password'=>$fooUser[0]['password'],
+                    'sqcode'=>$fooUser[0]['sq_code'],
+                );
+            }
+        }
+        
+        if($_POST){
+            $fooCUID = $this->admin->getUID();
+            //$fooZxcode = trim($this->input->post('zxcode'));
+            $fooType = trim($this->input->post('type'));
+            $fooUsername = trim($this->input->post('username'));
+            $fooPassword = trim($this->input->post('password'));
+            $fooSqcode = trim($this->input->post('sqcode'));
+            
+            //权限、使用人姓名、用户名、密码为必须，其它选填
+            if($fooUsername == NULL || $fooPassword == NULL || $fooSqcode == NULL){
+                
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createUser',$data);
+                return;
+            }
+            
+            $fooResult = $this->userbase->create($fooCUID,$zxcode,$fooSqcode,$fooUsername,$fooPassword,'','','','',$fooType);
+            if($fooResult == -1){
+                $data['flag'] = '用户登录名已存在！';
+            }elseif ($fooResult == 0) {
+                $data['flag'] = '添加失败！';
+            }elseif ($fooResult > 0) {
+                
+                //修改客户，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
+                if($uid > 0){
+                    $fooResult = $this->admin->delete($uid);
+                    if($fooResult){
+                        $data['flag'] = '修改成功！';
+                    }
+                    
+                }  else {
+                //新增客户,    
+                    $fooResult = $this->zxpool->useCode($zxcode);                //使用征信编码
+                    if($fooResult == 1){
+                        $data['flag'] = '添加成功！';
+                    }
+                }
+            }
+            
+            $this->load->view('admin/v_createUser',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_createUser',$data);
+        }
+    }
+
+
+
     /**--------------------------------CRM管理-------------------------------------**/
     /**
      * 增加客户基本信息
@@ -90,7 +282,11 @@ class Admin extends CI_Controller{
             }elseif ($fooUID == 0) {
                 $data['flag'] = '添加失败！';
             }elseif ($fooUID > 0) {
-                redirect(base_url("admin/createCertBase/$fooType/$fooUID"));
+                $fooResult = $this->zxpool->useCode($fooZxcode);
+                if($fooResult == 1){
+                    redirect(base_url("admin/createCertBase/$fooType/$fooUID"));
+                }
+                
             }
             
             $this->load->view('admin/v_createUserBase',$data);
@@ -346,13 +542,12 @@ class Admin extends CI_Controller{
 
     /**
      * 查询并显示客户
+     * 此处供纳税主体、中介机构、财税人才和客户管理四处查询使用
      * @return type
      */
     public function searchUsers($type = ''){
         $data['flag'] = '';
-        
         if($type != ''){
-            
             $fooTypeArray = array('topic','medium','talent');
             if( !in_array($type,$fooTypeArray)){
                 $data['flag'] = '参数错误！';
@@ -360,82 +555,129 @@ class Admin extends CI_Controller{
                 return;
             }
             
-            if($_POST){
-                $fooZxcode = trim($this->input->post('keySearch'));
-                if($fooZxcode != NULL){
-                    $fooUserBase = $this->userbase->search($fooZxcode,1);               //按征信编码查询
-                }  else {
-                    $fooUserBase = $this->userbase->search($type,2);                 //按类库查询
-                }
-
-                if($fooUserBase){
-                    $fooUserBases = $this->forSearchUsers($type, $fooUserBase);
-                    $data['userBases'] = $fooUserBases;
-                }  else {
-                    $data['flag'] = '没有数据！';
-                }
-
-                //将类型传入视图
-                $data['type'] = $type;
-                $this->load->view('admin/v_searchUsers',$data);
-                
-            }  else {
-                
-                $fooUserBase = $this->userbase->search($type,2);                     //按类库查询
-
-                if($fooUserBase){
-                    $data['userBases'] = $this->forSearchUsers($type, $fooUserBase);
-                }  else {
-                    $data['flag'] = '没有数据！';
-                }
-
-                //将类型传入视图
-                $data['type'] = $type;
-                $this->load->view('admin/v_searchUsers',$data);
-            }
         }
         
+        //使用处表头
+        if($type == 'topic'){
+            $data['head'] = '纳税主体征信库管理';
+        }elseif ($type == 'medium') {
+            $data['head'] = '中介机构征信库管理';
+        }elseif ($type == 'talent') {
+            $data['head'] = '财税人才征信库管理';
+        }elseif($type == '') {
+            $data['head'] = '客户管理';
+        }
+            
+        if($_POST){
+            $fooZxcode = trim($this->input->post('keySearch'));
+
+            //按征信编码查询
+            if($fooZxcode != NULL){
+                $fooUserBase = $this->userbase->search($fooZxcode,1);               
+            } 
+            //按类库查询
+            if($fooZxcode == NULL && $type != NULL) {
+                $fooUserBase = $this->userbase->search($type,2);                 
+            }
+            //查询全部
+            if($fooZxcode == NULL && $type == NULL) {
+                $fooUserBase = $this->userbase->search();         
+            }
+
+            if($fooUserBase){
+                $fooUserBases = $this->searchComName($fooUserBase);
+                $data['userBases'] = $fooUserBases;
+            }  else {
+                $data['flag'] = '没有数据！';
+            }
+
+            //将类型传入视图
+            $data['type'] = $type;
+            $this->load->view('admin/v_searchUsers',$data);
+
+        }  else {
+
+            if($type != NULL){
+                $fooUserBase = $this->userbase->search($type,2);                     //按类库查询
+            }  else {
+                $fooUserBase = $this->userbase->search();                           //查询全部
+            }
+
+            if($fooUserBase){
+                $data['userBases'] = $this->searchComName($fooUserBase);
+            }  else {
+                $data['flag'] = '没有数据！';
+            }
+
+            //将类型传入视图
+            $data['type'] = $type;
+            $this->load->view('admin/v_searchUsers',$data);
+        }
+            
     }
 
     /**
      * 将公司名加入数组中
      * 完全是为查询客户服务，
-     * @param type $_type
      * @param type $_userBases
      * @return type
      */
-    private function forSearchUsers($_type,$_userBases){
+    private function searchComName($_userBases){
         //查询公司名
-        if($_type == 'topic'){
+        if($_userBases){
             foreach ($_userBases as $userBase){
                 $fooUID = $userBase['id'];
-                $fooCertBase = $this->topic->searchCertBase($fooUID);
+                $fooType = $userBase['type'];
+                if($fooType == 'topic'){
+                    $fooCertBase = $this->topic->searchCertBase($fooUID);
+                }elseif ($fooType == 'medium') {
+                    $fooCertBase = $this->topic->searchCertBase($fooUID);
+                }elseif ($fooType == 'talent') {
+                    $fooCertBase = $this->topic->searchCertBase($fooUID);
+                }
+                
                 $userBase['com_name'] = $fooCertBase[0]['com_name'];
                 $fooUserBases[] = $userBase;
             }
-
-        } elseif ($_type == 'medium'){
-            foreach ($_userBases as $userBase){
-                $fooUID = $userBase['id'];
-                $fooCertBase = $this->medium->searchCertBase($fooUID);
-                $userBase['com_name'] = $fooCertBase[0]['com_name'];
-                $fooUserBases[] = $userBase;
-            }
-
-        } elseif ($_type == 'talent'){
-            foreach ($_userBases as $userBase){
-                $fooUID = $userBase['id'];
-                $fooCertBase = $this->talent->searchCertBase($fooUID);
-                $userBase['com_name'] = $fooCertBase[0]['com_name'];
-                $fooUserBases[] = $userBase;
-            }
-        }
+            
+            return $fooUserBases;
+        } 
         
-        return $fooUserBases;
     }
 
-
+    /**
+     * 查看征信编码
+     */
+    public function searchCode(){
+        $data = array(
+            'flag' => '',
+            'head'=>'征信编码池管理'
+        );
+        
+        if($_POST){
+            $fooCode = trim($this->input->post('keySearch'));
+            if($fooCode != NULL){
+                $fooCodes = $this->zxpool->searchCode($fooCode);
+            }  else {
+                $fooCodes = $this->zxpool->searchCode();
+            }
+            
+        }  else {
+            $fooCodes = $this->zxpool->searchCode();
+        }
+        
+        if($fooCodes){
+            $data['zxcodes'] = $fooCodes;
+        }  else {
+            $data['flag'] = '没有数据！';
+        }
+        
+        $this->load->view('admin/v_searchCode',$data);
+        
+    }
     
+
+
     /**
      * 批量导入征信编码
      */
@@ -478,6 +720,46 @@ class Admin extends CI_Controller{
             $this->load->view('fei_test/v_importCode.php');
         }    
     }
+    
+    /**
+     * 搜索征信项目类型,比如营业执照、组织机构代码...
+     */
+    public function searchFileType(){
+        $data = array(
+            'flag'=>'',
+            'head'=>'征信项目设置'
+        );
+        if($_POST){
+            $fooType = $this->input->post('type');
+            if($fooType == 'topic' || $fooType == 'medium' || $fooType == 'talent'){
+                $fooFileTypes = $this->zxpool->searchFileType($fooType,0);          //按所属类型查询
+            }
+            
+        }  else {
+            $fooFileTypes = $this->zxpool->searchFileType('topic',0);
+        }
+        
+        if($fooFileTypes){
+            $data['fileTypes'] = $fooFileTypes;
+        }  else {
+            $data['flag'] = '没有数据！';
+        }
+        
+        $this->load->view('admin/v_searchFileType',$data);
+    }
+
+
+    /**
+     * 查看行业类别
+     */
+    public function searchIndustry(){
+        //searchIndustry($key = '',$method = 0)
+        $result = $this->zxpool->searchIndustry('',0);
+        echo "<pre>";
+        print_r($result);
+        echo '</pre>';
+    }
+    
     
     /**
      * 上传方法

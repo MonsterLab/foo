@@ -137,7 +137,7 @@ class M_talent extends CI_Model{
    public function searchCertBase($uid){
        $this->db->where('uid',$uid);
        $this->db->where('status',1);        //查询没有被弃用的用户
-       $this->db->select('id,cert_name,sex,nation,personid,birth_place,live_place,cert_begin,cert_end,audit,audit_id,cuid,ctime');
+       $this->db->select('id,uid,cert_name,sex,nation,personid,birth_place,live_place,cert_begin,cert_end,audit,audit_id,cuid,ctime');
        $dbResult = $this->db->get('zx_talent_cert_base');
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){

@@ -24,7 +24,7 @@
                 <h3><?php echo $guide;?></h3>
                 <div id="article">
                     <h3><?php echo $article[0]['title'];?></h3>
-                    <p><?echo $article[0]['ctime'].'   作者：'.$article[0]['username'];?> </p>
+                    <p id="author"><?echo $article[0]['ctime'].'   作者：'.$article[0]['username'];?> </p>
                     <div id="arContent">
                     <?echo $article[0]['content'];?>
                     </div>

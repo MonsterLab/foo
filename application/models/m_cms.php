@@ -83,21 +83,21 @@ class M_cms extends CI_Model{
      * @param type $offset
      * @return int
      */
-    public function search($key,$method,$status = 1,$limit=0,$offset = 5 ){
+    public function search($key,$method,$status = 1,$limit=0,$offset = 5, $audit = 0){
         $result = null;
         
         switch ($method){
             case 0:
                 $uid = $key;
-                $result = $this->getUserArticles($uid, $limit, $offset, $status);
+                $result = $this->getUserArticles($uid, $limit, $offset, $status, $audit);
                 break;
             case 1:
                 $aid = $key;
-                $result = $this->getArticle($aid);
+                $result = $this->getArticle($aid, $status, $audit);
                 break;
             case 2:
                 $groupid = $key;
-                $result = $this->getArticlesOfGroup($groupid, $limit, $offset, $status);
+                $result = $this->getArticlesOfGroup($groupid, $limit, $offset, $status, $audit);
                 break;
                 
         }
@@ -114,9 +114,13 @@ class M_cms extends CI_Model{
      * @param type $aid
      * @return int if the query is null ,ruturn 0 
      */
-    private function getArticle($aid){		
+    private function getArticle($aid, $status, $audit){		
 	$this->db->select('aid, uid, username, title, content, groupid, audit, audit_id, status, ctime, viewtimes');
         $this->db->where('aid',$aid);
+        $this->db->where('status', $status);
+        if($audit != 0){
+            $this->db->where('audit', $audit);
+        }
 	$query = $this->db->get('zx_articles');
         $result = $query->result_array();
         
@@ -138,10 +142,13 @@ class M_cms extends CI_Model{
      * @param type $offset
      * @return int
      */
-    private function getUserArticles($uid,$limit,$offset, $status){
+    private function getUserArticles($uid,$limit,$offset, $status, $audit){
         $this->db->select('aid, uid, username, title, groupid, audit, audit_id, status, ctime, viewtimes');
         $this->db->where('uid', $uid);
         $this->db->where('status', $status);
+        if($audit != 0){
+            $this->db->where('audit', $audit);
+        }
         $this->db->order_by("ctime", "desc"); 
         $this->db->limit($offset,$limit);
         
@@ -166,7 +173,7 @@ class M_cms extends CI_Model{
      * @param type $offset
      * @param type $status
      */
-    private function getArticlesOfGroup($groupid, $limit, $offset, $status){
+    private function getArticlesOfGroup($groupid, $limit, $offset, $status, $audit){
         $this->db->select('aid, uid, username, title, groupid, audit, audit_id, status, ctime, viewtimes');
         if(is_array($groupid)){
             $this->db->where_in('groupid', $groupid);
@@ -176,6 +183,10 @@ class M_cms extends CI_Model{
         $this->db->where('status',$status);
         if(!($limit == 'start' && $offset == 'end')){
             $this->db->limit($offset,$limit);
+        }
+        
+        if($audit != 0){
+            $this->db->where('audit', $audit);
         }
         $this->db->order_by("ctime", "desc"); 
         
@@ -299,8 +310,8 @@ class M_cms extends CI_Model{
             'audit_id' => $audit_id
         );
         $this->db->where('aid', $aid);
-        $this->db->update('zx_articles', $data); 
-        $affectedRows = $this->db->affected_rows();
+        $affectedRows = $this->db->update('zx_articles', $data); 
+
         if( $affectedRows > 0){
             
             return 1;
@@ -374,9 +385,11 @@ class M_cms extends CI_Model{
      * @param type $uid
      * @return int
      */
-    public function getAllGroups($uid, $status = 1){
+    public function getAllGroups($uid = 0, $status = 1){
         $this->db->select("gid, group_name, groupfather_id");
-        $this->db->where('uid', $uid); 
+        if($uid != 0){
+            $this->db->where('uid', $uid); 
+        }
         $this->db->where('status',$status);
         $this->db->order_by("gid", "desc"); 
         $query = $this->db->get('zx_article_groups');

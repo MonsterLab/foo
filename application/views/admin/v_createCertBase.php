@@ -1,3 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <script type="text/javascript" src="<?= base_url()?>js/jquery-1.7.2.min.js"></script>
+        
+        <link type="text/css" href="<?= base_url()?>include/css/datepicker/jquery-ui-1.8.16.custom.css" rel="stylesheet" />	
+        <link type="text/css" href="<?= base_url()?>include/css/datepicker/jquery.ui.slider.css" rel="stylesheet" />	
+        <script type="text/javascript" src="<?= base_url()?>include/js/datepicker/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="<?= base_url()?>include/js/datepicker/jquery-ui-1.8.16.custom.min.js"></script>
+        <script type="text/javascript" src="<?= base_url()?>include/js/datepicker/fz.js"></script>
+        <script type="text/javascript" src="<?= base_url()?>include/js/datepicker/jquery-ui-timepicker-addon.js"></script>	
+        <script type="text/javascript" src="<?= base_url()?>include/js/datepicker/jquery.ui.slider.min.js"></script>
+        
+        <script type="text/javascript">
+                $(function(){
+                        showTimePanel("cert_begin");
+                        showTimePanel("cert_end");
+                });
+	</script>
+</head>
+<body>
+
+
+
 <div>
     <h2>添加认证基本信息</h2>
 </div>
@@ -21,11 +46,22 @@
     echo "公司电话："."<input type='text' name='com_phone' value='{$certBases[0]['com_phone']}'>"."<br>";
     echo "邮政编码："."<input type='text' name='zipcode' value='{$certBases[0]['zipcode']}'>"."<br>";
     echo "公司所在地："."<input type='text' name='com_place' value='{$certBases[0]['com_place']}'>"."<br>";
-    echo "征信开始时间："."<input type='text' name='cert_begin' value='{$certBases[0]['cert_begin']}'>"."<br>";
-    echo "征信结束时间："."<input type='text' name='cert_end' value='{$certBases[0]['cert_end']}'>"."<br>";
-    if($noneShow2){
-        echo "<input type='submit' name='submit' value='提交'>";
-    }
+    echo "征信开始时间："."<input type='text' id='cert_begin' name='cert_begin' value='{$certBases[0]['cert_begin']}'>"."<br>";
+    echo "征信结束时间："."<input type='text' id='cert_end' name='cert_end' value='{$certBases[0]['cert_end']}'>"."<br>";
+ ?>  
+    
+    <?php if($noneShow2){?>
+    <input type='submit' name='submit' value='提交'>
+    <?php 
+        }  else {
+    ?>        
+    <span style="color: red ; font-weight:  bolder">已提交</span>      
+     <?php }?> 
     
     
-    echo "</form>";
+    </form>
+
+    
+</body>
+</html>    
+    

@@ -1,9 +1,13 @@
 <div>
     <h2><?= $head;?></h2>
 </div>
+<?php
+    if($power == 99){
+?>
 <p>
     <a href="<?php echo base_url('admin/importCode')?>"><input type="button" value="批量导入征信编码"></a>
 </p>
+<?php }?>
     <?php
     $base_url = base_url();
     echo "<form action='{$base_url}admin/searchCode' method='post'>";

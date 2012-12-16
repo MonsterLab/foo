@@ -219,6 +219,7 @@ class M_admin extends CI_Model{
     */
    private function checkUsername($_username){
        $this->db->where('username',$_username);
+       $this->db->where('status',1);
        $this->db->select('id');
        $dbResult = $this->db->get('zx_admin');
        

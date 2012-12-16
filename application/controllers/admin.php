@@ -30,37 +30,104 @@ class Admin extends CI_Controller{
         }
     }
     
+    /**
+     * 管理员登录
+     * @return type
+     */
     public function login(){
+        $data['flag'] = ''; 
         if($_POST){
-            $username = $this->input->post('username');
-            $userpassword = $this->input->post('userpassword');
+            $username = trim($this->input->post('username'));
+            $userpassword = trim($this->input->post('password'));
             
-            $login = $this->admin->login($username,$userpassword);
+            if($username == NULL || $userpassword == NULL){
+                $data['flag'] = '请完善信息!';
+                $this->load->view('admin/login',$data);
+                return;
+            }
+            
+            $fooLogin = $this->admin->login($username,$userpassword);
 
-            if($login == 1){
+            if($fooLogin == -1){
+                $data['flag'] = '不存在此用户!';
+                $this->load->view('admin/login',$data);
+                return;
+            }
+            if($fooLogin == 0){
+                $data['flag'] = '密码错误!';
+                $this->load->view('admin/login',$data);
+                return;
+            }
+            if($fooLogin == 1){
                 redirect(base_url("admin/index/"));
             } 
             
             return;
         }
         
-        $this->load->view('admin/login');
+        $this->load->view('admin/login',$data);
        
         
     }
-    
+    /**
+     * 登出
+     */
     public function logout(){
         $this->admin->logout();
         redirect(base_url('admin/login/'));
     }
     
+    /**
+     * 加载左部菜单
+     * @return type
+     */
     public function left(){
-        $this->load->view('admin/left');
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        //根据power设置left视图显示项目
+        $data['power'] = $power;
+        $this->load->view('admin/left',$data);
+        return;
+    }
+    
+    public function top(){
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        
+        $this->load->view('admin/top');
+        return;
+    }
+
+    public function main(){
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        
+        $this->load->view('admin/main');
+        return;
+    }
+
+    public function bottom(){
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        
+        $this->load->view('admin/footer');
         return;
     }
     
     /**-----------------------------管理员、客户管理------------------------------------**/
     public function createAdmin($adminId = 0){
+        $power = $this->admin->getPower();
+        if($power < 99){
+            redirect(base_url('admin/login/'));
+        }
         
         //默认为直接添加，即不存在原有数据
         $data = array(
@@ -137,6 +204,11 @@ class Admin extends CI_Controller{
      * @param type $uid
      */
     public function deleteAdmin($uid){
+        $power = $this->admin->getPower();
+        if($power < 99){
+            redirect(base_url('admin/login/'));
+        }
+        
         $fooResult = $this->admin->delete($uid);
         if($fooResult){
             redirect(base_url('admin/searchAdmins'));
@@ -147,6 +219,11 @@ class Admin extends CI_Controller{
      * 查询管理用户
      */
     public function searchAdmins(){
+        $power = $this->admin->getPower();
+        if($power < 99){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data = array(
             'flag'=>'',
             'head'=>'管理用户管理'
@@ -179,7 +256,20 @@ class Admin extends CI_Controller{
         }
     }
 
+    /**
+     * 新建客户
+     * @param type $zxcode
+     * @param type $uid
+     * @return type
+     */
     public function createUser($zxcode = 0 ,$uid = 0){
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
+        
         //默认为直接添加，即不存在原有数据
         $data = array(
             'zxcode'=>$zxcode,
@@ -220,6 +310,7 @@ class Admin extends CI_Controller{
                 $this->load->view('admin/v_createUser',$data);
                 return;
             }
+            //TODO:$fooUserbase
             
             $fooUID = $this->userbase->create($fooCUID,$zxcode,$fooSqcode,$fooUsername,$fooPassword,'','','','',$fooType);
             if($fooUID == -1){
@@ -228,6 +319,102 @@ class Admin extends CI_Controller{
                 $data['flag'] = '添加失败！';
             }elseif ($fooUID > 0) {
                 
+                //增加公司名
+                if($fooType == 'topic'){
+                    $fooResult = $this->topic->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }elseif ($fooType == 'medium') {
+                    $fooResult = $this->medium->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }elseif ($fooType == 'talent') {
+                    $fooResult = $this->talent->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }
+                
+                if($uid == 0){
+                    //新增客户,    
+                    $fooResult = $this->zxpool->useCode($zxcode);                //使用征信编码
+                    if($fooResult == 1){
+                        $data['flag'] = '添加成功！';
+                    }
+                    
+                    
+                }  else {
+                    //修改客户，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
+                    $fooResult = $this->admin->delete($uid);
+                    if($fooResult){
+                        $data['flag'] = '修改成功！';
+                    }
+                }
+            }
+            
+            $this->load->view('admin/v_createUser',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_createUser',$data);
+        }
+    }
+    
+    //暂时没有用
+    public function updateUser($zxcode = 0 ,$uid = 0){
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
+        
+        //默认为直接添加，即不存在原有数据
+        $data = array(
+            'zxcode'=>$zxcode,
+            'type'=>'',
+            'cert_name'=>'',
+            'username'=>'',
+            'password'=>'',
+            'sqcode'=>'',
+        );
+        //修改，修改时显示原有数据
+        if($uid > 0){
+            $fooUserbase = $this->userbase->search($uid,3);         //查询用户基本信息
+            $fooUser = $this->searchComName($fooUserbase);          //将公司名查询出
+            if($fooUser){
+                $data = array(
+                    'zxcode'=>$zxcode,
+                    'type'=>$fooUser[0]['type'],
+                    'username'=>$fooUser[0]['username'],
+                    'password'=>$fooUser[0]['password'],
+                    'sqcode'=>$fooUser[0]['sq_code'],
+                    'cert_name'=>$fooUser[0]['cert_name']
+                );
+            }
+        }
+        
+        if($_POST){
+            $fooCUID = $this->admin->getUID();
+            $fooType = trim($this->input->post('type'));
+            $fooCertname = trim($this->input->post('cert_name'));
+            $fooUsername = trim($this->input->post('username'));
+            $fooPassword = trim($this->input->post('password'));
+            $fooSqcode = trim($this->input->post('sqcode'));
+            
+            //权限、使用人姓名、用户名、密码为必须，其它选填
+            if($fooUsername == NULL || $fooPassword == NULL || $fooSqcode == NULL||$fooCertname==NULL){
+                
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createUser',$data);
+                return;
+            }
+            //TODO:$fooUserbase
+//            $department = $fooUserbase[0]['department'];
+//            $phone = $fooUserbase[0]['phone'];
+//            $email = $fooUserbase[0]['email'];
+            //update($uid,$zx_code,$sq_code,$password,$truename,$position,$phone,$email,$type
+            $fooUID = $this->userbase->update($uid,$fooPassword,fooUsername,'','','','',$fooType);
+            if($fooUID == -1){
+                $data['flag'] = '用户登录名已存在！';
+            }elseif ($fooUID == 0) {
+                $data['flag'] = '添加失败！';
+            }elseif ($fooUID > 0) {
+                
+                //增加公司名
                 if($fooType == 'topic'){
                     $fooResult = $this->topic->createCertBase($fooCUID,$fooUID,$fooCertname);
                 }elseif ($fooType == 'medium') {
@@ -262,13 +449,18 @@ class Admin extends CI_Controller{
     }
 
 
-
     /**--------------------------------CRM管理-------------------------------------**/
     /**
      * 增加客户基本信息
      */
     
     public function showLuruView($uid){
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $fooUserBases = $this->userbase->search($uid,3);            //按id查询
         $fooZxcode = $fooUserBases[0]['zx_code'];
         $fooType = $fooUserBases[0]['type'];
@@ -280,16 +472,28 @@ class Admin extends CI_Controller{
             $fooCertBases = $this->topic->searchCertBase($uid);             //获得认证基本信息
             $fooCertFiles = $this->topic->searchCertFile($uid);             //获得认证扫描信息
             $fooCertContent = $this->topic->searchCertContent($uid);        //获得认证文字类信息
+            
+            if($fooCertBases[0]['com_nature'] != NULL){
+                $data['noneShow2'] = 0;
+            }
         }
         if($fooType == 'medium'){
             $fooCertBases = $this->medium->searchCertBase($uid);
             $fooCertFiles = $this->medium->searchCertFile($uid);
             $fooCertContent = $this->medium->searchCertContent($uid);
+            
+            if($fooCertBases[0]['com_nature']){
+                $data['noneShow2'] = 0;
+            }
         }
         if($fooType == 'talent'){
             $fooCertBases = $this->talent->searchCertBase($uid);
             $fooCertFiles = $this->talent->searchCertFile($uid);
             $fooCertContent = $this->talent->searchCertContent($uid);
+            
+            if($fooCertBases[0]['sex']){
+                $data['noneShow2'] = 0;
+            }
         }
         
         
@@ -325,9 +529,7 @@ class Admin extends CI_Controller{
         if($fooUserBases[0]['truename'] != NULL){
             $data['noneShow1'] = 0;
         }
-        if($fooCertBases){
-            $data['noneShow2'] = 0;
-        }
+        
         if($fooCertFiles){
             $data['noneShow3'] = 0;
         }
@@ -343,6 +545,12 @@ class Admin extends CI_Controller{
     }
     
     public function createUserBase($uid,$fooZxcode){
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         //$data['type'] = $fooType;
         $data['uid'] = $uid;
         $data['zxcode'] = $fooZxcode;
@@ -391,6 +599,13 @@ class Admin extends CI_Controller{
      * 添加征信基本信息
      */
     public function createCertBase($type = '',$uid = 0){
+        //权限设定
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['type'] = $type;
         $data['uid'] = $uid;
         $data['industrys'] = $this->zxpool->searchIndustry($type);
@@ -440,6 +655,13 @@ class Admin extends CI_Controller{
      * 上传扫描文件
      */
     public function addCertFile($type = '',$uid = 0){
+        //权限设定
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['type'] = $type;
         $data['uid'] = $uid;
         $data['fileTypes'] = $this->zxpool->searchFileType($type);             
@@ -487,6 +709,13 @@ class Admin extends CI_Controller{
      * 
      */
     public function addCertContent($type = '',$uid = 0){
+        //权限设定
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['type'] = $type;
         $data['uid'] = $uid;
         if($_POST){
@@ -533,6 +762,14 @@ class Admin extends CI_Controller{
      * @param type $isPass              审核情况，-1未通过，1通过
      */
     public function audit($uid = 1,$type = 'topic',$tableType = '',$tid = 0,$isPass = 0){
+        
+        //权限设定
+        $power = $this->admin->getPower();
+        $powerArray = array(14,99);                 //审核、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         //以下为根据审核情况对表审核
         if($isPass == -1 || $isPass == 1){
            $audit_id = $this->admin->getUID();                                  //获得审核人id
@@ -577,18 +814,30 @@ class Admin extends CI_Controller{
         $fooUserBases = $this->userbase->search($uid,3);                    //按id搜索,获得客户基本信息
         
         if($type == 'topic'){
-            $fooCertBases = $this->topic->searchCertBase($uid);             //获得认证基本信息
-            $fooCertFiles = $this->topic->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertBase = $this->topic->searchCertBase($uid);             //获得认证基本信息
+            $fooCertBases = $this->turnIndustryidtoName($fooCertBase);
+            
+            $fooCertFile = $this->topic->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
+            
             $fooCertContent = $this->topic->searchCertContent($uid);        //获得认证文字类信息
         }
         if($type == 'medium'){
-            $fooCertBases = $this->medium->searchCertBase($uid);
-            $fooCertFiles = $this->medium->searchCertFile($uid);
+            $fooCertBase = $this->medium->searchCertBase($uid);             //获得认证基本信息
+            $fooCertBases = $this->turnIndustryidtoName($fooCertBase);
+            
+            $fooCertFile = $this->medium->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
+            
             $fooCertContent = $this->medium->searchCertContent($uid);
         }
         if($type == 'talent'){
-            $fooCertBases = $this->talent->searchCertBase($uid);
-            $fooCertFiles = $this->talent->searchCertFile($uid);
+            $fooCertBase = $this->talent->searchCertBase($uid);             //获得认证基本信息
+            $fooCertBases = $this->turnIndustryidtoName($fooCertBase);
+            
+            $fooCertFile = $this->talent->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
+            
             $fooCertContent = $this->talent->searchCertContent($uid);
         }
         
@@ -604,6 +853,52 @@ class Admin extends CI_Controller{
     }
     
     /**
+     * 将认证基本信息中的Industryid转换为name
+     * @param type $_array
+     * @return type
+     * 
+     * $certBases
+     */
+    private function turnIndustryidtoName($_array){
+        //
+        if($_array){
+            foreach ($_array as $array){
+                $id = $array['industry_id'];
+                $fooIndustrys = $this->zxpool->searchIndustry($id,2);
+                $array['industry_name'] = $fooIndustrys[0]['industry_name'];
+                     
+                $fooResult[] = $array;
+            }
+            
+            return $fooResult;
+        } 
+        
+    }
+    
+    /**
+     * 认证扫描件中的FileTypeid转换为name
+     * @param type $_array
+     * @return type
+     * 
+     * $certBases
+     */
+    private function turnFileTypeidtoName($_array){
+        //
+        if($_array){
+            foreach ($_array as $array){
+                $id = $array['file_type_id'];
+                $fooFiletype = $this->zxpool->searchFileType($id,2);
+                $array['file_type_name'] = $fooFiletype[0]['file_name'];
+                     
+                $fooResult[] = $array;
+            }
+            
+            return $fooResult;
+        } 
+        
+    }
+    
+    /**
      * 审核时显示征信扫描件信息、征信文字类信息
      * 以下参数为审核时必须的，故传进来
      * @param type $uid
@@ -612,6 +907,13 @@ class Admin extends CI_Controller{
      * @param type $tid
      */
     public function showFileOrContent($uid,$type,$tableType,$tid){
+        //权限设定
+        $power = $this->admin->getPower();
+        $powerArray = array(14,99);                 //审核、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['uid'] = $uid;
         $data['type'] = $type;
         $data['tableType'] = $tableType;
@@ -636,8 +938,14 @@ class Admin extends CI_Controller{
      * @return type
      */
     public function searchUsers($type = ''){
+        $power = $this->admin->getPower();
+        $powerArray = array(13,14,99);
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $data['power'] = $power;
         $data['flag'] = '';
-        if($type != ''){
+        if( $type != ''){
             $fooTypeArray = array('topic','medium','talent');
             if( !in_array($type,$fooTypeArray)){
                 $data['flag'] = '参数错误！';
@@ -657,7 +965,7 @@ class Admin extends CI_Controller{
         }elseif($type == '') {
             $data['head'] = '客户管理';
         }
-            
+        
         if($_POST){
             $fooZxcode = trim($this->input->post('keySearch'));
 
@@ -686,7 +994,10 @@ class Admin extends CI_Controller{
             if($type != ''){
                 $this->load->view('admin/v_searchUsers',$data);
             }  else {
-                $this->load->view('admin/v_manageUsers',$data);
+                
+                if($power == 13 || $power == 99){
+                    $this->load->view('admin/v_manageUsers',$data);
+                } 
             }
 
         }  else {
@@ -706,9 +1017,15 @@ class Admin extends CI_Controller{
             //将类型传入视图
             $data['type'] = $type;
             if($type != ''){
-                $this->load->view('admin/v_searchUsers',$data);
+                
+                    $this->load->view('admin/v_searchUsers',$data);
+                
             }  else {
-                $this->load->view('admin/v_manageUsers',$data);
+                
+                if($power == 13 || $power == 99){
+                    $this->load->view('admin/v_manageUsers',$data);
+                } 
+                
             }
             
         }
@@ -748,9 +1065,18 @@ class Admin extends CI_Controller{
 
     /**
      * 查看征信编码
+     * 新增用户也会用到此方法
      */
     public function searchCode(){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                     //录入、超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data = array(
+            'power'=>$power,
             'flag' => '',
             'head'=>'征信编码池管理'
         );
@@ -777,7 +1103,23 @@ class Admin extends CI_Controller{
         
     }
     
+    /**
+     * 显示用户信息
+     * 征信编码处，通过征信编码查询
+     * 
+     * TODO：只能查看自己录入的信息
+     * 
+     * @param type $zxcode
+     * @return type
+     */
     public function showUserInfos($zxcode){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                     //录入、超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data = array(
             'flag'=>'',
             'zxcode' => 0,
@@ -829,9 +1171,26 @@ class Admin extends CI_Controller{
      * 批量导入征信编码
      */
     public function importCode(){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(99);                     //超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['flag'] = '';
         if($_POST){
             if(!empty($_FILES['file']['name'])){
+                
+                $endname = substr(strrchr($_FILES['file']['name'],'.'),1);          //截取上传文件的后缀名
+                //判断是否为txt格式
+                if(!in_array(strtolower($endname),array('txt'))){                  //strtolower()转化为小写，只能打开txt文件    
+                    
+                    $data['flag'] = '文件格式错误！';
+                    $this->load->view('admin/v_importCode',$data);
+                    return;
+                }                             
+                
                 $tmp_name = $_FILES['file']['tmp_name'];
                 //读取整个文件
                 $resourse = file($tmp_name);                      
@@ -853,6 +1212,7 @@ class Admin extends CI_Controller{
                     $result = $this->zxpool->createCode($codeArray);
                     if($result){
                         //成功导入
+                        //TODO:此处导入成功之后有错误，说没有定义flag，但是找不出原因
                         $data['flag'] = '成功导入！';
                     }
                     
@@ -879,6 +1239,13 @@ class Admin extends CI_Controller{
      * 添加征信项目类型,比如营业执照、组织机构代码...
      */
     public function addFileType(){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(99);                     //超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['flag'] = '';
         if($_POST){
             $fooType = trim($this->input->post('type'));
@@ -912,6 +1279,12 @@ class Admin extends CI_Controller{
      * 搜索征信项目类型,比如营业执照、组织机构代码...
      */
     public function searchFileType(){
+        //权限管理
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data = array(
             'flag'=>'',
             'head'=>'征信项目设置'
@@ -940,6 +1313,13 @@ class Admin extends CI_Controller{
      * @param type $fid
      */
     public function deleteFileType($fid){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(99);                     //超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $fooResult = $this->zxpool->deleteFileType($fid);
         if($fooResult){
             redirect(base_url('admin/searchFileType'));
@@ -947,6 +1327,13 @@ class Admin extends CI_Controller{
     }
     
     public function addIndustry(){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(99);                     //超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['flag'] = '';
         if($_POST){
             $fooType = trim($this->input->post('type'));
@@ -979,6 +1366,12 @@ class Admin extends CI_Controller{
      * 查看行业类别
      */
     public function searchIndustry(){
+        //权限管理
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data = array(
             'flag'=>'',
             'head'=>'征信项目设置'
@@ -1053,20 +1446,7 @@ class Admin extends CI_Controller{
 
     }
     
-    public function top(){
-        $this->load->view('admin/top');
-        return;
-    }
-
-    public function main(){
-        $this->load->view('admin/main');
-        return;
-    }
-
-    public function bottom(){
-        $this->load->view('admin/footer');
-        return;
-    }
+    
     
 //**************************CMS操作**********************************************
     /**
@@ -1075,8 +1455,12 @@ class Admin extends CI_Controller{
      */
     //create($uid , $username  , $title ,$content, $groupid)
     public function createArticle(){        
-        //TODO 权限的验证
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);     //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = 0;        //get all group created by everyone
         $status = 1;    // the group isn't deleted
         $groups = $this->cms->getAllGroups($uid, $status);
         $data['groups'] = $groups;
@@ -1085,13 +1469,13 @@ class Admin extends CI_Controller{
             $groupid = $this->input->post('gid');
             $title = $this->input->post('title');
             $content = $this->input->post('content'); 
-            $uid = 5;
-            $username = 'zhang';
+            $username = $_SESSION['admin']['username'];
             $result = $this->cms->create($uid ,$username  ,$title, $content, $groupid);
             
             if($result){
                 $data['flag'] = 1;
-                $data['message'] = '添加成功';    
+                $data['message'] = '添加成功';   
+                $data['gid'] = $groupid;
                 
                 $this->load->view('admin/v_createArticle', $data);
             } else {
@@ -1111,10 +1495,12 @@ class Admin extends CI_Controller{
     }
     
     public function manageArticle(){
-        //TODO 权限验证 username= zhang uid = 5;
-        // $method 0->getUserArticles(), 1->getArticle(), 2->getArticlesOfGroup()
-        //public function search($key,$method,$status = 1,$limit=0,$offset = 5 )
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = 0;        //get all group created by everyone
         $status = 1;    // the group isn't deleted
         $groups = $this->cms->getAllGroups($uid, $status);
         
@@ -1127,16 +1513,18 @@ class Admin extends CI_Controller{
                 break;
             }
         }
-        //TODO 
-        $groupid = 41;
+        $ajaxGroupsHtml = '';
         $groupsHtml = '<select name="groupid" id="groupid">';
+        
         if($groups){
             foreach ($groups as $group){
                 if($group['gid'] == $groupid){
                     $groupsHtml .= '<option value="'.$group['gid'].'" selected="selected">'.$group['group_name'].'</option>';
+                    $ajaxGroupsHtml .= '<option value="'.$group['gid'].'" selected="selected">'.$group['group_name'].'</option>';
                     continue;;
                 }
                 $groupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
+                $ajaxGroupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
             }
         } else {
             $groupsHtml .= '<option value="0">没有分类</option>';
@@ -1154,8 +1542,9 @@ class Admin extends CI_Controller{
         $articles =$this->cms->search($groupid, $method, $status, $limit, $offset);
         $pageBar = $page->getPage($articles);
         $currentPage = $page->getCurrentPage();
-        $articleHtml = '<table>';
-        $articleHtml .= '<tr>
+        
+        $articlehead = '<table>';
+        $articleHtml = '<tr>
                         <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th>状态</th><th colspan="2">操作</th>
                         </tr>';
         if($articles){
@@ -1179,18 +1568,20 @@ class Admin extends CI_Controller{
                 $articleHtml .= '</tr>';
             }
         }
-        $articleHtml .= '</table>';
+        $articleEnd = '</table>';
+        $ajaxArtilceHtml = $articleHtml;
+        $articleHtml = $articlehead.$articleHtml.$articleEnd;
         $data['groupsHtml'] = $groupsHtml;
         $data['pageBar'] = $pageBar;
         $data['articleHtml'] = $articleHtml; 
-        
+        $ajaxPageBar = substr($pageBar, (strpos($pageBar, '>') + 1), (strlen($pageBar)-24));
         if(isset($_GET['groupid'])){
             $return = array(
-                'groupsHtml'=> $groupsHtml,
-                'pageBar'=>$pageBar,
-                'articleHtml'=> $articleHtml
+                'groupsHtml'=> $ajaxGroupsHtml,
+                'pageBar'=>$ajaxPageBar,
+                'articleHtml'=> $ajaxArtilceHtml
             );
-            $json = json_encode($return);
+            $json = json_encode($return, JSON_FORCE_OBJECT);
             echo $json;
         } else {        
             $this->load->view('admin/v_manageArticle', $data);
@@ -1204,11 +1595,15 @@ class Admin extends CI_Controller{
      * -1:represents it can't be accepted
      */
     public function auditArticle(){
-        //TODO 权限的验证
+        //TODO 暂时属于平台管理
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 14, 99);      //超管 审核权限
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         $aid = $_GET['aid'];
         $audit = $this->input->post('audit');
-        $uid = 5;   //TODO
-        $audit_id = $uid;
+        $audit_id = $_SESSION['admin']['id'];
         $result = $this->cms->updateAudit($aid, $audit, $audit_id);
         if($result){
             $mess = '审核成功';
@@ -1221,6 +1616,11 @@ class Admin extends CI_Controller{
      * @param type $mess the pram is used to transfer messege
      */
     public function viewArticle($mess = ''){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 14, 99);      //超管 审核权限 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         $aid = $_GET['aid'];
         $method = 1;    //the method is get a article
         $article = $this->cms->search($aid, $method);
@@ -1252,8 +1652,12 @@ class Admin extends CI_Controller{
      * 
      */
     public function createGroup(){
-        //TODO 权限的验证
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管  平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = $_SESSION['admin']['username'];
         $status = 1;    // the group isn't deleted
         if(isset($_POST['sub'])){
             $groupfather_id = trim($_POST['groupfather_id']);
@@ -1333,9 +1737,12 @@ class Admin extends CI_Controller{
     }
     
     public function manageGroup(){
-        //TODO 权限的验证
-        //TODOsss
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = 0;       //get all groups
         $status = 1;    // the group isn't deleted
         $groups = $this->cms->getAllGroups($uid, $status);
         $groupsHtml = '<table>';
@@ -1366,16 +1773,15 @@ class Admin extends CI_Controller{
      * this method is used for create article for super user
      */
     public function createSArticle(){ 
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         if(isset($_GET['uid'])){        //if the admin click a user 
             $uid = $_GET['uid'];
-            //TODO 根据用户id写文章
-            //the uid should use session transfer
-            //TODO 用户是否可以自定义分组，如果不可以，则不能要uid这个字段，因为任何用户
-            //登录都不是管理员，也就是说没有分组
-            //$space_uid = 5;
-            
             $space_status = 1;
-            $uidadmin = 5;// the user who has created the groups of user space
+            $uidadmin = 0;          // get all groups
             $space_groups = $this->space->getAllSGroups($uidadmin, $space_status);
             $data['space_groups'] = $space_groups;
             $data['uid'] = $uid;
@@ -1392,7 +1798,8 @@ class Admin extends CI_Controller{
                 if($result){
                     $data['flag'] = 1;
                     $data['message'] = '添加成功';    
-
+                    $data['space_gid'] = $space_groupid;
+                    
                     $this->load->view('admin/v_createSArticle', $data);
                 } else {
                     $data['flag'] = 0;
@@ -1538,39 +1945,61 @@ class Admin extends CI_Controller{
     }
     
     public function manageSArticle(){
-        if(isset($_GET['uid'])){    //if click the username in list
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 14, 99);      //超管 审核管理 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        if(isset($_GET['uid']) || isset($_GET['space_groupid'])){    //if click the username in list
             
-            $uidadmin = 5;// the user who has created the groups of user space
+            $uidadmin = 0;      // get all groups
             $space_status = 1;
             $space_groups = $this->space->getAllSGroups($uidadmin, $space_status);
-            $groupsHtml = '<select name="space_groupid" id="groupid">';
+            $space_groupid = 0;
+            if(isset($_GET['space_groupid'])){
+                $space_groupid = $_GET['space_groupid'];
+            } else {
+                foreach ($space_groups as $row){
+                    $space_groupid = $row['space_gid'];
+                    break;
+                }
+            }
+            
+            $space_uidGid['space_groupid'] = $space_groupid;
+            
+            $groupsHtml = '';
+            $groupsHead = '<select name="space_groupid" id="groupid">';
             if(!empty($space_groups)){
                 foreach ($space_groups as $group){
+                    if($space_groupid == $group['space_gid']){
+                        $groupsHtml .= '<option value="'.$group['space_gid'].'" selected="selected">'.$group['space_group_name'].'</option>';
+                        continue;
+                    }
                     $groupsHtml .= '<option value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
                 }
-//
-//
-//                foreach ($space_groups as $row){
-//                    $groupid = $row['space_gid'];
-//                    break;
-//                }
             } else {
                 $groupsHtml .= '<option value="0">没有分类</option>';
             }
-            $groupsHtml .= ' </select>';
+            $groupsEnd = ' </select>';
+            $ajaxGroupHtml = $groupsHtml;
+            $groupsHtml = $groupsHead.$groupsHtml.$groupsEnd;
+            
             $space_uid = $_GET['uid'];
+            $space_uidGid['space_uid'] = $space_uid;
             $method = 0;    //this represents getUserSArticles()
             $limit = 'start';
             $offset= 'end';
             
-            $articles = $this->space->searchS($space_uid, $method, $space_status, $limit, $offset);
+            $articles = $this->space->searchS($space_uidGid, $method, $space_status, $limit, $offset);
             $page = new Page(count($articles));
             $limit = $page->getLimit();
             $offset = $page->getOffset();
-            $articles = $this->space->searchS($space_uid, $method, $space_status, $limit, $offset);
+            $articles = $this->space->searchS($space_uidGid, $method, $space_status, $limit, $offset);
             $pageBar = $page->getPage($articles);
-            $articleHtml = '<table>';
-            $articleHtml .= '<tr>
+            
+            $articleHtml = '';
+            $articleHead = '<table>';
+            $articleHtml = '<tr>
                             <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th>状态</th><th colspan="2">操作</th>
                             </tr>';
             if(!empty($articles)){
@@ -1594,23 +2023,42 @@ class Admin extends CI_Controller{
                     $articleHtml .= '</tr>';
                 }
             }
-            $articleHtml .= '</table>';
+            $articleEnd = '</table>';
+            
+            $ajaxArticleHtml = $articleHtml;
+            $articleHtml = $articleHead.$articleHtml.$articleEnd;
+            
             $data['groupsHtml'] = $groupsHtml;
             $data['pageBar'] = $pageBar;
             $data['articleHtml'] = $articleHtml;
-            
-            $this->load->view('admin/v_manageSArticle', $data);
+            $data['uid'] = $space_uid;
+            $ajaxPageBar = substr($pageBar, (strpos($pageBar, '>') + 1), (strlen($pageBar)-24));
+            if(isset($_GET['space_groupid'])){
+                $return = array(
+                    'groupsHtml'=> $ajaxGroupHtml,
+                    'pageBar'=>$ajaxPageBar,
+                    'articleHtml'=> $ajaxArticleHtml
+                );
+                $json = json_encode($return, JSON_FORCE_OBJECT);
+                echo $json;
+            } else {        
+                 $this->load->view('admin/v_manageSArticle', $data);
+            }           
         } else {    // else if(isset($_GET['uid']))
             $m = 'manageSArticle';
             $this->userspaceList($m);
         }
     }
     
-        public function auditSArticle(){
-        //TODO 权限的验证
+   public function auditSArticle(){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 14, 99);      //超管 审核权限 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         $space_aid = $_GET['space_aid'];
         $space_audit = $this->input->post('space_audit');
-        $space_uid = 5;   //TODO
+        $space_uid = $_SESSION['admin']['id'];  
         $space_audit_id = $space_uid;
         $result = $this->space->updateSAudit($space_aid, $space_audit, $space_audit_id);
         if($result){
@@ -1624,6 +2072,11 @@ class Admin extends CI_Controller{
      * @param type $mess the pram is used to transfer messege
      */
     public function viewSArticle($mess = ''){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 14, 99);      //超管 审核权限 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         $space_aid = $_GET['space_aid'];
         $method = 1;    //the method is get a article
         $article = $this->space->searchS($space_aid, $method);
@@ -1654,8 +2107,12 @@ class Admin extends CI_Controller{
      * 
      */
     public function createSGroup(){
-        //TODO 权限的验证
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = $_SESSION['admin']['id'];
         $status = 1;    // the group isn't deleted
         if(isset($_POST['sub'])){
             $groupfather_id = trim($_POST['groupfather_id']);
@@ -1733,9 +2190,12 @@ class Admin extends CI_Controller{
     }
     
     public function manageSGroup(){
-        //TODO 权限的验证
-        //TODOsss
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = 0;       // get all groups 
         $status = 1;    // the group isn't deleted
         $groups = $this->space->getAllSGroups($uid, $status);
         $groupsHtml = '<table>';

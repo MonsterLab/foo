@@ -33,8 +33,13 @@
             $html .= "<td align='center'>{$fooType}</td>";
             $html .= "<td align='center'>{$userBase['ctime']}</td>";
             $html .= "<td align='center'><a href='{$base_url}admin/createUser/{$userBase['zx_code']}/{$userBase['id']}/'><input type='button' value='修改'></a>";
-            $html .= "<a href='{$base_url}admin/createUserBase/{$userBase['type']}/{$userBase['zx_code']}'><input type='button' value='录入'></a>";  
-            $html .= "<a href='{$base_url}admin/audit/{$userBase['id']}/{$type}/'><input type='button' value='审核'></a></td>";
+            
+            $html .= "<a href='{$base_url}admin/showLuruView/{$userBase['id']}'><input type='button' value='录入'></a>";  
+            if($power == 14 || $power == 99){
+                $html .= "<a href='{$base_url}admin/audit/{$userBase['id']}/{$type}/'><input type='button' value='审核'></a>";
+            }
+            
+            $html .= "</td>";
             $html .= "</tr>";
         }
         echo $html;

@@ -130,7 +130,10 @@ dl,ul{
     background: #d9dfef;
 }
 
-#viewArticle #article p{
+#viewArticle #mess{
+    padding: 0 0 0 50px;
+}
+#viewArticle #article #author{
     text-align: center;
     font-size: 14px;
 }

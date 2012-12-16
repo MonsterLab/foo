@@ -8,7 +8,7 @@
         <script type="text/javascript">
             $(function(){
                 var $selectGroup = $("#groupid");
-                $base = <?php echo base_url('admin/manageArticle?groupid='); ?>;
+                $base = "<?php echo base_url('admin/manageArticle?groupid='); ?>";
                 $selectGroup.change(function(){
                     $url = $base+$(this).val();
                     $.ajax({
@@ -17,24 +17,20 @@
                         url:$url,
                         success:function(data)
                         {
-
-                        var result = JSON.parse(data);
-                        //TODO 用JQURE 添加信息到后面
-//
-//                            //result = (Object)result;
-//                          $("#pagefirst").html(null);
-//                          $("#pagefirst").html(result.page);
-//                          var title = "<tr class='tableTitle'><th>标题(评论次数)</th><th>作者</th><th>添加时间</th><th>操作</th></tr>";
-//                          var list = title+result.articleList;
-//                          $("#manArticleTable").html(null);
-//                          $("#manArticleTable").html(list);
-                         },
+                            var result = JSON.parse(data);
+                            
+                            $('#groupid').html(null);
+                            $('#groupid').html(result.groupsHtml);
+                            $('#content table').html(null);
+                            $('#content table').html(result.articleHtml);
+                            $('#pageBar').html(null);
+                            $('#pageBar').html(result.pageBar);
+                        },
 
                         error:function()
                         {
                              $("#loading_message").hide();
-                             alert("ajax error");
-                         }
+                        }
                      });
 
                  });

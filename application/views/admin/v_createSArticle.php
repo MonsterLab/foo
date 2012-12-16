@@ -25,7 +25,7 @@
                     <select name="space_gid">
                         <?php 
                             foreach ($space_groups as $row){
-                                if(isset($flag) && $gid == $row['space_gid']){
+                                if(isset($flag) && $space_gid == $row['space_gid']){
                                     echo '<option selected="selected" value='.$row['space_gid'].'>'.$row['space_group_name'].'</option>';
                                     continue;;
                                 }
@@ -43,7 +43,7 @@
                     <?
                         $this->load->helper('form_helper');
                         $data = array(
-                                      'name'        => 'content',
+                                      'name'        => 'space_content',
                                       'id'          => 'content',
                                       'toolbarset'  => 'Default',
                                       'basepath'    => '/workspace/foo/include/fckeditor/',

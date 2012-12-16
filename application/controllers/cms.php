@@ -18,7 +18,12 @@ class Cms extends CI_Controller{
     public function article($aid){
         //TODO nav
         $method = 1;    //the method is get a article
-        $article = $this->cms->search($aid, $method);
+        $limit = 'start';
+        $offset = 'end';
+        $status = 1;
+        $audit = 1;
+        //$status = 1,$limit=0,$offset = 5, $audit = 0
+        $article = $this->cms->search($aid, $method, $status, $limit, $offset, $audit);
         $gid = $article[0]['groupid'];
         $guide = $this->getGuideByGid($gid);
         $data['article'] = $article;
@@ -38,12 +43,13 @@ class Cms extends CI_Controller{
         $offset = 'end';
         $status = 1;
         //search($key,$method,$status = 1,$limit=0,$offset = 5 ){
-        $aritcles = $this->cms->search($groupids, $method, $status, $limit, $offset);
+        $audit = 1;
+        $aritcles = $this->cms->search($groupids, $method, $status, $limit, $offset, $audit);
         
         $page = new Page(count($aritcles));
         $limit = $page->getLimit();
         $offset = $page->getOffset();
-        $aritcles = $this->cms->search($groupids, $method, $status, $limit, $offset);
+        $aritcles = $this->cms->search($groupids, $method, $status, $limit, $offset, $audit);
         $pageBar = $page->getPage($aritcles);
         
         $articlesHtml = '<ul>'; 

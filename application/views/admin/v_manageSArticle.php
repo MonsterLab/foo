@@ -2,7 +2,42 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
             <link href="<?php echo base_url("include/css/admin.css");?>" type="text/css" rel="stylesheet"/>
+            <script src="<?php echo base_url('include/js/jquery-1.7.2.js');?>" type="text/javascript"></script>
+            <script src="<?php echo base_url('include/js/json2.js');?>" type="text/javascript"></script>
         <title></title>
+        <script type="text/javascript">
+            $(function(){
+                var $selectGroup = $("#groupid");
+                $base = "<?php echo base_url('admin/manageSArticle?uid='.$uid.'&space_groupid='); ?>";
+                $selectGroup.change(function(){
+                    $url = $base+$(this).val();
+                    $.ajax({
+                        type:"post",
+                        data:'',
+                        url:$url,
+                        success:function(data)
+                        {
+                            
+                            var result = JSON.parse(data);
+                            $('#groupid').html(null);
+                            $('#groupid').html(result.groupsHtml);
+                            $('#content table').html(null);
+                            $('#content table').html(result.articleHtml);
+                            $('#pageBar').html(null);
+                            $('#pageBar').html(result.pageBar);
+                        },
+
+                        error:function()
+                        {
+                             $("#loading_message").hide();
+                        }
+                     });
+
+                 });
+
+            });
+                    
+        </script>
     </head>
     <body id="manageArticle-body">
         <div id="manageArticle">

@@ -355,7 +355,7 @@ class M_space extends CI_Model{
             'space_group_sumarry' => $space_group_sumarry,
             'space_groupfather_id' => $space_groupfather_id
           );
-       $insertId = $this->db->insert('zx_article_groups',$sql);
+       $insertId = $this->db->insert('zx_space_article_groups',$sql);
        if($insertId > 0){
 
            return 1;
@@ -373,7 +373,7 @@ class M_space extends CI_Model{
      * @return int
      */
     public function getAllSGroups($uid = 0, $space_status = 1){
-        $this->db->select("space_gid, space_group_name, space_group_sumarry");
+        $this->db->select("space_gid, space_group_name, space_groupfather_id, space_group_sumarry");
         if($uid != 0){
             $this->db->where('uid', $uid); 
         }

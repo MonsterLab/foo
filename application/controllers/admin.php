@@ -23,45 +23,111 @@ class Admin extends CI_Controller{
     //************************基本操作**********************************************
     public function index(){
         $power = $this->admin->getPower();
-//        if($power < 1){
-//            redirect(base_url("admin/login/"));
-//        }  else {
-            //$this->load->view('admin/index');
+        if($power < 1){
+            redirect(base_url("admin/login/"));
+        }  else {
             $this->load->view('admin/index');
-//        }
+        }
     }
     
+    /**
+     * 管理员登录
+     * @return type
+     */
     public function login(){
+        $data['flag'] = ''; 
         if($_POST){
-            $username = $this->input->post('username');
-            $userpassword = $this->input->post('userpassword');
+            $username = trim($this->input->post('username'));
+            $userpassword = trim($this->input->post('password'));
             
-            $login = $this->admin->login($username,$userpassword);
+            if($username == NULL || $userpassword == NULL){
+                $data['flag'] = '请完善信息!';
+                $this->load->view('admin/login',$data);
+                return;
+            }
+            
+            $fooLogin = $this->admin->login($username,$userpassword);
 
-            if($login == 1){
+            if($fooLogin == -1){
+                $data['flag'] = '不存在此用户!';
+                $this->load->view('admin/login',$data);
+                return;
+            }
+            if($fooLogin == 0){
+                $data['flag'] = '密码错误!';
+                $this->load->view('admin/login',$data);
+                return;
+            }
+            if($fooLogin == 1){
                 redirect(base_url("admin/index/"));
             } 
             
             return;
         }
         
-        $this->load->view('admin/login');
+        $this->load->view('admin/login',$data);
        
         
     }
-    
+    /**
+     * 登出
+     */
     public function logout(){
         $this->admin->logout();
         redirect(base_url('admin/login/'));
     }
     
+    /**
+     * 加载左部菜单
+     * @return type
+     */
     public function left(){
-        $this->load->view('admin/left');
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        //根据power设置left视图显示项目
+        $data['power'] = $power;
+        $this->load->view('admin/left',$data);
+        return;
+    }
+    
+    public function top(){
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        
+        $this->load->view('admin/top');
+        return;
+    }
+
+    public function main(){
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        
+        $this->load->view('admin/main');
+        return;
+    }
+
+    public function bottom(){
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        
+        $this->load->view('admin/footer');
         return;
     }
     
     /**-----------------------------管理员、客户管理------------------------------------**/
     public function createAdmin($adminId = 0){
+        $power = $this->admin->getPower();
+        if($power < 99){
+            redirect(base_url('admin/login/'));
+        }
         
         //默认为直接添加，即不存在原有数据
         $data = array(
@@ -138,6 +204,11 @@ class Admin extends CI_Controller{
      * @param type $uid
      */
     public function deleteAdmin($uid){
+        $power = $this->admin->getPower();
+        if($power < 99){
+            redirect(base_url('admin/login/'));
+        }
+        
         $fooResult = $this->admin->delete($uid);
         if($fooResult){
             redirect(base_url('admin/searchAdmins'));
@@ -148,6 +219,11 @@ class Admin extends CI_Controller{
      * 查询管理用户
      */
     public function searchAdmins(){
+        $power = $this->admin->getPower();
+        if($power < 99){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data = array(
             'flag'=>'',
             'head'=>'管理用户管理'
@@ -180,7 +256,20 @@ class Admin extends CI_Controller{
         }
     }
 
+    /**
+     * 新建客户
+     * @param type $zxcode
+     * @param type $uid
+     * @return type
+     */
     public function createUser($zxcode = 0 ,$uid = 0){
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
+        
         //默认为直接添加，即不存在原有数据
         $data = array(
             'zxcode'=>$zxcode,
@@ -270,6 +359,12 @@ class Admin extends CI_Controller{
      */
     
     public function showLuruView($uid){
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $fooUserBases = $this->userbase->search($uid,3);            //按id查询
         $fooZxcode = $fooUserBases[0]['zx_code'];
         $fooType = $fooUserBases[0]['type'];
@@ -344,6 +439,12 @@ class Admin extends CI_Controller{
     }
     
     public function createUserBase($uid,$fooZxcode){
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         //$data['type'] = $fooType;
         $data['uid'] = $uid;
         $data['zxcode'] = $fooZxcode;
@@ -392,6 +493,13 @@ class Admin extends CI_Controller{
      * 添加征信基本信息
      */
     public function createCertBase($type = '',$uid = 0){
+        //权限设定
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['type'] = $type;
         $data['uid'] = $uid;
         $data['industrys'] = $this->zxpool->searchIndustry($type);
@@ -441,6 +549,13 @@ class Admin extends CI_Controller{
      * 上传扫描文件
      */
     public function addCertFile($type = '',$uid = 0){
+        //权限设定
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['type'] = $type;
         $data['uid'] = $uid;
         $data['fileTypes'] = $this->zxpool->searchFileType($type);             
@@ -488,6 +603,13 @@ class Admin extends CI_Controller{
      * 
      */
     public function addCertContent($type = '',$uid = 0){
+        //权限设定
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['type'] = $type;
         $data['uid'] = $uid;
         if($_POST){
@@ -534,6 +656,14 @@ class Admin extends CI_Controller{
      * @param type $isPass              审核情况，-1未通过，1通过
      */
     public function audit($uid = 1,$type = 'topic',$tableType = '',$tid = 0,$isPass = 0){
+        
+        //权限设定
+        $power = $this->admin->getPower();
+        $powerArray = array(14,99);                 //审核、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         //以下为根据审核情况对表审核
         if($isPass == -1 || $isPass == 1){
            $audit_id = $this->admin->getUID();                                  //获得审核人id
@@ -613,6 +743,13 @@ class Admin extends CI_Controller{
      * @param type $tid
      */
     public function showFileOrContent($uid,$type,$tableType,$tid){
+        //权限设定
+        $power = $this->admin->getPower();
+        $powerArray = array(14,99);                 //审核、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['uid'] = $uid;
         $data['type'] = $type;
         $data['tableType'] = $tableType;
@@ -637,8 +774,14 @@ class Admin extends CI_Controller{
      * @return type
      */
     public function searchUsers($type = ''){
+        $power = $this->admin->getPower();
+        $powerArray = array(13,14,99);
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['flag'] = '';
-        if($type != ''){
+        if( $type != ''){
             $fooTypeArray = array('topic','medium','talent');
             if( !in_array($type,$fooTypeArray)){
                 $data['flag'] = '参数错误！';
@@ -658,7 +801,7 @@ class Admin extends CI_Controller{
         }elseif($type == '') {
             $data['head'] = '客户管理';
         }
-            
+        
         if($_POST){
             $fooZxcode = trim($this->input->post('keySearch'));
 
@@ -687,7 +830,10 @@ class Admin extends CI_Controller{
             if($type != ''){
                 $this->load->view('admin/v_searchUsers',$data);
             }  else {
-                $this->load->view('admin/v_manageUsers',$data);
+                
+                if($power == 13 || $power == 99){
+                    $this->load->view('admin/v_manageUsers',$data);
+                } 
             }
 
         }  else {
@@ -707,9 +853,15 @@ class Admin extends CI_Controller{
             //将类型传入视图
             $data['type'] = $type;
             if($type != ''){
-                $this->load->view('admin/v_searchUsers',$data);
+                
+                    $this->load->view('admin/v_searchUsers',$data);
+                
             }  else {
-                $this->load->view('admin/v_manageUsers',$data);
+                
+                if($power == 13 || $power == 99){
+                    $this->load->view('admin/v_manageUsers',$data);
+                } 
+                
             }
             
         }
@@ -749,8 +901,16 @@ class Admin extends CI_Controller{
 
     /**
      * 查看征信编码
+     * 新增用户也会用到此方法
      */
     public function searchCode(){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                     //录入、超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data = array(
             'flag' => '',
             'head'=>'征信编码池管理'
@@ -778,7 +938,23 @@ class Admin extends CI_Controller{
         
     }
     
+    /**
+     * 显示用户信息
+     * 征信编码处，通过征信编码查询
+     * 
+     * TODO：只能查看自己录入的信息
+     * 
+     * @param type $zxcode
+     * @return type
+     */
     public function showUserInfos($zxcode){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                     //录入、超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data = array(
             'flag'=>'',
             'zxcode' => 0,
@@ -830,9 +1006,26 @@ class Admin extends CI_Controller{
      * 批量导入征信编码
      */
     public function importCode(){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(99);                     //超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['flag'] = '';
         if($_POST){
             if(!empty($_FILES['file']['name'])){
+                
+                $endname = substr(strrchr($_FILES['file']['name'],'.'),1);          //截取上传文件的后缀名
+                //判断是否为txt格式
+                if(!in_array(strtolower($endname),array('text'))){                  //strtolower()转化为小写，只能打开txt文件    
+                    
+                    $data['flag'] = '文件格式错误！';
+                    $this->load->view('admin/v_importCode',$data);
+                    return;
+                }                             
+                
                 $tmp_name = $_FILES['file']['tmp_name'];
                 //读取整个文件
                 $resourse = file($tmp_name);                      
@@ -854,6 +1047,7 @@ class Admin extends CI_Controller{
                     $result = $this->zxpool->createCode($codeArray);
                     if($result){
                         //成功导入
+                        //TODO:此处导入成功之后有错误，说没有定义flag，但是找不出原因
                         $data['flag'] = '成功导入！';
                     }
                     
@@ -880,6 +1074,13 @@ class Admin extends CI_Controller{
      * 添加征信项目类型,比如营业执照、组织机构代码...
      */
     public function addFileType(){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(99);                     //超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['flag'] = '';
         if($_POST){
             $fooType = trim($this->input->post('type'));
@@ -913,6 +1114,12 @@ class Admin extends CI_Controller{
      * 搜索征信项目类型,比如营业执照、组织机构代码...
      */
     public function searchFileType(){
+        //权限管理
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data = array(
             'flag'=>'',
             'head'=>'征信项目设置'
@@ -941,6 +1148,13 @@ class Admin extends CI_Controller{
      * @param type $fid
      */
     public function deleteFileType($fid){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(99);                     //超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $fooResult = $this->zxpool->deleteFileType($fid);
         if($fooResult){
             redirect(base_url('admin/searchFileType'));
@@ -948,6 +1162,13 @@ class Admin extends CI_Controller{
     }
     
     public function addIndustry(){
+        //权限管理
+        $power = $this->admin->getPower();
+        $powerArray = array(99);                     //超管 
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data['flag'] = '';
         if($_POST){
             $fooType = trim($this->input->post('type'));
@@ -980,6 +1201,12 @@ class Admin extends CI_Controller{
      * 查看行业类别
      */
     public function searchIndustry(){
+        //权限管理
+        $power = $this->admin->getPower();
+        if($power < 1){
+            redirect(base_url('admin/login/'));
+        }
+        
         $data = array(
             'flag'=>'',
             'head'=>'征信项目设置'
@@ -1054,20 +1281,7 @@ class Admin extends CI_Controller{
 
     }
     
-    public function top(){
-        $this->load->view('admin/top');
-        return;
-    }
-
-    public function main(){
-        $this->load->view('admin/main');
-        return;
-    }
-
-    public function bottom(){
-        $this->load->view('admin/footer');
-        return;
-    }
+    
     
 //**************************CMS操作**********************************************
     /**

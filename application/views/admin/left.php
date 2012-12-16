@@ -7,13 +7,37 @@
     <body id="menu-body">
         <div id="menu">
             <ul id="mainnav">
+                <?php 
+                    //录入、超管
+                    if($power == 13 || $power == 99){ 
+                ?>
+                
                 <li>
                     <dl>
                         <dt>用户管理</dt>
+                        <?php
+                            //超管
+                            if($power == 99){
+                        ?>
                         <dd><a href="<?php echo base_url('admin/searchAdmins');?>" target="main">管理用户管理</a></dd>
+                        <?php }?>
+                        
+                        <?php 
+                            //录入、超管
+                            if($power == 13 || $power == 99){
+                        ?>
                         <dd><a href="<?php echo base_url('admin/searchUsers');?>" target="main">客户管理</a></dd>
+                        <?php }?>
                     </dl>
                 </li>
+                
+                <?php }?>
+                
+                <?php 
+                    //平台管理、超管
+                    if($power == 12 || $power == 99){ 
+                ?>
+                
                 <li>
                     <dl>
                         <dt>综合信息管理</dt>
@@ -42,17 +66,36 @@
                         </dd>
                     </dl>
                 </li>
+                <?php }?>
+                
+                <?php 
+                    //录入、审核、超管
+                    if($power == 13 || $power == 14 || $power == 99){ 
+                ?>
                 <li>
                     <dl>
                         <dt>征信库管理</dt>
+                        <?php 
+                            //超管
+                            if($power == 99){ 
+                        ?>
                         <dd><a href="<?= base_url('admin/searchCode')?>" target="main">征信编码池管理</a></dd>
+                        <?php }?>
+                        
                         <dd><a href="<?= base_url('admin/searchUsers/topic')?>" target="main">纳税主体征信库</a></dd>
                         <dd><a href="<?= base_url('admin/searchUsers/medium')?>" target="main">中介机构征信库</a></dd>
                         <dd><a href="<?= base_url('admin/searchUsers/talent')?>" target="main">财税个人征信库</a></dd>
+                        
+                        <?php 
+                            //超管
+                            if($power == 99){ 
+                        ?>
                         <dd><a href="<?= base_url('admin/searchFileType')?>" target="main">具体征信项目设置</a></dd>
                         <dd><a href="<?= base_url('admin/searchIndustry')?>" target="main">行业分类设置</a></dd>
+                        <?php }?>
                     </dl>
                 </li>
+                <?php }?>
             </ul>         
         </div>
     </body>

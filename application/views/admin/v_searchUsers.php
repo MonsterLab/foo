@@ -34,7 +34,8 @@
             $html .= "<td align='center'>{$userBase['zx_code']}</td>";
             $html .= "<td align='center'>{$userBase['cert_name']}</td>";
             $html .= "<td align='center'>{$userBase['ctime']}</td>";
-            $html .= "<td align='center'><a href='{$base_url}admin/createUser/{$userBase['id']}/'><input type='button' value='修改'></a>";
+            $html .= "<td align='center'>";
+            //$html .= "<a href='{$base_url}admin/createUser/{$userBase['id']}/'><input type='button' value='修改'></a>";
             $html .= "<a href='{$base_url}admin/showLuruView/{$userBase['id']}/'><input type='button' value='录入'></a>";  
             $html .= "<a href='{$base_url}admin/audit/{$userBase['id']}/{$type}/'><input type='button' value='审核'></a></td>";
             $html .= "</tr>";

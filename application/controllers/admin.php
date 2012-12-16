@@ -472,16 +472,28 @@ class Admin extends CI_Controller{
             $fooCertBases = $this->topic->searchCertBase($uid);             //获得认证基本信息
             $fooCertFiles = $this->topic->searchCertFile($uid);             //获得认证扫描信息
             $fooCertContent = $this->topic->searchCertContent($uid);        //获得认证文字类信息
+            
+            if($fooCertBases[0]['com_nature'] != NULL){
+                $data['noneShow2'] = 0;
+            }
         }
         if($fooType == 'medium'){
             $fooCertBases = $this->medium->searchCertBase($uid);
             $fooCertFiles = $this->medium->searchCertFile($uid);
             $fooCertContent = $this->medium->searchCertContent($uid);
+            
+            if($fooCertBases[0]['com_nature']){
+                $data['noneShow2'] = 0;
+            }
         }
         if($fooType == 'talent'){
             $fooCertBases = $this->talent->searchCertBase($uid);
             $fooCertFiles = $this->talent->searchCertFile($uid);
             $fooCertContent = $this->talent->searchCertContent($uid);
+            
+            if($fooCertBases[0]['sex']){
+                $data['noneShow2'] = 0;
+            }
         }
         
         
@@ -517,9 +529,7 @@ class Admin extends CI_Controller{
         if($fooUserBases[0]['truename'] != NULL){
             $data['noneShow1'] = 0;
         }
-        if($fooCertBases){
-            $data['noneShow2'] = 0;
-        }
+        
         if($fooCertFiles){
             $data['noneShow3'] = 0;
         }
@@ -1174,7 +1184,7 @@ class Admin extends CI_Controller{
                 
                 $endname = substr(strrchr($_FILES['file']['name'],'.'),1);          //截取上传文件的后缀名
                 //判断是否为txt格式
-                if(!in_array(strtolower($endname),array('text'))){                  //strtolower()转化为小写，只能打开txt文件    
+                if(!in_array(strtolower($endname),array('txt'))){                  //strtolower()转化为小写，只能打开txt文件    
                     
                     $data['flag'] = '文件格式错误！';
                     $this->load->view('admin/v_importCode',$data);

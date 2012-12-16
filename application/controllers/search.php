@@ -19,17 +19,17 @@ class Search extends CI_Controller{
             return;
         }
         
-        if($_GET['step'] == 1){
-            $this->step1();
-            
-            return;
-        }
-        
-        if($_GET['step'] == 2){
-            $this->step2();
-            
-            return;
-        }
+//        if($_GET['step'] == 1){
+//            $this->step1();
+//            
+//            return;
+//        }
+//        
+//        if($_GET['step'] == 2){
+//            $this->step2();
+//            
+//            return;
+//        }
         
     }
     
@@ -39,12 +39,12 @@ class Search extends CI_Controller{
             'zxcode' => 0,
             'com_name' => 'unknown'            
         );
-        
         if($_POST){
             $fooZxcode = $this->input->post('zxcode');
-            if($fooZxcode == NULL){
+            if($fooZxcode == NULL){  
                 $data['flag'] = '请完善信息！';
-                $this->load->view('search/step1',$data);
+                $this->load>view('cms/index',$data);
+                //$this->load->view('search/step1',$data);
                 return;
             }
             $fooUserBase = $this->userbase->search($fooZxcode,1);
@@ -52,7 +52,7 @@ class Search extends CI_Controller{
             
             if($fooUserBase == FALSE){
                 $data['flag'] = '客户不存在！';
-                $this->load->view('search/step1',$data);
+                $this->load->view('cms/index',$data);
                 return;
             }
             
@@ -80,7 +80,7 @@ class Search extends CI_Controller{
             
         }  else {#end of post
             
-            $this->load->view('search/step1',$data);
+            $this->load->view('cms/index',$data);
         }
     }
     

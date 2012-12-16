@@ -48,13 +48,19 @@
     echo "公司所在地："."<input type='text' name='com_place' value='{$certBases[0]['com_place']}'>"."<br>";
     echo "征信开始时间："."<input type='text' id='cert_begin' name='cert_begin' value='{$certBases[0]['cert_begin']}'>"."<br>";
     echo "征信结束时间："."<input type='text' id='cert_end' name='cert_end' value='{$certBases[0]['cert_end']}'>"."<br>";
-    if($noneShow2){
-        echo "<input type='submit' name='submit' value='提交'>";
-    }
+ ?>  
+    
+    <?php if($noneShow2){?>
+    <input type='submit' name='submit' value='提交'>
+    <?php 
+        }  else {
+    ?>        
+    <span style="color: red ; font-weight:  bolder">已提交</span>      
+     <?php }?> 
     
     
-    echo "</form>";
-?>
+    </form>
+
     
 </body>
 </html>    

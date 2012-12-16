@@ -17,5 +17,10 @@
     
     <?php if($noneShow1){?>
     <input type='submit' name='submit' value='提交'>
-    <?php }?>
+    <?php 
+        }  else {
+    ?>        
+     <span style="color: red ; font-weight:  bolder">已提交</span>      
+     <?php }?>   
+    
 </form>

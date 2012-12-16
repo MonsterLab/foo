@@ -1306,7 +1306,8 @@ class Admin extends CI_Controller{
             
             if($result){
                 $data['flag'] = 1;
-                $data['message'] = '添加成功';    
+                $data['message'] = '添加成功';   
+                $data['gid'] = $groupid;
                 
                 $this->load->view('admin/v_createArticle', $data);
             } else {
@@ -1342,16 +1343,18 @@ class Admin extends CI_Controller{
                 break;
             }
         }
-        //TODO 
-        $groupid = 41;
+        $ajaxGroupsHtml = '';
         $groupsHtml = '<select name="groupid" id="groupid">';
+        
         if($groups){
             foreach ($groups as $group){
                 if($group['gid'] == $groupid){
                     $groupsHtml .= '<option value="'.$group['gid'].'" selected="selected">'.$group['group_name'].'</option>';
+                    $ajaxGroupsHtml .= '<option value="'.$group['gid'].'" selected="selected">'.$group['group_name'].'</option>';
                     continue;;
                 }
                 $groupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
+                $ajaxGroupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
             }
         } else {
             $groupsHtml .= '<option value="0">没有分类</option>';
@@ -1369,10 +1372,12 @@ class Admin extends CI_Controller{
         $articles =$this->cms->search($groupid, $method, $status, $limit, $offset);
         $pageBar = $page->getPage($articles);
         $currentPage = $page->getCurrentPage();
-        $articleHtml = '<table>';
-        $articleHtml .= '<tr>
+        
+        $articlehead = '<table>';
+        $articlehead .= '<tr>
                         <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th>状态</th><th colspan="2">操作</th>
                         </tr>';
+        $articleHtml  = '';
         if($articles){
             foreach ($articles as $row){
                 $articleHtml .= '<tr>';
@@ -1394,18 +1399,20 @@ class Admin extends CI_Controller{
                 $articleHtml .= '</tr>';
             }
         }
-        $articleHtml .= '</table>';
+        $articleEnd = '</table>';
+        $ajaxArtilceHtml = $articleHtml;
+        $articleHtml = $articlehead.$articleHtml.$articleEnd;
         $data['groupsHtml'] = $groupsHtml;
         $data['pageBar'] = $pageBar;
         $data['articleHtml'] = $articleHtml; 
-        
+        $ajaxPageBar = substr($pageBar, (strpos($pageBar, '>') + 1), (strlen($pageBar)-24));
         if(isset($_GET['groupid'])){
             $return = array(
-                'groupsHtml'=> $groupsHtml,
-                'pageBar'=>$pageBar,
-                'articleHtml'=> $articleHtml
+                'groupsHtml'=> $ajaxGroupsHtml,
+                'pageBar'=>$ajaxPageBar,
+                'articleHtml'=> $ajaxArtilceHtml
             );
-            $json = json_encode($return);
+            $json = json_encode($return, JSON_FORCE_OBJECT);
             echo $json;
         } else {        
             $this->load->view('admin/v_manageArticle', $data);
@@ -1607,7 +1614,8 @@ class Admin extends CI_Controller{
                 if($result){
                     $data['flag'] = 1;
                     $data['message'] = '添加成功';    
-
+                    $data['space_gid'] = $space_groupid;
+                    
                     $this->load->view('admin/v_createSArticle', $data);
                 } else {
                     $data['flag'] = 0;
@@ -1753,39 +1761,56 @@ class Admin extends CI_Controller{
     }
     
     public function manageSArticle(){
-        if(isset($_GET['uid'])){    //if click the username in list
+        if(isset($_GET['uid']) || isset($_GET['space_groupid'])){    //if click the username in list
             
             $uidadmin = 5;// the user who has created the groups of user space
             $space_status = 1;
             $space_groups = $this->space->getAllSGroups($uidadmin, $space_status);
-            $groupsHtml = '<select name="space_groupid" id="groupid">';
+            $space_groupid = 0;
+            if(isset($_GET['space_groupid'])){
+                $space_groupid = $_GET['space_groupid'];
+            } else {
+                foreach ($space_groups as $row){
+                    $space_groupid = $row['space_gid'];
+                    break;
+                }
+            }
+            
+            $space_uidGid['space_groupid'] = $space_groupid;
+            
+            $groupsHtml = '';
+            $groupsHead = '<select name="space_groupid" id="groupid">';
             if(!empty($space_groups)){
                 foreach ($space_groups as $group){
+                    if($space_groupid == $group['space_gid']){
+                        $groupsHtml .= '<option value="'.$group['space_gid'].'" selected="selected">'.$group['space_group_name'].'</option>';
+                        continue;
+                    }
                     $groupsHtml .= '<option value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
                 }
-//
-//
-//                foreach ($space_groups as $row){
-//                    $groupid = $row['space_gid'];
-//                    break;
-//                }
             } else {
                 $groupsHtml .= '<option value="0">没有分类</option>';
             }
-            $groupsHtml .= ' </select>';
+            $groupsEnd = ' </select>';
+            $ajaxGroupHtml = $groupsHtml;
+            $groupsHtml = $groupsHead.$groupsHtml.$groupsEnd;
+            
             $space_uid = $_GET['uid'];
+            $space_uidGid['space_uid'] = $space_uid;
             $method = 0;    //this represents getUserSArticles()
             $limit = 'start';
             $offset= 'end';
             
-            $articles = $this->space->searchS($space_uid, $method, $space_status, $limit, $offset);
+            $articles = $this->space->searchS($space_uidGid, $method, $space_status, $limit, $offset);
             $page = new Page(count($articles));
             $limit = $page->getLimit();
             $offset = $page->getOffset();
-            $articles = $this->space->searchS($space_uid, $method, $space_status, $limit, $offset);
+            $articles = $this->space->searchS($space_uidGid, $method, $space_status, $limit, $offset);
             $pageBar = $page->getPage($articles);
-            $articleHtml = '<table>';
-            $articleHtml .= '<tr>
+            
+            $articleHtml = '';
+            $articleHead = '<table>';
+            $articleHead .= '<tr>
                             <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th>状态</th><th colspan="2">操作</th>
                             </tr>';
             if(!empty($articles)){
@@ -1809,12 +1834,27 @@ class Admin extends CI_Controller{
                     $articleHtml .= '</tr>';
                 }
             }
-            $articleHtml .= '</table>';
+            $articleEnd = '</table>';
+            
+            $ajaxArticleHtml = $articleHtml;
+            $articleHtml = $articleHead.$articleHtml.$articleEnd;
+            
             $data['groupsHtml'] = $groupsHtml;
             $data['pageBar'] = $pageBar;
             $data['articleHtml'] = $articleHtml;
-            
-            $this->load->view('admin/v_manageSArticle', $data);
+            $data['uid'] = $space_uid;
+            $ajaxPageBar = substr($pageBar, (strpos($pageBar, '>') + 1), (strlen($pageBar)-24));
+            if(isset($_GET['space_groupid'])){
+                $return = array(
+                    'groupsHtml'=> $ajaxGroupHtml,
+                    'pageBar'=>$ajaxPageBar,
+                    'articleHtml'=> $ajaxArticleHtml
+                );
+                $json = json_encode($return, JSON_FORCE_OBJECT);
+                echo $json;
+            } else {        
+                 $this->load->view('admin/v_manageSArticle', $data);
+            }           
         } else {    // else if(isset($_GET['uid']))
             $m = 'manageSArticle';
             $this->userspaceList($m);

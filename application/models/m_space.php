@@ -81,20 +81,20 @@ class M_space extends CI_Model{
      * @param type $offset
      * @return int
      */
-    public function searchS($key,$method,$space_status = 1,$limit=0,$offset = 5 ){
+    public function searchS($key,$method,$space_status = 1,$limit=0,$offset = 5 , $space_audit = 0){
         $result = null;
         switch ($method){
             case 0:
-                $space_uid = $key;
-                $result = $this->getUserSArticles($space_uid, $limit, $offset, $space_status);
+                $space_uidGid = $key;
+                $result = $this->getUserSArticles($space_uidGid, $limit, $offset, $space_status, $space_audit);
                 break;
             case 1:
                 $space_aid = $key;
-                $result = $this->getSArticle($space_aid);
+                $result = $this->getSArticle($space_aid, $status, $space_audit);
                 break;
             case 2:
                 $space_groupid = $key;
-                $result = $this->getSArticlesOfGroup($space_groupid, $limit, $offset, $space_status);
+                $result = $this->getSArticlesOfGroup($space_groupid, $limit, $offset, $space_status, $space_audit);
                 break;
         }
         
@@ -110,11 +110,16 @@ class M_space extends CI_Model{
      * @param type $aid
      * @return int if the query is null ,ruturn 0 
      */
-    private function getSArticle($space_aid){		
+    private function getSArticle($space_aid, $space_status, $space_audit){		
 	$this->db->select('space_aid, space_uid, space_username, space_title, 
             space_content, space_groupid, space_audit,
             space_audit_id, space_status, space_ctime, space_viewtimes');
-        $this->db->where('space_aid',$space_aid);       
+        $this->db->where('space_aid',$space_aid);  
+        
+        if($space_audit != 0){
+            $this->db->where('space_audit', $space_audit);
+        }
+        
 	$query = $this->db->get('zx_space_articles');
         $result = $query->result_array();
         
@@ -136,15 +141,21 @@ class M_space extends CI_Model{
      * @param type $offset
      * @return int
      */
-    private function getUserSArticles($space_uid,$limit,$offset, $space_status){
+    private function getUserSArticles($space_uidGid, $limit,$offset, $space_status, $space_audit){
         $this->db->select('space_aid, space_uid, space_username, space_title,
             space_groupid, space_audit, space_audit_id, space_status, 
             space_ctime, space_viewtimes');
-        $this->db->where('space_uid', $space_uid);
+        $this->db->where('space_uid', $space_uidGid['space_uid']);
+        $this->db->where('space_groupid', $space_uidGid['space_groupid']);
         $this->db->where('space_status', $space_status);
         if(!($limit == 'start' && $offset == 'end')){
             $this->db->limit($offset,$limit);
         }
+        
+        if($space_audit != 0){
+            $this->db->where('space_audit', $space_audit);
+        }
+        
         $query = $this->db->get('zx_space_articles');
         $result = $query->result_array();
         $numRows = $query->num_rows();
@@ -165,7 +176,7 @@ class M_space extends CI_Model{
      * @param type $offset
      * @param type $space_status
      */
-    private function getSArticlesOfGroup($space_groupid, $limit, $offset, $space_status){
+    private function getSArticlesOfGroup($space_groupid, $limit, $offset, $space_status, $space_audit){
         $this->db->select('space_aid, space_uid, space_username, space_title,  space_groupid, space_audit, space_audit_id, space_status, space_ctime, space_viewtimes');
         if(is_array($space_groupid)){
             $this->db->where_in('space_groupid', $space_groupid);
@@ -175,6 +186,10 @@ class M_space extends CI_Model{
         $this->db->where('space_status',$space_status);
         if(!($limit == 'start' && $offset == 'end')){
             $this->db->limit($offset,$limit);
+        }
+        
+        if($space_audit != 0){
+            $this->db->where('space_audit', $space_audit);
         }
         
         $query = $this->db->get('zx_space_articles');

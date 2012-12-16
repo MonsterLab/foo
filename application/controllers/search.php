@@ -148,39 +148,35 @@ class Search extends CI_Controller{
         }
     }
     
-    public function show(){
-        echo "asd";
-    }
-
-    public function showUserInfos(){
-        
-        if($fooType == 'topic'){
-            $fooBase = $this->topic->searchCertBase($fooUID);
-            $fooContent = $this->topic->searchCertContent($fooUID);
-            $fooFile = $this->topic->searchCertFile($fooUID);
-
-        }
-        if($fooType == 'medium'){
-
-            $fooBase = $this->medium->searchCertBase($fooUID);
-            $fooContent = $this->medium->searchCertContent($fooUID);
-            $fooFile = $this->medium->searchCertFile($fooUID);
-
-        }           
-        if($fooType == 'talent'){
-            $fooBase = $this->talent->searchCertBase($fooUID);
-            $fooContent = $this->talent->searchCertContent($fooUID);
-            $fooFile = $this->talent->searchCertFile($fooUID);
-
-        }           
-
-        $data['userBases'] = $fooUserBase;
-        $data['certBases'] = $fooBase;
-        $data['certContents'] = $fooContent;
-        $data['certFiles'] = $fooFile;
-
-        $this->load->view('search/step2res',$data);
-    }
+//    public function showUserInfos(){
+//        
+//        if($fooType == 'topic'){
+//            $fooBase = $this->topic->searchCertBase($fooUID);
+//            $fooContent = $this->topic->searchCertContent($fooUID);
+//            $fooFile = $this->topic->searchCertFile($fooUID);
+//
+//        }
+//        if($fooType == 'medium'){
+//
+//            $fooBase = $this->medium->searchCertBase($fooUID);
+//            $fooContent = $this->medium->searchCertContent($fooUID);
+//            $fooFile = $this->medium->searchCertFile($fooUID);
+//
+//        }           
+//        if($fooType == 'talent'){
+//            $fooBase = $this->talent->searchCertBase($fooUID);
+//            $fooContent = $this->talent->searchCertContent($fooUID);
+//            $fooFile = $this->talent->searchCertFile($fooUID);
+//
+//        }           
+//
+//        $data['userBases'] = $fooUserBase;
+//        $data['certBases'] = $fooBase;
+//        $data['certContents'] = $fooContent;
+//        $data['certFiles'] = $fooFile;
+//
+//        $this->load->view('search/step2res',$data);
+//    }
     
 }
 

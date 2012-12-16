@@ -18,9 +18,9 @@
     echo "<select name = 'type'>";
 ?>
 
-    <option value='topic' <?php echo $type=='topic' ? 'selected' : ''; ?>>纳税主体征信库</option>
-    <option value='medium' <?php echo $type=='medium' ? 'selected' : ''; ?>>中介机构征信库</option>
-    <option value='talent' <?php echo $type=='talent' ? 'selected' : ''; ?>>财税人才征信库</option>
+    <option value='topic' <?php echo $type=='topic' ? 'selected' : ''; ?>>纳税主体</option>
+    <option value='medium' <?php echo $type=='medium' ? 'selected' : ''; ?>>中介机构</option>
+    <option value='talent' <?php echo $type=='talent' ? 'selected' : ''; ?>>财税人才</option>
     
 <?php    
     echo "</select><br>";

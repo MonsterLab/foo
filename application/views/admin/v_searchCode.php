@@ -1,7 +1,10 @@
 <div>
     <h2><?= $head;?></h2>
 </div>
-<?php
+<p>
+    <a href="<?php echo base_url('admin/importCode')?>"><input type="button" value="批量导入征信编码"></a>
+</p>
+    <?php
     $base_url = base_url();
     echo "<form action='{$base_url}admin/searchCode' method='post'>";
     echo "征信编码：<input type='text' name='keySearch'>";
@@ -21,7 +24,7 @@
         if($zxcode['status'] == 1){
             $state = '已使用';
             $handle = '查看信息';
-            $link = "";
+            $link = base_url("admin/showUserInfos/{$zxcode['zx_code']}/");
         }elseif ($zxcode['status'] == 0) {
             $state = '未使用';
             $handle = '添加客户';

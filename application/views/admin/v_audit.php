@@ -43,7 +43,7 @@
             $cbHtml .= "<td width='200'>单位性质：{$certBase['com_nature']}</td>";
             $cbHtml .= "</tr>";
             $cbHtml .= "<tr>";
-            $cbHtml .= "<td width='200'>行业类别：{$certBase['industry_id']}</td>";
+            $cbHtml .= "<td width='200'>行业类别：{$certBase['industry_name']}</td>";
             $cbHtml .= "<td width='200'>单位电话：{$certBase['com_phone']}</td>";
             $cbHtml .= "</tr>";
             $cbHtml .= "<tr>";
@@ -75,7 +75,7 @@
         $cfHtml = "<table width='500'>";
         foreach ($certFiles as $certFile){
             $cfHtml .= "<tr>";
-            $cfHtml .= "<td width='200'>文件名称：{$certFile['file_type_id']}</td>";
+            $cfHtml .= "<td width='200'>文件名称：{$certFile['file_type_name']}</td>";
             $cfHtml .= "<td width='200'>";
             if($certFile['audit'] == 0){
                 $cfHtml .= form_open("{$base_url}admin/showFileOrContent/{$uid}/{$type}/{$tableType}/{$certFile['id']}");

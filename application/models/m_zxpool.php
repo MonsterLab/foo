@@ -177,7 +177,7 @@ class M_zxpool extends CI_Model{
    /**
     * 查询行业类型
     * @param type $key                      关键字
-    * @param type $method                   查方法默认0 ； 0 所属征信库类型，1 行业名
+    * @param type $method                   查方法默认0 ； 0 所属征信库类型，1 行业名,3
     * @param type $$limit                   每页条数
     * @param type $$offset                  偏移量
     *   
@@ -193,9 +193,12 @@ class M_zxpool extends CI_Model{
            if($method == 1){
                $this->db->where('industry_name',$key);
            }
+           if($method == 2){
+               $this->db->where('id',$key);
+           }
        }
        $this->db->where('status',1);
-       $this->db->limit($limit,$offset);
+       //$this->db->limit($limit,$offset);
        $this->db->select('id,industry_name,type,cuid,ctime');
        $dbResult = $this->db->get('zx_industry_type');
        
@@ -328,7 +331,7 @@ class M_zxpool extends CI_Model{
    /**
     * 查询扫描键类型
     * @param type $key                      关键字
-    * @param type $method                   查方法默认0 ； 0 所属征信库类型，1 行业名
+    * @param type $method                   查方法默认0 ； 0 所属征信库类型，1 行业名,2id
     * @param type $$limit                   每页条数
     * @param type $$offset                  偏移量
     *   
@@ -344,9 +347,12 @@ class M_zxpool extends CI_Model{
            if($method == 1){
                $this->db->where('file_name',$key);              //类型名
            }
+           if($method == 2){
+               $this->db->where('id',$key);
+           }
        }
        $this->db->where('status',1);
-       $this->db->limit($limit,$offset);
+       //$this->db->limit($limit,$offset);
        $this->db->select('id,file_name,type,cuid,ctime');
        $dbResult = $this->db->get('zx_cert_file_type');
        

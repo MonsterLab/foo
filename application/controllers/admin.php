@@ -310,6 +310,7 @@ class Admin extends CI_Controller{
                 $this->load->view('admin/v_createUser',$data);
                 return;
             }
+            //TODO:$fooUserbase
             
             $fooUID = $this->userbase->create($fooCUID,$zxcode,$fooSqcode,$fooUsername,$fooPassword,'','','','',$fooType);
             if($fooUID == -1){
@@ -318,6 +319,7 @@ class Admin extends CI_Controller{
                 $data['flag'] = '添加失败！';
             }elseif ($fooUID > 0) {
                 
+                //增加公司名
                 if($fooType == 'topic'){
                     $fooResult = $this->topic->createCertBase($fooCUID,$fooUID,$fooCertname);
                 }elseif ($fooType == 'medium') {
@@ -350,7 +352,101 @@ class Admin extends CI_Controller{
             $this->load->view('admin/v_createUser',$data);
         }
     }
-
+    
+    //暂时没有用
+    public function updateUser($zxcode = 0 ,$uid = 0){
+        $power = $this->admin->getPower();
+        $powerArray = array(13,99);                 //录入、超管
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
+        
+        //默认为直接添加，即不存在原有数据
+        $data = array(
+            'zxcode'=>$zxcode,
+            'type'=>'',
+            'cert_name'=>'',
+            'username'=>'',
+            'password'=>'',
+            'sqcode'=>'',
+        );
+        //修改，修改时显示原有数据
+        if($uid > 0){
+            $fooUserbase = $this->userbase->search($uid,3);         //查询用户基本信息
+            $fooUser = $this->searchComName($fooUserbase);          //将公司名查询出
+            if($fooUser){
+                $data = array(
+                    'zxcode'=>$zxcode,
+                    'type'=>$fooUser[0]['type'],
+                    'username'=>$fooUser[0]['username'],
+                    'password'=>$fooUser[0]['password'],
+                    'sqcode'=>$fooUser[0]['sq_code'],
+                    'cert_name'=>$fooUser[0]['cert_name']
+                );
+            }
+        }
+        
+        if($_POST){
+            $fooCUID = $this->admin->getUID();
+            $fooType = trim($this->input->post('type'));
+            $fooCertname = trim($this->input->post('cert_name'));
+            $fooUsername = trim($this->input->post('username'));
+            $fooPassword = trim($this->input->post('password'));
+            $fooSqcode = trim($this->input->post('sqcode'));
+            
+            //权限、使用人姓名、用户名、密码为必须，其它选填
+            if($fooUsername == NULL || $fooPassword == NULL || $fooSqcode == NULL||$fooCertname==NULL){
+                
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createUser',$data);
+                return;
+            }
+            //TODO:$fooUserbase
+//            $department = $fooUserbase[0]['department'];
+//            $phone = $fooUserbase[0]['phone'];
+//            $email = $fooUserbase[0]['email'];
+            //update($uid,$zx_code,$sq_code,$password,$truename,$position,$phone,$email,$type
+            $fooUID = $this->userbase->update($uid,$fooPassword,fooUsername,'','','','',$fooType);
+            if($fooUID == -1){
+                $data['flag'] = '用户登录名已存在！';
+            }elseif ($fooUID == 0) {
+                $data['flag'] = '添加失败！';
+            }elseif ($fooUID > 0) {
+                
+                //增加公司名
+                if($fooType == 'topic'){
+                    $fooResult = $this->topic->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }elseif ($fooType == 'medium') {
+                    $fooResult = $this->medium->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }elseif ($fooType == 'talent') {
+                    $fooResult = $this->talent->createCertBase($fooCUID,$fooUID,$fooCertname);
+                }
+                
+                if($uid == 0){
+                    //新增客户,    
+                    $fooResult = $this->zxpool->useCode($zxcode);                //使用征信编码
+                    if($fooResult == 1){
+                        $data['flag'] = '添加成功！';
+                    }
+                    
+                    
+                }  else {
+                    //修改客户，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
+                    $fooResult = $this->admin->delete($uid);
+                    if($fooResult){
+                        $data['flag'] = '修改成功！';
+                    }
+                }
+            }
+            
+            $this->load->view('admin/v_createUser',$data);
+            
+        }  else {
+            $data['flag'] = '';
+            $this->load->view('admin/v_createUser',$data);
+        }
+    }
 
 
     /**--------------------------------CRM管理-------------------------------------**/
@@ -708,18 +804,30 @@ class Admin extends CI_Controller{
         $fooUserBases = $this->userbase->search($uid,3);                    //按id搜索,获得客户基本信息
         
         if($type == 'topic'){
-            $fooCertBases = $this->topic->searchCertBase($uid);             //获得认证基本信息
-            $fooCertFiles = $this->topic->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertBase = $this->topic->searchCertBase($uid);             //获得认证基本信息
+            $fooCertBases = $this->turnIndustryidtoName($fooCertBase);
+            
+            $fooCertFile = $this->topic->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
+            
             $fooCertContent = $this->topic->searchCertContent($uid);        //获得认证文字类信息
         }
         if($type == 'medium'){
-            $fooCertBases = $this->medium->searchCertBase($uid);
-            $fooCertFiles = $this->medium->searchCertFile($uid);
+            $fooCertBase = $this->medium->searchCertBase($uid);             //获得认证基本信息
+            $fooCertBases = $this->turnIndustryidtoName($fooCertBase);
+            
+            $fooCertFile = $this->medium->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
+            
             $fooCertContent = $this->medium->searchCertContent($uid);
         }
         if($type == 'talent'){
-            $fooCertBases = $this->talent->searchCertBase($uid);
-            $fooCertFiles = $this->talent->searchCertFile($uid);
+            $fooCertBase = $this->talent->searchCertBase($uid);             //获得认证基本信息
+            $fooCertBases = $this->turnIndustryidtoName($fooCertBase);
+            
+            $fooCertFile = $this->talent->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
+            
             $fooCertContent = $this->talent->searchCertContent($uid);
         }
         
@@ -732,6 +840,52 @@ class Admin extends CI_Controller{
         $data['type'] = $type;
         
         $this->load->view('admin/v_audit',$data);
+    }
+    
+    /**
+     * 将认证基本信息中的Industryid转换为name
+     * @param type $_array
+     * @return type
+     * 
+     * $certBases
+     */
+    private function turnIndustryidtoName($_array){
+        //
+        if($_array){
+            foreach ($_array as $array){
+                $id = $array['industry_id'];
+                $fooIndustrys = $this->zxpool->searchIndustry($id,2);
+                $array['industry_name'] = $fooIndustrys[0]['industry_name'];
+                     
+                $fooResult[] = $array;
+            }
+            
+            return $fooResult;
+        } 
+        
+    }
+    
+    /**
+     * 认证扫描件中的FileTypeid转换为name
+     * @param type $_array
+     * @return type
+     * 
+     * $certBases
+     */
+    private function turnFileTypeidtoName($_array){
+        //
+        if($_array){
+            foreach ($_array as $array){
+                $id = $array['file_type_id'];
+                $fooFiletype = $this->zxpool->searchFileType($id,2);
+                $array['file_type_name'] = $fooFiletype[0]['file_name'];
+                     
+                $fooResult[] = $array;
+            }
+            
+            return $fooResult;
+        } 
+        
     }
     
     /**
@@ -779,7 +933,7 @@ class Admin extends CI_Controller{
         if(!in_array($power, $powerArray)){
             redirect(base_url('admin/login/'));
         }
-        
+        $data['power'] = $power;
         $data['flag'] = '';
         if( $type != ''){
             $fooTypeArray = array('topic','medium','talent');
@@ -912,6 +1066,7 @@ class Admin extends CI_Controller{
         }
         
         $data = array(
+            'power'=>$power,
             'flag' => '',
             'head'=>'征信编码池管理'
         );

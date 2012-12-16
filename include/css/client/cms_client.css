@@ -139,7 +139,7 @@ ul, ol{
     background: #d9dfef;
 }
 
-#article p{
+#article p#author{
     text-align: center;
     font-size: 14px;
 }
@@ -149,55 +149,37 @@ ul, ol{
 }
 /*article end*/
 
-/*cms index begin*/
-#left, #center, #right{
-    height: 530px;
+/*space index begin*/
+#space-content{
+    width: 1000px;
+    height: 500px;
+    margin: 0 auto;
+}
+#space-content #left{
+    width: 690px;
+    height: 100%;
     float: left;
-}
-
-#left{
-    width: 300px;
-    background: green;
-}
-
-#center{
-    width: 480px;
-    margin: 0 10px;
-    background:#d9dfef;
-}
-
-#right{
-    width: 200px;
-    background: pink;
 }
 
 #col1,#col2,#col3,#col4{
     width: 50%;
-    float: left;
     height: 50%;
+    float: left;
 }
+
 #col1 h3,#col2 h3,#col3 h3,#col4 h3{
     font-size: 16px;
     font-weight: normal;
-    height: 30px;
-    line-height: 30px;
-    padding: 0 0 0 10px;
 }
-#col1 h3 a,#col2 h3 a,#col3 h3 a,#col4 h3 a{
+
+#space-content #right{
+    width: 300px;
+    height: 100%;
     float: right;
-    font-size: 12px;
-    display: inline-block;
-    padding: 0 15px 0 0;
+    background: green;
 }
 
-#col1 ul,#col2 ul,#col3 ul,#col4 ul{
-    padding: 10 10px 0 15px;
-}
-
-#col1 ul li,#col2 ul li,#col3 ul li,#col4 ul li{
-    line-height: 20px;
-}
-/*cms index end*/
+/*space index end*/
 
 
 

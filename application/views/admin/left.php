@@ -42,21 +42,26 @@
                     <dl>
                         <dt>综合信息管理</dt>
                         <dd>
-                            <a>栏目管理</a>
+                            <span>栏目管理</span>
                             <ul>
                                 <li><a href="<?php echo base_url('admin/createGroup');?>" target="main">添加栏目</a></li>
                                 <li><a href="<?php echo base_url('admin/manageGroup');?>" target="main">管理栏目</a></li>
                             </ul>
                         </dd>
                         <dd>
-                            <a>文章管理</a>
+                            <span>文章管理</span>
                             <ul>
                                 <li><a href="<?php echo base_url('admin/createArticle');?>" target="main">添加文章</a></li>
                                 <li><a href="<?php echo base_url('admin/manageArticle');?>" target="main">管理文章</a></li>
                             </ul>
                         </dd>
+                    </dl>
+                </li>
+                
+                <li>
+                    <dl>
+                        <dt>用户空间管理</dt>
                         <dd>
-                            <a>用户空间管理</a>
                             <ul>
                                 <li><a href="<?php echo base_url('admin/createSArticle');?>" target="main">添加空间文章</a></li>
                                 <li><a href="<?php echo base_url('admin/manageSArticle');?>" target="main">管理空间文章</a></li>
@@ -66,6 +71,7 @@
                         </dd>
                     </dl>
                 </li>
+                
                 <?php }?>
                 
                 <?php 

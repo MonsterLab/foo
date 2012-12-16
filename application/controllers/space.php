@@ -20,7 +20,7 @@ class Space extends CI_Controller{
         $limit= 'start';
         $offset = 'end';
         $space_audit = 1;
-        $article = $this->space->searchS($aid, $method);
+        $article = $this->space->searchS($aid, $method, $space_status, $limit, $offset, $space_audit);
         $gid = $article[0]['space_groupid'];
         $guide = $this->getGuideByGid($space_uid, $gid);
         $data['article'] = $article;
@@ -41,13 +41,13 @@ class Space extends CI_Controller{
         $limit = 'start';
         $offset = 'end';
         $status = 1;
-        //search($key,$method,$status = 1,$limit=0,$offset = 5 ){
+        //$key,$method,$space_status = 1,$limit=0,$offset = 5 , $space_audit = 0
         $space_audit = 1;
         $aritcles = $this->space->searchS($groupids, $method, $status, $limit, $offset, $space_audit);
         $page = new Page(count($aritcles));
         $limit = $page->getLimit();
         $offset = $page->getOffset();
-        $aritcles = $this->space->searchS($groupids, $method, $status, $limit, $offset);
+        $aritcles = $this->space->searchS($groupids, $method, $status, $limit, $offset, $space_audit);
         $pageBar = $page->getPage($aritcles);
         
         $articlesHtml = '<ul>'; 

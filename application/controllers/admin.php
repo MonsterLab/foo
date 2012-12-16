@@ -1290,8 +1290,12 @@ class Admin extends CI_Controller{
      */
     //create($uid , $username  , $title ,$content, $groupid)
     public function createArticle(){        
-        //TODO 权限的验证
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);     //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = 0;        //get all group created by everyone
         $status = 1;    // the group isn't deleted
         $groups = $this->cms->getAllGroups($uid, $status);
         $data['groups'] = $groups;
@@ -1300,8 +1304,7 @@ class Admin extends CI_Controller{
             $groupid = $this->input->post('gid');
             $title = $this->input->post('title');
             $content = $this->input->post('content'); 
-            $uid = 5;
-            $username = 'zhang';
+            $username = $_SESSION['admin']['username'];
             $result = $this->cms->create($uid ,$username  ,$title, $content, $groupid);
             
             if($result){
@@ -1327,10 +1330,12 @@ class Admin extends CI_Controller{
     }
     
     public function manageArticle(){
-        //TODO 权限验证 username= zhang uid = 5;
-        // $method 0->getUserArticles(), 1->getArticle(), 2->getArticlesOfGroup()
-        //public function search($key,$method,$status = 1,$limit=0,$offset = 5 )
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = 0;        //get all group created by everyone
         $status = 1;    // the group isn't deleted
         $groups = $this->cms->getAllGroups($uid, $status);
         
@@ -1374,10 +1379,9 @@ class Admin extends CI_Controller{
         $currentPage = $page->getCurrentPage();
         
         $articlehead = '<table>';
-        $articlehead .= '<tr>
+        $articleHtml = '<tr>
                         <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th>状态</th><th colspan="2">操作</th>
                         </tr>';
-        $articleHtml  = '';
         if($articles){
             foreach ($articles as $row){
                 $articleHtml .= '<tr>';
@@ -1426,11 +1430,15 @@ class Admin extends CI_Controller{
      * -1:represents it can't be accepted
      */
     public function auditArticle(){
-        //TODO 权限的验证
+        //TODO 暂时属于平台管理
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 14, 99);      //超管 审核权限
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         $aid = $_GET['aid'];
         $audit = $this->input->post('audit');
-        $uid = 5;   //TODO
-        $audit_id = $uid;
+        $audit_id = $_SESSION['admin']['id'];
         $result = $this->cms->updateAudit($aid, $audit, $audit_id);
         if($result){
             $mess = '审核成功';
@@ -1443,6 +1451,11 @@ class Admin extends CI_Controller{
      * @param type $mess the pram is used to transfer messege
      */
     public function viewArticle($mess = ''){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 14, 99);      //超管 审核权限 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         $aid = $_GET['aid'];
         $method = 1;    //the method is get a article
         $article = $this->cms->search($aid, $method);
@@ -1474,8 +1487,12 @@ class Admin extends CI_Controller{
      * 
      */
     public function createGroup(){
-        //TODO 权限的验证
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管  平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = $_SESSION['admin']['username'];
         $status = 1;    // the group isn't deleted
         if(isset($_POST['sub'])){
             $groupfather_id = trim($_POST['groupfather_id']);
@@ -1555,9 +1572,12 @@ class Admin extends CI_Controller{
     }
     
     public function manageGroup(){
-        //TODO 权限的验证
-        //TODOsss
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = 0;       //get all groups
         $status = 1;    // the group isn't deleted
         $groups = $this->cms->getAllGroups($uid, $status);
         $groupsHtml = '<table>';
@@ -1588,16 +1608,15 @@ class Admin extends CI_Controller{
      * this method is used for create article for super user
      */
     public function createSArticle(){ 
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         if(isset($_GET['uid'])){        //if the admin click a user 
             $uid = $_GET['uid'];
-            //TODO 根据用户id写文章
-            //the uid should use session transfer
-            //TODO 用户是否可以自定义分组，如果不可以，则不能要uid这个字段，因为任何用户
-            //登录都不是管理员，也就是说没有分组
-            //$space_uid = 5;
-            
             $space_status = 1;
-            $uidadmin = 5;// the user who has created the groups of user space
+            $uidadmin = 0;          // get all groups
             $space_groups = $this->space->getAllSGroups($uidadmin, $space_status);
             $data['space_groups'] = $space_groups;
             $data['uid'] = $uid;
@@ -1761,9 +1780,14 @@ class Admin extends CI_Controller{
     }
     
     public function manageSArticle(){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 14, 99);      //超管 审核管理 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         if(isset($_GET['uid']) || isset($_GET['space_groupid'])){    //if click the username in list
             
-            $uidadmin = 5;// the user who has created the groups of user space
+            $uidadmin = 0;      // get all groups
             $space_status = 1;
             $space_groups = $this->space->getAllSGroups($uidadmin, $space_status);
             $space_groupid = 0;
@@ -1810,7 +1834,7 @@ class Admin extends CI_Controller{
             
             $articleHtml = '';
             $articleHead = '<table>';
-            $articleHead .= '<tr>
+            $articleHtml = '<tr>
                             <th>标题(浏览次数)</th><th>作者</th><th>添加时间</th><th>状态</th><th colspan="2">操作</th>
                             </tr>';
             if(!empty($articles)){
@@ -1861,11 +1885,15 @@ class Admin extends CI_Controller{
         }
     }
     
-        public function auditSArticle(){
-        //TODO 权限的验证
+   public function auditSArticle(){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 14, 99);      //超管 审核权限 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         $space_aid = $_GET['space_aid'];
         $space_audit = $this->input->post('space_audit');
-        $space_uid = 5;   //TODO
+        $space_uid = $_SESSION['admin']['id'];  
         $space_audit_id = $space_uid;
         $result = $this->space->updateSAudit($space_aid, $space_audit, $space_audit_id);
         if($result){
@@ -1879,6 +1907,11 @@ class Admin extends CI_Controller{
      * @param type $mess the pram is used to transfer messege
      */
     public function viewSArticle($mess = ''){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 14, 99);      //超管 审核权限 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
         $space_aid = $_GET['space_aid'];
         $method = 1;    //the method is get a article
         $article = $this->space->searchS($space_aid, $method);
@@ -1909,8 +1942,12 @@ class Admin extends CI_Controller{
      * 
      */
     public function createSGroup(){
-        //TODO 权限的验证
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = $_SESSION['admin']['id'];
         $status = 1;    // the group isn't deleted
         if(isset($_POST['sub'])){
             $groupfather_id = trim($_POST['groupfather_id']);
@@ -1988,9 +2025,12 @@ class Admin extends CI_Controller{
     }
     
     public function manageSGroup(){
-        //TODO 权限的验证
-        //TODOsss
-        $uid = 5;
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $uid = 0;       // get all groups 
         $status = 1;    // the group isn't deleted
         $groups = $this->space->getAllSGroups($uid, $status);
         $groupsHtml = '<table>';

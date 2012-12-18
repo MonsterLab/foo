@@ -44,9 +44,10 @@ class M_talent extends CI_Model{
     * @param type $cert_end
     * @return boolean
     */
-   public function createCertBase($cuid,$cert_name,$sex,$nation,$personid,$birth_place,$live_place,$cert_begin,$cert_end){
+   public function createCertBase($cuid,$uid,$cert_name,$sex,$nation,$personid,$birth_place,$live_place,$cert_begin,$cert_end){
        $sqlQuery = array(
            'cuid'=>$cuid,
+           'uid'=>$uid,
            'cert_name'=>$cert_name,
            'sex'=>$sex,
            'nation'=>$nation,

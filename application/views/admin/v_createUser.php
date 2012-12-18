@@ -8,7 +8,7 @@
     * 弹出提示信息
     */
    if($flag != ''){
-       echo "<script>alert('{$flag}');window.location='{$base_url}admin/createUser/{$zxcode}';</script>";
+       echo "<script>alert('{$flag}');window.location='{$base_url}admin/searchCode';</script>";
        exit();
    }
    

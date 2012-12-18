@@ -123,40 +123,90 @@ class Admin extends CI_Controller{
     }
     
     /**-----------------------------管理员、客户管理------------------------------------**/
-    public function createAdmin($adminId = 0){
+    
+    /**
+     * 添加管理员
+     * @return type
+     */
+    public function createAdmin(){
         $power = $this->admin->getPower();
         if($power < 99){
             redirect(base_url('admin/login/'));
         }
         
-        //默认为直接添加，即不存在原有数据
-        $data = array(
-            'username'=>'',
-            'password'=>'',
-            'truename'=>'',
-            'department'=>'',
-            'phone'=>'',
-            'email'=>'',
-            'power'=>'',
-        );
-        //修改，修改时显示原有数据
-        if($adminId > 0){
-            $fooAdmin = $this->admin->search($adminId,3);
-            if($fooAdmin){
-                $data = array(
-                    'username'=>$fooAdmin[0]['username'],
-                    'password'=>$fooAdmin[0]['password'],
-                    'truename'=>$fooAdmin[0]['truename'],
-                    'department'=>$fooAdmin[0]['department'],
-                    'phone'=>$fooAdmin[0]['phone'],
-                    'email'=>$fooAdmin[0]['email'],
-                    'power'=>$fooAdmin[0]['power'],
-                );
+        $data['flag'] = '';
+        if($_POST){
+            
+            $fooUsername = trim($this->input->post('username'));
+            $fooPassword = trim($this->input->post('password'));
+            $fooTruename = trim($this->input->post('truename'));
+            $fooDepartment = trim($this->input->post('department'));
+            $fooPhone = trim($this->input->post('phone'));
+            $fooEmail = trim($this->input->post('email'));
+            $fooPower = trim($this->input->post('power'));
+            
+            $fooCUID = $this->admin->getUID();
+            //权限、使用人姓名、用户名、密码、部门为必须，其它选填
+            if($fooUsername == NULL || $fooPassword == NULL || $fooTruename == NULL 
+                    ||$fooDepartment == NULL || $fooPower == NULL){
+                
+                $data['flag'] = '请完善信息！';
+                $this->load->view('admin/v_createAdmin',$data);
+                return;
             }
+            
+            $fooCreateid = $this->admin->create($fooCUID,$fooUsername,$fooPassword,$fooTruename,$fooDepartment,$fooPhone,$fooEmail,$fooPower);
+            if($fooCreateid == -1){
+                $data['flag'] = '用户登录名已存在！';
+            }elseif ($fooCreateid == 0) {
+                $data['flag'] = '添加失败！';
+            }elseif ($fooCreateid > 0) {
+                $data['flag'] = '添加成功！';
+            }
+            
+            $this->load->view('admin/v_createAdmin',$data);
+            
+        }  else {
+            
+            $this->load->view('admin/v_createAdmin',$data);
+        }
+    }
+    
+    /**
+     * 更新管理员信息
+     * @param type $adminId
+     * @return type
+     */
+    public function updateAdmin($adminId = 0){
+        $power = $this->admin->getPower();
+        if($power < 99){
+            redirect(base_url('admin/login/'));
         }
         
+        //检查参数
+        if($adminId < 1){
+            $data['adminId'] = $adminId;
+            $data['flag'] = '参数错误！';
+            $this->load->view('admin/v_updateAdmin',$data);
+            return;
+        }
+        //修改，修改时显示原有数据
+        $fooAdmin = $this->admin->search($adminId,3);
+        if($fooAdmin){
+            $data = array(
+                'username'=>$fooAdmin[0]['username'],
+                'password'=>$fooAdmin[0]['password'],
+                'truename'=>$fooAdmin[0]['truename'],
+                'department'=>$fooAdmin[0]['department'],
+                'phone'=>$fooAdmin[0]['phone'],
+                'email'=>$fooAdmin[0]['email'],
+                'power'=>$fooAdmin[0]['power'],
+            );
+        }
+        
+        $data['adminId'] = $adminId;
+        $data['flag'] = '';
         if($_POST){
-            $fooCUID = $this->admin->getUID();
             $fooUsername = trim($this->input->post('username'));
             $fooPassword = trim($this->input->post('password'));
             $fooTruename = trim($this->input->post('truename'));
@@ -167,35 +217,28 @@ class Admin extends CI_Controller{
             
             //权限、使用人姓名、用户名、密码为必须，其它选填
             if($fooUsername == NULL || $fooPassword == NULL || $fooTruename == NULL 
-                    || $fooPower == NULL){
+                    ||$fooDepartment == NULL|| $fooPower == NULL){
                 
                 $data['flag'] = '请完善信息！';
-                $this->load->view('admin/v_createAdmin',$data);
+                $this->load->view('admin/v_updateAdmin',$data);
                 return;
             }
             
-            $fooResult = $this->admin->create($fooCUID,$fooUsername,$fooPassword,$fooTruename,$fooDepartment,$fooPhone,$fooEmail,$fooPower);
-            if($fooResult == -1){
+            //修改，将原来数据删除,然后再添加新的数据（修改，即删除老用户,添加新用户）
+            $fooUpdate = $this->admin->update($adminId,$fooUsername,$fooPassword,$fooTruename,$fooDepartment,$fooPhone,$fooEmail,$fooPower);
+            if($fooUpdate == -1){
                 $data['flag'] = '用户登录名已存在！';
-            }elseif ($fooResult == 0) {
-                $data['flag'] = '添加失败！';
-            }elseif ($fooResult == 1) {
-                $data['flag'] = '添加成功！';
-                
-                //修改，添加成功则将原来数据删除（修改，即添加新用户，删除老用户）
-                if($adminId > 0){
-                    $fooResult = $this->admin->delete($adminId);
-                    if($fooResult){
-                        $data['flag'] = '修改成功！';
-                    }
-                }
+            }elseif ($fooUpdate == 0) {
+                $data['flag'] = '修改失败！';
+            }elseif ($fooUpdate == 1) {
+                $data['flag'] = '修改成功！';
             }
             
-            $this->load->view('admin/v_createAdmin',$data);
+            $this->load->view('admin/v_updateAdmin',$data);
             
         }  else {
-            $data['flag'] = '';
-            $this->load->view('admin/v_createAdmin',$data);
+            
+            $this->load->view('admin/v_updateAdmin',$data);
         }
     }
     
@@ -325,11 +368,12 @@ class Admin extends CI_Controller{
                 }elseif ($fooType == 'medium') {
                     $fooResult = $this->medium->createCertBase($fooCUID,$fooUID,$fooCertname);
                 }elseif ($fooType == 'talent') {
-                    $fooResult = $this->talent->createCertBase($fooCUID,$fooUID,$fooCertname);
+                    //$cuid,$uid,$cert_name,$sex,$nation,$personid,$birth_place,$live_place,$cert_begin,$cert_end
+                    $fooResult = $this->talent->createCertBase($fooCUID,$fooUID,$fooCertname,'','','','','','','');
                 }
                 
                 if($uid == 0){
-                    //新增客户,    
+                    //新增客户
                     $fooResult = $this->zxpool->useCode($zxcode);                //使用征信编码
                     if($fooResult == 1){
                         $data['flag'] = '添加成功！';
@@ -608,17 +652,43 @@ class Admin extends CI_Controller{
         
         $data['type'] = $type;
         $data['uid'] = $uid;
+        //
+//        if($type == 'topic'){
+//            $data['certbases'] = $this->topic->searchCertBase($uid);
+//        }
+//        if($type == 'medium'){
+//            $data['certbases'] = $this->medium->searchCertBase($uid);
+//        }
+//        if($type == 'talent'){
+//            $data['certbases'] = $this->talent->searchCertBase($uid);
+//        }
+        
         $data['industrys'] = $this->zxpool->searchIndustry($type);
         
         if($_POST){
-            $fooIndustryId = $this->input->post('industry');
-            $fooComname = trim($this->input->post('com_name'));
-            $fooComnature = trim($this->input->post('com_nature'));
-            $fooComphone = trim($this->input->post('com_phone'));
-            $fooZipcode = trim($this->input->post('zipcode'));
-            $fooComplace = trim($this->input->post('com_place'));
-            $fooCertBegin = trim($this->input->post('cert_begin'));          //将$fooCertBegin，$fooCertEnd转换为时间戳
-            $fooCertEnd = trim($this->input->post('cert_end'));
+            
+            if($type == 'topic' || $type == 'medium' ){
+                $fooIndustryId = $this->input->post('industry');
+                $fooComname = trim($this->input->post('com_name'));
+                $fooComnature = trim($this->input->post('com_nature'));
+                $fooComphone = trim($this->input->post('com_phone'));
+                $fooZipcode = trim($this->input->post('zipcode'));
+                $fooComplace = trim($this->input->post('com_place'));
+                $fooCertBegin = trim($this->input->post('cert_begin'));          //将$fooCertBegin，$fooCertEnd转换为时间戳
+                $fooCertEnd = trim($this->input->post('cert_end'));
+            
+            }
+            if($type == 'talent'){
+                $fooCertname = trim($this->input->post('cert_name'));
+                $fooSex = trim($this->input->post('sex'));
+                $fooNation = trim($this->input->post('nation'));
+                $fooPersonid = trim($this->input->post('personid'));
+                $fooBirthplace = trim($this->input->post('birth_place'));
+                $fooLiveplace = trim($this->input->post('live_place'));
+                $fooCertBegin = trim($this->input->post('cert_begin'));          //将$fooCertBegin，$fooCertEnd转换为时间戳
+                $fooCertEnd = trim($this->input->post('cert_end'));
+            
+            }
             
             if($fooIndustryId == NULL || $fooComname == NULL || $fooComnature == NULL 
                     || $fooComphone == NULL || $fooZipcode == NULL || $fooComplace == NULL
@@ -634,7 +704,7 @@ class Admin extends CI_Controller{
             }elseif ($type == 'medium') {
                 $fooResult = $this->medium->createCertBase($fooCUID,$uid,$fooComname,$fooComnature,$fooComphone,$fooZipcode,$fooComplace,$fooIndustryId,$fooCertBegin,$fooCertEnd);
             }elseif ($type == 'talent') {
-                $fooResult = $this->talent->createCertBase($fooCUID,$uid,$fooComname,$fooComnature,$fooComphone,$fooZipcode,$fooComplace,$fooIndustryId,$fooCertBegin,$fooCertEnd);
+                $fooResult = $this->talent->createCertBase($fooCUID,$uid,$fooCertname,$fooSex,$fooNation,$fooPersonid,$fooBirthplace,$fooLiveplace,$fooCertBegin,$fooCertEnd);
             }
             
             if($fooResult){

@@ -7,18 +7,6 @@
 </head>
 
 <body>
-    <?php
-        /**
-         * 弹出提示信息
-         */
-        if($flag != ''){
-            $base_url = base_url();
-            echo "<script>alert('{$flag}');window.location='{$base_url}search/step1/';</script>";
-            exit();
-        }
-        
-    ?>
-    
 <div id="main">
 	<div id="top">
     	<div class="form">
@@ -59,5 +47,17 @@
         </ul>
     </div>
 </div>
+    
+    <?php
+        /**
+         * 弹出提示信息
+         */
+        if($flag != ''){
+            $base_url = base_url();
+            echo "<script>alert('{$flag}');window.location='{$base_url}search/step1/';</script>";
+            exit();
+        }
+        
+    ?>
 </body>
 </html>

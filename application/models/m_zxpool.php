@@ -39,8 +39,8 @@ class M_zxpool extends CI_Model{
     * @param int $zxCode
     * @return int                   -1征信编码未设置   0操作失败   1操作成功
     */
-   public function useCode($zxCode = 0){
-       if($zxCode == 0){
+   public function useCode($zxCode = NULL){
+       if($zxCode == NULL){
            return -1;
        }
        $this->db->where('zx_code',$zxCode);

@@ -45,7 +45,7 @@ class M_medium extends CI_Model{
     * 
     * @return bolean                                成功返回true ，失败返回 false                                   
     */
-   public function createCertBase($cuid,$uid,$com_name,$com_nature,$com_phone,$zipcode,$com_place,$industry_id,$cert_begin,$cert_end){
+   public function createCertBase($cuid,$uid,$com_name,$com_nature='',$com_phone='',$zipcode='',$com_place='',$industry_id=0,$cert_begin=0,$cert_end=0){
        $sqlQuery = array(
            'cuid'=>$cuid,
            'uid'=>$uid,

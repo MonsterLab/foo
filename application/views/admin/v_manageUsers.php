@@ -24,7 +24,7 @@
                 $fooType = '纳税主体';
             }elseif ($userBase['type'] == 'medium') {
                 $fooType = '中介机构';
-            }elseif ($userBase['type'] == 'medium') {
+            }elseif ($userBase['type'] == 'talent') {
                 $fooType = '财税人才';
             }
             $html .= "<tr>";

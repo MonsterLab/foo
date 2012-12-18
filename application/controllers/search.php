@@ -43,7 +43,7 @@ class Search extends CI_Controller{
             $fooZxcode = $this->input->post('zxcode');
             if($fooZxcode == NULL){  
                 $data['flag'] = '请完善信息！';
-                $this->load>view('cms/index',$data);
+                $this->load->view('cms/index',$data);
                 //$this->load->view('search/step1',$data);
                 return;
             }

@@ -97,9 +97,7 @@ class M_user_base extends CI_Model{
    /**
     * 修改客户基本信息
     * 
-    * @param type $zx_code                          征信编码
     * @param type $sq_code                          授权码
-    * @param type $username                         用户名
     * @param type $password                         密码
     * @param type $truename                         真实姓名，联系人
     * @param type $position                         职务
@@ -107,11 +105,10 @@ class M_user_base extends CI_Model{
     * @param type $email                            E-mail
     * @param type $type                             客户征信类型 topic、medium、talent 
     * 
-    * @return int                       成功返回 1，失败返回 0 ，用户名存在返回 -1
+    * @return int                       成功返回 1，失败返回 0 
     */
-   public function update($uid,$zx_code,$sq_code,$password,$truename,$position,$phone,$email,$type){
+   public function update($uid,$sq_code,$password,$truename,$position,$phone,$email,$type){
        $sqlQuery = array(
-           'zx_code'=>$zx_code,
            'sq_code'=>$sq_code,
            'password'=>$password,
            'truename'=>$truename,
@@ -136,12 +133,13 @@ class M_user_base extends CI_Model{
     * 
     * @param type $key                  //关键字，默认为空 ； 如果关键字为空，则全部查询
     * @param int $method                //选择搜索方法，默认0； 0用户名，1征信编码，2 征信库类别 ， 3 用户id
+    * @param boolean $$isStatus             //判断是否查询status=0的数据，$isStatus=true默认不查询，$isStatus=false则查询
     * @param int $limit 分页每页的显示条数
     * @param int $offset 分页的开始位置
     * 
     * @return array                     //成功返回数组，失败返回false
     */
-   public function search($key = '',$method = 0,$limit = 10,$offset = 0){
+   public function search($key = '',$method = 0 ,$limit = 10,$offset = 0,$isStatus = true){
        
        //若关键字不为空，设置查询条件
        if($key != ''){
@@ -162,11 +160,12 @@ class M_user_base extends CI_Model{
            $this->db->where($sqlQuery,$key);
        }
        
-       $this->db->limit($limit,$offset);
-       //TODO:是否限制查询status=1，和审核有关。。。
-       $this->db->where('status',1);        //查询没有被弃用的用户
+       //$this->db->limit($limit,$offset);
+       if($isStatus){
+            $this->db->where('status',1);        //查询没有被弃用的用户
+       }
        $this->db->select('id,zx_code,sq_code,username,password,truename,position,phone,email,type,space_id,audit,audit_id,cuid,ctime');
-       $dbResult = $this->db->get('zx_user_base',$limit,$offset);
+       $dbResult = $this->db->get('zx_user_base');
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){
                $result[] = $row;
@@ -299,8 +298,8 @@ class M_user_base extends CI_Model{
     * @param type $_username
     * @return boolean
     */
-   private function checkUsername($_username){
-       $this->db->where('username',$_username);
+   public function checkUsername($username){
+       $this->db->where('username',$username);
        $this->db->where('status',1);
        $this->db->select('id');
        $dbResult = $this->db->get('zx_user_base');

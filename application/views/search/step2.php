@@ -4,7 +4,7 @@
         
     }  else {
         
-        echo "用户:{$userBases[0]['com_name']}<br/>已通过认证!<br/>";
+        echo "用户:{$userBases[0]['cert_name']}<br/>已通过认证!<br/>";
     }
     
 ?>
@@ -19,11 +19,15 @@
 <?php
     if($flag == ''){
         echo "<h3>客户基本信息：</h3>";
+        if($userBases[0]['audit'] == 0){
+            echo '该客户基本信息未通过审核！';
+            exit();
+        }
         $ubHtml = "<table  width='500'>";
         foreach ($userBases as $userBase){
             $ubHtml .= "<tr>";
             $ubHtml .= "<td width='200'>征信编码：{$userBase['zx_code']}</td>";
-            $ubHtml .= "<td width='200'>公司名称：{$userBase['com_name']}</td>";
+            $ubHtml .= "<td width='200'>认证法人名称：{$userBase['cert_name']}</td>";
             $ubHtml .= "</tr>";
             $ubHtml .= "<tr>";
             $ubHtml .= "<td width='200'>联系人姓名：{$userBase['truename']}</td>";
@@ -35,7 +39,7 @@
             $ubHtml .= "</tr>";
         }
         $ubHtml .= '</table><br>';
-
+        
         echo $ubHtml;
     }
 ?>

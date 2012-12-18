@@ -9,6 +9,27 @@
     }
 ?>  
 
+<div>
+    
+    <?php
+        if($certContents){
+            echo "<h5>已提交文字类信息：</h5>";
+            $cfHtml = "<table width='500'>";
+            foreach ($certContents as $certContent){
+                $cfHtml .= "<tr>";
+                $cfHtml .= "<td width='200'>标题：{$certContent['title']}</td>";
+                $cfHtml .= "<td width='200'>";
+                $cfHtml .= "<input type='button' class='showPic_button' value='查看'>";
+                $cfHtml .= "</td>";
+                $cfHtml .= "</tr>";
+            }
+            $cfHtml .= '</table><br>';
+
+            echo $cfHtml; 
+        }
+    ?>
+</div>
+<div>
     <form action="<?php echo base_url("admin/addCertContent/$type/{$uid}") ?>" method='post'>
         <p>
             <label for="title">认证题目:</label>
@@ -35,3 +56,4 @@
             <input type='submit' name='submit' value='提交'>
         </p>    
     </form>
+</div>    

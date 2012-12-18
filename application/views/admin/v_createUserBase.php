@@ -7,8 +7,15 @@
     if($flag != ''){
         exit($flag);
     }
+    
+    //添加、修改共用
+    if($handle == 'add'){
+        echo "<form action='{$base_url}admin/createUserBase/{$uid}/{$zxcode}' method ='post'>";
+    }  else {
+        echo "<form action='{$base_url}admin/updateUserBase/{$uid}/' method ='post'>";
+    }
 ?>        
-<form action="<?php echo base_url("admin/createUserBase/{$uid}/{$zxcode}") ?>" method ='post'>
+
     征信编码：<?= $zxcode?><br>
     联系人：<input type='text' name='truename' value='<?php echo $userBases[0]['truename']?>'><br>
     联系人职位：<input type='text' name='position' value='<?php echo $userBases[0]['position']?>'><br>

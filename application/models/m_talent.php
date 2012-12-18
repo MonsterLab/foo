@@ -245,7 +245,7 @@ class M_talent extends CI_Model{
     public function searchCertFile($uid){
         $this->db->where('uid',$uid);
         $this->db->where('status',1);
-        $this->db->select('id,file_type_id,file_name,audit,audit_id,cuid,ctime');
+        $this->db->select('id,uid,file_type_id,file_name,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_talent_cert_file');
        
         if($dbResult->num_rows() > 0){
@@ -268,7 +268,7 @@ class M_talent extends CI_Model{
     * @param type $_fileTypeId
     * @return boolean
     */
-   private function checkCertFile($_uid,$_fileTypeId){
+   public function checkCertFile($_uid,$_fileTypeId){
        $this->db->where('uid',$_uid);
        $this->db->where('file_type_id',$_fileTypeId);
        $this->db->where('status',1);
@@ -375,7 +375,7 @@ class M_talent extends CI_Model{
     public function searchCertContent($uid){
         $this->db->where('uid',$uid);
         $this->db->where('status',1);
-        $this->db->select('id,title,content,audit,audit_id,cuid,ctime');
+        $this->db->select('id,uid,title,content,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_talent_cert_content');
        
         if($dbResult->num_rows() > 0){

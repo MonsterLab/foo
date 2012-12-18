@@ -43,7 +43,7 @@
                     <?
                         $this->load->helper('form_helper');
                         $data = array(
-                                      'name'        => 'content',
+                                      'name'        => 'space_content',
                                       'id'          => 'content',
                                       'toolbarset'  => 'Default',
                                       'basepath'    => '/workspace/foo/include/fckeditor/',

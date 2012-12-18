@@ -10,21 +10,21 @@
 <div id="main">
 	<div id="top">
     	<div class="form">
-            <form action="<?php echo base_url('search/step1')?>" method="POST">
+            <form action="<?php echo base_url('search/step1');?>" method="post">
                 <p class="minP">
                     <label>纳税主体: </label>
                     <input type="text" name="zxcode" size="20" />
                     <input type="submit" value='' class="button" />
                 </p>
             </form>
-            <form action="<?php echo base_url('search/step1')?>" method="post">
+            <form action="<?php echo base_url('search/step1');?>" method="post">
                 <p class="minP">
                     <label>财税中介: </label>
                     <input type="text" name="zxcode" size="20" />
                     <input type="submit" value='' class="button" />
                 </p>
             </form>
-            <form action="<?php echo base_url('search/step1')?>" method="post">
+            <form action="<?php echo base_url('search/step1');?>" method="post">
                 <p class="minP">
                     <label>财税人才: </label>
                     <input type="text" name="zxcode" size="20" />
@@ -43,7 +43,7 @@
             <li><a href="">征信单位</a></li>
             <li><a href="">征信个人</a></li>
             <li><a href="">用户登录</a></li>
-            <li class="returnI"><a href="">返回平台首页</a></li>
+            <li class="returnI"><a href="<?php echo base_url();?>">返回平台首页</a></li>
         </ul>
     </div>
 </div>

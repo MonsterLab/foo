@@ -90,7 +90,7 @@ class M_space extends CI_Model{
                 break;
             case 1:
                 $space_aid = $key;
-                $result = $this->getSArticle($space_aid, $status, $space_audit);
+                $result = $this->getSArticle($space_aid, $space_status, $space_audit);
                 break;
             case 2:
                 $space_groupid = $key;

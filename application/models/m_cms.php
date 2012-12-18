@@ -310,8 +310,8 @@ class M_cms extends CI_Model{
             'audit_id' => $audit_id
         );
         $this->db->where('aid', $aid);
-        $this->db->update('zx_articles', $data); 
-        $affectedRows = $this->db->affected_rows();
+        $affectedRows = $this->db->update('zx_articles', $data); 
+
         if( $affectedRows > 0){
             
             return 1;
@@ -385,9 +385,11 @@ class M_cms extends CI_Model{
      * @param type $uid
      * @return int
      */
-    public function getAllGroups($uid, $status = 1){
+    public function getAllGroups($uid = 0, $status = 1){
         $this->db->select("gid, group_name, groupfather_id");
-        $this->db->where('uid', $uid); 
+        if($uid != 0){
+            $this->db->where('uid', $uid); 
+        }
         $this->db->where('status',$status);
         $this->db->order_by("gid", "desc"); 
         $query = $this->db->get('zx_article_groups');

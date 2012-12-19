@@ -2360,6 +2360,7 @@ class Admin extends CI_Controller{
         if(!in_array($power, $powerArray)){
             redirect(base_url('admin/login/'));
         }
+        
         if(isset($_GET['uid'])){        //if the admin click a user 
             $uid = $_GET['uid'];
             $space_status = 1;

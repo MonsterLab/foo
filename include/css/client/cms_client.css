@@ -23,7 +23,12 @@ ul, ol{
     height: 10px;
     clear: both;
 }
-#header{
+#line_100{
+    width: 100%;
+    height: 20px;
+    clear: both;
+}
+/*#header{
     width: 1000px;
     margin: 0 auto;
 }
@@ -34,13 +39,12 @@ ul, ol{
 
 #header ul{
     padding: 20px  0 20px 60px;
-    background:#d9dfef;
     margin: 0 0 10px 0;
 }
 
 #header ul li{
     display: inline;
-}
+}*/
 /*show article list begin*/
 
 
@@ -74,13 +78,42 @@ ul, ol{
     list-style:disc;
 }
 #column1,#column2, #column3{
-    width: 290px;
-    height: 170px;
+    width: 288px;
+    height: 168px;
     float: right;
+    background:#d9dfef;
+    border:1px solid #ccc;
 }
 #column1,#column2{
     margin: 0 0 10px 0;
 }
+#column1{
+
+}
+#column2{
+
+}
+#column3{
+    margin: 0;
+}
+#column1 h3,#column2 h3, #column3 h3{
+    height: 30px;
+    line-height: 30px;
+    padding: 0 0 0 10px;
+    font-size: 16px;
+    font-weight: normal;
+    background: #fff;
+}
+
+#column1 ul,#column2 ul, #column3 ul{
+    padding: 10px 10px 10px 15px;
+}
+
+#column1 ul li,#column2 ul li, #column3 ul li{
+    height: 20px;
+    line-height: 20px;
+}
+
 #infoList ul li{
     height: 15px;
     line-height: 18px;
@@ -98,17 +131,6 @@ ul, ol{
 #infoList #pageBar{
     position: absolute;
     bottom: 20px;
-}
-
-#column1{
-    background: green;
-}
-#column2{
-    background: red;
-}
-#column3{
-    background: pink;
-    margin: 0;
 }
 
 #footer{
@@ -148,38 +170,6 @@ ul, ol{
     padding: 10px;
 }
 /*article end*/
-
-/*space index begin*/
-#space-content{
-    width: 1000px;
-    height: 500px;
-    margin: 0 auto;
-}
-#space-content #left{
-    width: 690px;
-    height: 100%;
-    float: left;
-}
-
-#col1,#col2,#col3,#col4{
-    width: 50%;
-    height: 50%;
-    float: left;
-}
-
-#col1 h3,#col2 h3,#col3 h3,#col4 h3{
-    font-size: 16px;
-    font-weight: normal;
-}
-
-#space-content #right{
-    width: 300px;
-    height: 100%;
-    float: right;
-    background: green;
-}
-
-/*space index end*/
 
 
 

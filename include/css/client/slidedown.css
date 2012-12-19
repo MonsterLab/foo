@@ -1,0 +1,72 @@
+#header{
+	width:1000px;
+        margin: 0 auto;
+        background: #d9dfef;
+}
+
+#header h1{
+    padding: 20px 50px;
+    background:#6b99cb;
+    
+}
+
+#header ul.daohang{
+	text-align:center;
+	font-size:16px;
+	width:100%;
+	height:57px;
+	margin:0px;
+	padding:0px;
+        background:url("../../images/head.gif") repeat-x left center;
+}
+#header ul  li {
+	height:36px;
+	margin-top:10px;
+	cursor:pointer;
+	position:relative;
+	border-right:1px solid #ccc;
+	z-index:10;
+	float:left;
+}
+#header li#first{
+	border-left:none;
+}
+#header ul li a{
+	line-height:36px;
+	height:100%;
+	font-weight:bold;
+	color:#000;
+	display:block;
+}
+
+#header ul  li a.press:hover{
+	background:url("../../images/li_hover.gif") repeat-x left top;
+}
+#header  ul  li.main ul {
+	border:1px solid #ccc;
+	width:100%;
+	background-color:#8CB1F2;
+	position:absolute;
+	top:36px;
+	left:-1px;
+	display:none;
+}
+#header  ul  li.main ul li {
+	border-bottom:1px dashed #ccc;
+        margin: 0;
+	width:100%;
+	height:auto;
+}
+#header  ul  li.main ul.showMenu {
+	display:block;
+}
+#header  ul  li.main ul li a {
+	color:#000;
+	width:100%;
+	text-decoration:none;
+	padding:4px 0;
+	display:inline-block;
+}
+#header  ul  li.main ul li a:hover {
+	background:lightgreen;
+}

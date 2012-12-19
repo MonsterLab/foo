@@ -8,7 +8,7 @@
         <script type="text/javascript">
             $(function(){
                 var $selectGroup = $("#groupid");
-                $base = "<?php echo base_url('admin/manageArticle?groupid='); ?>";
+                $base = "<?php echo base_url('admin/manageArticle?fun=ajax&groupid='); ?>";
                 $selectGroup.change(function(){
                     $url = $base+$(this).val();
                     $.ajax({
@@ -35,7 +35,16 @@
 
                  });
 
+                 
             });
+            
+            function alert_deleteArticle(aid, groupid){
+                var r = confirm("删除文章，是否删除?");
+                if(r == true){
+                    url = "<?php echo base_url('admin/deleteArticle?aid=');?>"+aid+"&groupid="+groupid;
+                    window.location.href = url;
+                }
+            }
                     
         </script>
     </head>

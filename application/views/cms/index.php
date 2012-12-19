@@ -35,7 +35,7 @@
     </div>
     <div id="bottom">
     	<ul>
-        	<li class="first"><a href="">中心简介</a></li>
+            <li class="first"><a href="">中心简介</a></li>
             <li><a href="">征信范围</a></li>
             <li><a href="">办理流程</a></li>
             <li><a href="">后续服务</a></li>
@@ -52,7 +52,7 @@
         /**
          * 弹出提示信息
          */
-        if($flag != ''){
+        if(isset($flag) && $flag != ''){
             $base_url = base_url();
             echo "<script>alert('{$flag}');window.location='{$base_url}search/step1/';</script>";
             exit();

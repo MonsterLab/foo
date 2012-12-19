@@ -1539,6 +1539,7 @@ class Admin extends CI_Controller{
             $groupid = $this->input->post('gid');
             $title = $this->input->post('title');
             $content = $this->input->post('content'); 
+            $uid = $_SESSION['admin']['id'];
             $username = $_SESSION['admin']['username'];
             $result = $this->cms->create($uid ,$username  ,$title, $content, $groupid);
             
@@ -1632,8 +1633,8 @@ class Admin extends CI_Controller{
                 }
                 $articleHtml .= '<td>【'.$auditText.'】</td>';
                 $articleHtml .= '<td><a href="'.base_url('admin/viewArticle?page='.$currentPage.'&aid='.$row['aid']).'">【查看】</a>';
-                $articleHtml .= '<a href="">【修改】</a>';
-                $articleHtml .= '<a href="">【删除】</a>';
+                $articleHtml .= '<a href="'.base_url('admin/updateArticle?page='.$currentPage.'&aid='.$row['aid']).'">【修改】</a>';
+                $articleHtml .= '<a onclick = "alert_deleteArticle('.$row['aid'].','.$row['groupid'].')">【删除】</a>';
                 $articleHtml .= '</td>';
                 $articleHtml .= '</tr>';
             }
@@ -1645,7 +1646,7 @@ class Admin extends CI_Controller{
         $data['pageBar'] = $pageBar;
         $data['articleHtml'] = $articleHtml; 
         $ajaxPageBar = substr($pageBar, (strpos($pageBar, '>') + 1), (strlen($pageBar)-24));
-        if(isset($_GET['groupid'])){
+        if(isset($_GET['fun']) && $_GET['fun'] == 'ajax'){
             $return = array(
                 'groupsHtml'=> $ajaxGroupsHtml,
                 'pageBar'=>$ajaxPageBar,
@@ -1716,6 +1717,106 @@ class Admin extends CI_Controller{
         $this->load->view('admin/v_viewArticle', $data);
     }
 
+    /**
+     * upate the article ,but we don't update it truely,
+     * just create a new article,and the previous article
+     * is saved in database
+     */
+    public function updateArticle(){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $aid = $_GET['aid'];
+        $uid = 0;        //get all group created by everyone
+        $status = 1;    // the group isn't deleted
+        $groups = $this->cms->getAllGroups($uid, $status);
+        $data['groups'] = $groups;
+        if(isset($_POST['sub'])){   // if click update article
+            $groupid = $this->input->post('gid');
+            $title = $this->input->post('title');
+            $content = $this->input->post('content'); 
+            $username = $_SESSION['admin']['username'];
+            $uid = $_SESSION['admin']['id'];
+            //step1 insert the article
+            $insertId = $this->cms->create($uid ,$username  ,$title, $content, $groupid);
+            //step2 if insert article successful ,then update the previous article
+            if($insertId > 0){ 
+                //    public function updateStatus($aid, $status){
+                $status = 0;       // the article is unvisible
+                $result = $this->cms->updateStatus($aid, $status);
+                if($result){    //if update success ,show current article
+                    $data['flag'] = 1;
+                    $data['message'] = '修改成功！';
+                    $data['aid'] = $insertId;
+                    $data['gid'] = $groupid;
+                    $data['title'] = $title;
+                    $data['content'] = $content;
+                    
+                    $this->load->view('admin/v_updateArticle', $data);
+                } else {    //if upate fail ,delete current article ,and show privious aritcle
+                    //delete the current article
+                    $re = $this->cms->deleteArticle($insertId);
+                    if($re){ // show previous article
+                        //get the artilce 
+                        $method = 1;    //the method is get a article
+                        $article = $this->cms->search($aid, $method);
+                        $data['flag'] = 1;
+                        $data['message'] = '修改失败！';
+                        $data['aid'] = $aid;
+                        $data['gid'] = $article[0]['groupid'];
+                        $data['title'] = $article[0]['title'];
+                        $data['content'] = $article[0]['content'];
+                        
+                        $this->load->view('admin/v_updateArticle', $data);
+                    }
+                }
+            } else {        //if insert fail ,show previous article
+                //get the artilce 
+                $method = 1;    //the method is get a article
+                $article = $this->cms->search($aid, $method);
+                $data['flag'] = 1;
+                $data['message'] = '修改失败！';
+                $data['aid'] = $aid;
+                $data['gid'] = $article[0]['groupid'];
+                $data['title'] = $article[0]['title'];
+                $data['content'] = $article[0]['content'];
+
+                $this->load->view('admin/v_updateArticle', $data);                
+            }
+            
+        } else {                    //if not click update article            
+            //get the artilce 
+            $method = 1;    //the method is get a article
+            $article = $this->cms->search($aid, $method);
+            $data['aid'] = $aid;
+            $data['gid'] = $article[0]['groupid'];
+            $data['title'] = $article[0]['title'];
+            $data['content'] = $article[0]['content'];
+            
+            $this->load->view('admin/v_updateArticle', $data);
+        }
+    }
+
+    /**
+     * this method is used to delete a article,but not delete it truely
+     * just update its status = 0
+     */
+    public function deleteArticle(){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管  平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $aid = $_GET['aid'];
+        $status = 0;
+        $result = $this->cms->updateStatus($aid, $status);
+        if($result){
+            $this->manageArticle();
+        }        
+    }
+
 
     /**
      * this method is used for creating a group of article
@@ -1727,7 +1828,7 @@ class Admin extends CI_Controller{
         if(!in_array($power, $powerArray)){
             redirect(base_url('admin/login/'));
         }
-        $uid = $_SESSION['admin']['username'];
+        $uid = $_SESSION['admin']['id'];
         $status = 1;    // the group isn't deleted
         if(isset($_POST['sub'])){
             $groupfather_id = trim($_POST['groupfather_id']);
@@ -1740,24 +1841,9 @@ class Admin extends CI_Controller{
             } else {
                 $result = $this->cms->createGroup($uid,$group_name, $group_url, $group_summary, $groupfather_id);
             }
-            
-            $groups = $this->cms->getAllGroups($uid, $status);
-            
-            $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
-            $groupsHtml .= '<option value="-1">请选择一个分类</option>';
-            if($groups){
-                foreach ($groups as $group){
-                    if(isset($_POST['sub'])){
-                        if($group['gid'] == $_POST['groupfather_id']){
-                            $groupsHtml .= '<option selected="selected" value="'.$group['gid'].'">'.$group['group_name'].'</option>';
-                            continue;
-                        }
-                    }
-                    $groupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
-                }
-            }
+            $uid = 0;   //get all groups
+            $groupsHtml = $this->getGroupsHtml($uid, $status);
 
-            $groupsHtml .= ' </select>';
             $data['groupsHtml'] = $groupsHtml;
             
             if($result){
@@ -1777,6 +1863,7 @@ class Admin extends CI_Controller{
                 $this->load->view('admin/v_createGroup', $data);
             }
         } else {
+            $uid = 0;       //get all groups;
             $groups = $this->cms->getAllGroups($uid, $status);
             if(count($groups) == 0){
                 $group_name = '首页';
@@ -1786,21 +1873,7 @@ class Admin extends CI_Controller{
                 $result = $this->cms->createGroup($uid,$group_name, $group_url, $group_summary, $groupfather_id);
                 $groups = $this->cms->getAllGroups($uid, $status);
             }
-            $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
-            $groupsHtml .= '<option value="-1">请选择一个分类</option>';
-            if($groups){
-                foreach ($groups as $group){
-                    if(isset($_POST['sub'])){
-                        if($group['gid'] == $_POST['groupfather_id']){
-                            $groupsHtml .= '<option selected="selected" value="'.$group['gid'].'">'.$group['group_name'].'</option>';
-                            continue;
-                        }
-                    }
-                    $groupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
-                }
-            }
-
-            $groupsHtml .= ' </select>';
+            $groupsHtml = $this->getGroupsHtml($uid, $status);
             $data['groupsHtml'] = $groupsHtml;
             $this->load->view('admin/v_createGroup', $data);
         }
@@ -1826,18 +1899,172 @@ class Admin extends CI_Controller{
                         $groupsHtml .= '<tr>';
                         $groupsHtml .= '<td>'.$groupChild['group_name'].'</td>';
                         $groupsHtml .= '<td>'.$groupfather['group_name'].'</td>';
-                        $groupsHtml .= '<td><a href="">修改</td>';
-                        $groupsHtml .= '<td><a href="">删除</a></td>';
+                        $groupsHtml .= '<td><a href="'.base_url('admin/updateGroup?gid='.$groupChild['gid']).'">修改</td>';
+                        $groupsHtml .= '<td><a onclick="alert_deleteGroup('.$groupChild['gid'].')">删除</a></td>';
                         $groupsHtml .= '</tr>';
                     }
                 }
         }
         $groupsHtml .= '</table>';
-        $data['groupsHtml'] = $groupsHtml;        
+        $data['groupsHtml'] = $groupsHtml; 
+        
         $this->load->view('admin/v_manageGroup', $data);
     }
     
+    private function getGroupsHtml($uid, $status){
+        $groups = $this->cms->getAllGroups($uid, $status);
+        $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
+        $groupsHtml .= '<option value="-1">请选择一个分类</option>';
+        if($groups){
+            foreach ($groups as $group){
+                if(isset($_POST['sub'])){
+                    if($group['gid'] == $_POST['groupfather_id']){
+                        $groupsHtml .= '<option selected="selected" value="'.$group['gid'].'">'.$group['group_name'].'</option>';
+                        continue;
+                    }
+                }
+                $groupsHtml .= '<option value="'.$group['gid'].'">'.$group['group_name'].'</option>';
+            }
+        }
+
+        $groupsHtml .= ' </select>';
+        
+        return $groupsHtml;
+    }
+
+    public function updateGroup(){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
+        $gid = $_GET['gid'];
+        if(isset($_POST['sub'])) {// if post
+            //step1 create a group
+            $groupfather_id = trim($_POST['groupfather_id']);
+            $group_name = trim($_POST['group_name']);
+            $group_url = trim($_POST['group_url']);
+            $group_summary = trim($_POST['group_summary']);
+            $result = 0;
+            if($groupfather_id == -1 || empty($group_name) || empty($group_url) || empty($group_summary)){
+                $result = 0;
+            } else {
+                $uid = $_SESSION['admin']['id'];
+                $insertId = $this->cms->createGroup($uid,$group_name, $group_url, $group_summary, $groupfather_id);
+                $result = $insertId;
+            }
+            
+            // update the current group's status = 0
+            if($result){
+                $status = 0;
+                $this->cms->updateGroupStatus($gid, $status);
+                //getGroupByGroupfather($groupfather_id, $status = 1){
+                $status = 1;
+                $groupfather_id = $gid;         // update all the prev gid's child
+                $childGids = $this->cms->getGroupByGroupfather($groupfather_id, $status);
+                //  update all children
+                $status = 0;
+                foreach ($childGids as $child){  
+                    //    public function updateGroup($gid, $groupfather_id = 0,
+                    $this->cms->updateGroup($child['gid'], $insertId);
+                }
+                $data['flag'] = 1;
+                $data['message'] = '修改成功！';
+                $data['gid'] = $insertId;
+                $data['group_name'] = $group_name;
+                $data['group_url'] = $group_url;
+                $data['group_summary'] = $group_summary;   
+                $uid = 0;       //get all groups
+                $status = 1;
+                $groupsHtml = $this->getGroupsHtml($uid, $status);
+                $data['groupsHtml'] = $groupsHtml;
+                
+                $this->load->view("admin/v_updateGroup", $data);
+            } else {    //update fail
+                $uid = 0;
+                $status = 1;
+                $group = $this->cms->getGroupByGid($gid, $status);
+                $groups = $this->cms->getAllGroups($uid, $status);
+                $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
+                $groupsHtml .= '<option value="-1">请选择一个分类</option>';
+                if($groups){
+                    foreach ($groups as $row){
+                        if($row['gid'] == $group[0]['groupfather_id']){
+                            $groupsHtml .= '<option selected="selected" value="'.$row['gid'].'">'.$row['group_name'].'</option>';
+                            continue;
+                        }
+                        $groupsHtml .= '<option value="'.$row['gid'].'">'.$row['group_name'].'</option>';
+                    }
+                }
+
+                $groupsHtml .= ' </select>';
+                
+                $data['flag'] = 1;
+                $data['message'] = '修改失败！';
+                $data['gid'] = $gid;
+                $data['group_name'] = $group[0]['group_name'];
+                $data['group_url'] = $group[0]['group_url'];
+                $data['group_summary'] = $group[0]['group_sumarry'];   
+                $data['groupsHtml'] = $groupsHtml;
+                
+                $this->load->view("admin/v_updateGroup", $data);
+            }
+            
+        } else {    //if not post
+            $uid = 0;
+            $status = 1;
+            $group = $this->cms->getGroupByGid($gid, $status);
+            $groups = $this->cms->getAllGroups($uid, $status);
+            $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
+            $groupsHtml .= '<option value="-1">请选择一个分类</option>';
+            if($groups){
+                foreach ($groups as $row){
+                    if($row['gid'] == $group[0]['groupfather_id']){
+                        $groupsHtml .= '<option selected="selected" value="'.$row['gid'].'">'.$row['group_name'].'</option>';
+                        continue;
+                    }
+                    $groupsHtml .= '<option value="'.$row['gid'].'">'.$row['group_name'].'</option>';
+                }
+            }
+
+            $groupsHtml .= ' </select>';
+            
+            $data['gid'] = $gid;
+            $data['group_name'] = $group[0]['group_name'];
+            $data['group_url'] = $group[0]['group_url'];
+            $data['group_summary'] = $group[0]['group_sumarry'];   
+            $data['groupsHtml'] = $groupsHtml;
+            $this->load->view("admin/v_updateGroup", $data);
+        }
+    }
+
+
+    public function deleteGroup(){
+        $gid = $_GET['gid'];
+        $this->deleteGroup_back($gid);
+        
+        $this->manageGroup();
+        
+    }
     
+    private function deleteGroup_back($gid){
+        $status = 1;
+        $childGids = $this->cms->getGroupByGroupfather($gid, $status);
+        $status = 0;
+        //delete itself
+        $this->cms->updateGroupStatus($gid, $status);
+        //delete all children
+        foreach ($childGids as $child){
+            $this->cms->updateGroupStatus($child['gid'], $status);
+            $this->deleteGroup_back($child['gid']);
+        }
+    }
+    
+
+
+
+
     /************************************space******************************************/
     /**
      * this method is used for create article for super user
@@ -2020,7 +2247,7 @@ class Admin extends CI_Controller{
         if(!in_array($power, $powerArray)){
             redirect(base_url('admin/login/'));
         }
-        if(isset($_GET['uid']) || isset($_GET['space_groupid'])){    //if click the username in list
+        if(isset($_GET['uid']) || isset($_GET['space_groupid']) || isset($_GET['fun'])){    //if click the username in list
             
             $uidadmin = 0;      // get all groups
             $space_status = 1;
@@ -2087,8 +2314,8 @@ class Admin extends CI_Controller{
                     }
                     $articleHtml .= '<td>【'.$auditText.'】</td>';
                     $articleHtml .= '<td><a href="'.base_url('admin/viewSArticle?space_aid='.$row['space_aid']).'">【查看】</a>';
-                    $articleHtml .= '<a href="">【修改】</a>';
-                    $articleHtml .= '<a href="">【删除】</a>';
+                    $articleHtml .= '<a href="'.base_url('admin/updateSArticle?space_aid='.$row['space_aid']).'">【修改】</a>';
+                    $articleHtml .= '<a onclick="alert_deleteSArticle('.$row['space_aid'].','.$row['space_groupid'].','.$space_uid.')">【删除】</a>';
                     $articleHtml .= '</td>';
                     $articleHtml .= '</tr>';
                 }
@@ -2103,7 +2330,7 @@ class Admin extends CI_Controller{
             $data['articleHtml'] = $articleHtml;
             $data['uid'] = $space_uid;
             $ajaxPageBar = substr($pageBar, (strpos($pageBar, '>') + 1), (strlen($pageBar)-24));
-            if(isset($_GET['space_groupid'])){
+            if(isset($_GET['fun']) && $_GET['fun'] = 'ajax'){
                 $return = array(
                     'groupsHtml'=> $ajaxGroupHtml,
                     'pageBar'=>$ajaxPageBar,
@@ -2172,6 +2399,112 @@ class Admin extends CI_Controller{
         $this->load->view('admin/v_viewSArticle', $data);
     }
     
+    
+/**
+     * upate the article ,but we don't update it truely,
+     * just create a new article,and the previous article
+     * is saved in database
+     */
+    public function updateSArticle(){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $space_aid = $_GET['space_aid'];
+        $uid = 0;        //get all group created by everyone
+        $status = 1;    // the group isn't deleted
+        echo 'sssssss';
+        $groups = $this->space->getAllSGroups($uid, $status);
+        echo 'eeeeeeee';
+        $data['space_groups'] = $groups;
+        if(isset($_POST['sub'])){   // if click update article
+            $space_groupid = $this->input->post('space_gid');
+            $space_title = $this->input->post('space_title');
+            $space_content = $this->input->post('space_content'); 
+            $username = $_SESSION['admin']['username'];
+            $uid = $_SESSION['admin']['id'];
+            //step1 insert the article
+            $insertId = $this->space->createS($uid ,$username  ,$space_title, $space_content, $space_groupid);
+            echo 'isertid  '.$insertId;
+            //step2 if insert article successful ,then update the previous article
+            if($insertId > 0){ 
+                //    public function updateStatus($aid, $status){
+                echo 'suss';
+                $status = 0;       // the article is unvisible
+                $result = $this->space->updateSStatus($space_aid, $status);
+                if($result){    //if update success ,show current article
+                    $data['flag'] = 1;
+                    $data['message'] = '修改成功！';
+                    $data['space_aid'] = $insertId;
+                    $data['space_gid'] = $space_groupid;
+                    $data['space_title'] = $space_title;
+                    $data['space_content'] = $space_content;
+                    
+                    $this->load->view('admin/v_updateSArticle', $data);
+                } else {    //if upate fail ,delete current article ,and show privious aritcle
+                    //delete the current article
+                    echo 'delet';
+                    $re = $this->space->deleteSArticle($insertId);
+                    if($re){ // show previous article
+                        //get the artilce 
+                        $method = 1;    //the method is get a article
+                        $article = $this->space->searchS($space_aid, $method);
+                        $data['flag'] = 1;
+                        $data['message'] = '修改失败！';
+                        $data['space_aid'] = $space_aid;
+                        $data['space_gid'] = $article[0]['space_groupid'];
+                        $data['space_title'] = $article[0]['space_title'];
+                        $data['space_content'] = $article[0]['space_content'];
+                        
+                        $this->load->view('admin/v_updateSArticle', $data);
+                    }
+                }
+            } else {        //if insert fail ,show previous article
+                //get the artilce 
+                $method = 1;    //the method is get a article
+                echo 'fail';
+                $article = $this->space->searchS($space_aid, $method);
+                $data['flag'] = 1;
+                $data['message'] = '修改失败！';
+                $data['space_aid'] = $aid;
+                $data['space_gid'] = $article[0]['space_groupid'];
+                $data['space_title'] = $article[0]['space_title'];
+                $data['space_content'] = $article[0]['space_content'];
+
+                $this->load->view('admin/v_updateSArticle', $data);                
+            }
+            
+        } else {                    //if not click update article            
+            //get the artilce 
+            $method = 1;    //the method is get a article
+            $article = $this->space->searchS($space_aid, $method);
+            $data['space_aid'] = $space_aid;
+            $data['space_gid'] = $article[0]['space_groupid'];
+            $data['space_title'] = $article[0]['space_title'];
+            $data['space_content'] = $article[0]['space_content'];
+            
+            $this->load->view('admin/v_updateSArticle', $data);
+        }
+    }
+    
+    /**
+     * this method is used to delete a article,but not delete it truely
+     * just update its status = 0
+     */
+    public function deleteSArticle(){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管  平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        $space_aid = $_GET['space_aid'];
+        $space_status = 0;
+        $result = $this->space->updateSStatus($space_aid, $space_status);
+        if($result){
+            $this->manageSArticle();
+        }        
+    }
     /**
      * this method is used for creating a group of article
      * 
@@ -2195,6 +2528,7 @@ class Admin extends CI_Controller{
             } else {
                 $result = $this->space->createSGroup($uid,$group_name, $group_url, $group_summary, $groupfather_id);
             }
+            $uid = 0;   //get all groups
             $groups = $this->space->getAllSGroups($uid, $status);
             $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
             $groupsHtml .= '<option value="-1">请选择一个分类</option>';
@@ -2268,6 +2602,7 @@ class Admin extends CI_Controller{
         $uid = 0;       // get all groups 
         $status = 1;    // the group isn't deleted
         $groups = $this->space->getAllSGroups($uid, $status);
+
         $groupsHtml = '<table>';
         $groupsHtml .= '<tr>
                             <th>文章栏目</th><th>上级分组</th><th colspan="2">操作</th>
@@ -2279,8 +2614,8 @@ class Admin extends CI_Controller{
                         $groupsHtml .= '<tr>';
                         $groupsHtml .= '<td>'.$groupChild['space_group_name'].'</td>';
                         $groupsHtml .= '<td>'.$groupfather['space_group_name'].'</td>';
-                        $groupsHtml .= '<td><a href="">修改</td>';
-                        $groupsHtml .= '<td><a href="">删除</a></td>';
+                        $groupsHtml .= '<td><a href="'.base_url('admin/updateSGroup?space_gid='.$groupChild['space_gid']).'">修改</td>';
+                        $groupsHtml .= '<td><a onclick="alert_deleteSGroup('.$groupChild['space_gid'].')">删除</a></td>';
                         $groupsHtml .= '</tr>';
                     }
                 }
@@ -2290,6 +2625,151 @@ class Admin extends CI_Controller{
         $groupsHtml .= '</table>';
         $data['groupsHtml'] = $groupsHtml;        
         $this->load->view('admin/v_manageGroup', $data);
+    }
+    
+    public function updateSGroup(){
+        $power = $this->admin->getPower();
+        $powerArray = array(12, 99);      //超管 平台管理
+        if(!in_array($power, $powerArray)){
+            redirect(base_url('admin/login/'));
+        }
+        
+        $space_gid = $_GET['space_gid'];
+        if(isset($_POST['sub'])) {// if post
+            //step1 create a group
+            $space_groupfather_id = trim($_POST['space_groupfather_id']);
+            $space_group_name = trim($_POST['space_group_name']);
+            $space_group_url = trim($_POST['space_group_url']);
+            $space_group_summary = trim($_POST['space_group_summary']);
+            $result = 0;
+            if($space_groupfather_id == -1 || empty($space_group_name) || empty($space_group_url) || empty($space_group_summary)){
+                $result = 0;
+            } else {
+                $uid = $_SESSION['admin']['id'];
+                $insertId = $this->space->createSGroup($uid,$space_group_name, $space_group_url, $space_group_summary, $space_groupfather_id);
+                $result = $insertId;
+            }
+            
+            // update the current group's status = 0
+            if($result){
+                $status = 0;
+                $this->space->updateSGroupStatus($space_gid, $status);
+                //getGroupByGroupfather($groupfather_id, $status = 1){
+                $status = 1;       
+                // update all the prev gid's child
+                $childGids = $this->space->getSGroupByGroupfather($space_gid, $status);
+                //  update all children
+                $status = 0;;
+                foreach ($childGids as $child){  
+                    //    public function updateGroup($gid, $groupfather_id = 0,
+                    $this->space->updateSGroup($child['space_gid'], $insertId);
+                }
+                $data['flag'] = 1;
+                $data['message'] = '修改成功！';
+                $data['space_gid'] = $insertId;
+                $data['group_name'] = $space_group_name;
+                $data['group_url'] = $space_group_url;
+                $data['group_summary'] = $space_group_summary;   
+                $uid = 0;       //get all groups
+                $status = 1;
+                $uidadmin = 0;      // get all groups
+                $space_status = 1;
+                $space_groups = $this->space->getAllSGroups($uidadmin, $space_status);
+                $groupsHtml = '';
+                $groupsHead = '<select name="space_groupid" id="groupid">';
+                if(!empty($space_groups)){
+                    foreach ($space_groups as $group){
+                        if($space_groupfather_id == $group['space_gid']){
+                            $groupsHtml .= '<option value="'.$group['space_gid'].'" selected="selected">'.$group['space_group_name'].'</option>';
+                            continue;
+                        }
+                        $groupsHtml .= '<option value="'.$group['space_gid'].'">'.$group['space_group_name'].'</option>';
+                    }
+                } else {
+                    $groupsHtml .= '<option value="0">没有分类</option>';
+                }
+                $groupsEnd = ' </select>';
+                $ajaxGroupHtml = $groupsHtml;
+                $groupsHtml = $groupsHead.$groupsHtml.$groupsEnd;
+                $data['groupsHtml'] = $groupsHtml;
+                
+                $this->load->view("admin/v_updateSGroup", $data);
+            } else {    //update fail
+                $uid = 0;
+                $status = 1;
+                $group = $this->cms->getGroupByGid($gid, $status);
+                $groups = $this->cms->getAllGroups($uid, $status);
+                $groupsHtml = '<select name="groupfather_id" id="groupfather_id">';
+                $groupsHtml .= '<option value="-1">请选择一个分类</option>';
+                if($groups){
+                    foreach ($groups as $row){
+                        if($row['gid'] == $group[0]['groupfather_id']){
+                            $groupsHtml .= '<option selected="selected" value="'.$row['gid'].'">'.$row['group_name'].'</option>';
+                            continue;
+                        }
+                        $groupsHtml .= '<option value="'.$row['gid'].'">'.$row['group_name'].'</option>';
+                    }
+                }
+
+                $groupsHtml .= ' </select>';
+                
+                $data['flag'] = 1;
+                $data['message'] = '修改失败！';
+                $data['gid'] = $gid;
+                $data['group_name'] = $group[0]['group_name'];
+                $data['group_url'] = $group[0]['group_url'];
+                $data['group_summary'] = $group[0]['group_sumarry'];   
+                $data['groupsHtml'] = $groupsHtml;
+                
+                $this->load->view("admin/v_updateSGroup", $data);
+            }
+            
+        } else {    //if not post
+            $uid = 0;
+            $status = 1;
+            $group = $this->space->getSGroupByGid($space_gid, $status);
+            $groups = $this->space->getAllSGroups($uid, $status);
+            $groupsHtml = '<select name="space_groupfather_id" id="groupfather_id">';
+            $groupsHtml .= '<option value="-1">请选择一个分类</option>';
+            if($groups){
+                foreach ($groups as $row){
+                    if($row['space_gid'] == $group[0]['space_groupfather_id']){
+                        $groupsHtml .= '<option selected="selected" value="'.$row['space_gid'].'">'.$row['space_group_name'].'</option>';
+                        continue;
+                    }
+                    $groupsHtml .= '<option value="'.$row['space_gid'].'">'.$row['space_group_name'].'</option>';
+                }
+            }
+
+            $groupsHtml .= ' </select>';
+            $data['space_gid'] = $space_gid;
+            $data['group_name'] = $group[0]['space_group_name'];
+            $data['group_url'] = $group[0]['space_group_url'];
+            $data['group_summary'] = $group[0]['space_group_sumarry'];   
+            $data['groupsHtml'] = $groupsHtml;
+            $this->load->view("admin/v_updateSGroup", $data);
+        }
+    }
+    
+    public function deleteSGroup(){
+        $space_gid = $_GET['space_gid'];
+        $this->deleteSGroup_back($space_gid);
+        
+        $this->manageSGroup();
+        
+    }
+    
+    private function deleteSGroup_back($space_gid){
+        $status = 1;
+        $childGids = $this->space->getSGroupByGroupfather($space_gid, $status);
+        $status = 0;
+        //delete itself
+        $this->space->updateSGroupStatus($space_gid, $status);
+        //delete all children
+        foreach ($childGids as $child){
+            $this->space->updateSGroupStatus($child['space_gid'], $status);
+            $this->deleteGroup_back($child['space_gid']);
+        }
     }
     
 }# end of class

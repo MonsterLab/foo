@@ -62,10 +62,11 @@ class M_space extends CI_Model{
             'space_content' => $space_content,
             'space_groupid' => $space_groupid
           );
-       $insertId = $this->db->insert('zx_space_articles',$sql);
+       $this->db->insert('zx_space_articles',$sql);
+       $insertId =  $this->db->insert_id();;
        if($insertId > 0){
 
-           return 1;
+           return $insertId;
        }  else {
 
            return 0;
@@ -250,19 +251,13 @@ class M_space extends CI_Model{
     }
     
     /**
-     * this method is the same as the method updateStatus,
-     * both of them just change the status ,but not delete the article truely
-     * 
      * @param type $aid
      * @param type $space_status
      * @return int
      */
-    public function deleteSArticle($space_aid, $space_status){
-        $data = array(
-            'space_status' => $space_status
-        );
+    public function deleteSArticle($space_aid){
         $this->db->where('space_aid', $space_aid);
-        $this->db->update('zx_space_articles', $data); 
+        $this->db->delete('zx_space_articles'); 
         $affectedRows = $this->db->affected_rows();
         if( $affectedRows > 0){
             
@@ -370,10 +365,11 @@ class M_space extends CI_Model{
             'space_group_sumarry' => $space_group_sumarry,
             'space_groupfather_id' => $space_groupfather_id
           );
-       $insertId = $this->db->insert('zx_space_article_groups',$sql);
+       $this->db->insert('zx_space_article_groups',$sql);
+       $insertId = $this->db->insert_id();
        if($insertId > 0){
 
-           return 1;
+           return $insertId;
        }  else {
 
            return 0;
@@ -413,8 +409,8 @@ class M_space extends CI_Model{
      * @param type $status
      * @return type
      */
-    public function getGroupByGid($space_gid, $space_status = 1){
-        $this->db->select("space_gid, space_group_url, space_group_name, space_groupfather_id");
+    public function getSGroupByGid($space_gid, $space_status = 1){
+        $this->db->select("space_gid, space_group_url, space_group_name, space_groupfather_id, space_group_sumarry");
         $this->db->where('space_status',$space_status);
         $this->db->where('space_gid', $space_gid);
         $query = $this->db->get('zx_space_article_groups');
@@ -436,7 +432,7 @@ class M_space extends CI_Model{
      * @param type $space_status
      * @return type
      */
-    public function getGroupByGroupfather($space_groupfather_id, $space_status = 1){
+    public function getSGroupByGroupfather($space_groupfather_id, $space_status = 1){
         $this->db->select("space_gid, space_group_url, space_group_name, space_groupfather_id");
         $this->db->where('space_status',$space_status);
         $this->db->where('space_groupfather_id', $space_groupfather_id);
@@ -463,17 +459,31 @@ class M_space extends CI_Model{
      * @param type $groupfather_id
      * @return int
      */
-    public function updateSGroup($space_gid ,$uid, $space_group_name, $space_group_url, $space_group_sumarry, $space_groupfather_id, $space_status){
-        $data = array(
-            'uid' => $uid,
-            'space_group_name' => $space_group_name,
-            'space_group_url' => $space_group_url,
-            'space_group_sumarry' => $space_group_sumarry,
-            'space_groupfather_id' => $space_groupfather_id,
-            'space_status' => $space_status
-        );
+    public function updateSGroup($space_gid , $space_groupfather_id = 0,
+            $uid = 0, $space_group_name = 0, $space_group_url = 0, 
+            $space_group_sumarry = 0, $space_status = 0){
+        $data = array();
+        if($space_groupfather_id != 0){
+            $data['space_groupfather_id'] = $space_groupfather_id;
+        }
+        if($uid != 0){
+            $data['uid'] = $uid;
+        }
+        if($space_group_name != 0){
+            $data['space_group_name'] = $space_group_name;
+        }
+        if($space_group_url != 0){
+            $data['space_group_url'] = $space_group_url;
+        }
+        if($space_group_sumarry != 0){
+            $data['space_group_sumarry'] = $space_group_sumarry;
+        }
+        if($space_status != 0){
+            $data['space_status'] = $space_status;
+        }
+        
         $this->db->where('space_gid', $space_gid);
-        $this->db->update('zx_article_groups', $data); 
+        $this->db->update('zx_space_article_groups', $data); 
         $affectedRows = $this->db->affected_rows();
         if( $affectedRows > 0){
             
@@ -485,7 +495,26 @@ class M_space extends CI_Model{
         
     }
     
-
+    /**
+     * update the group's space_status = 0 or 1
+     * @param type $spac_gid
+     * @param type $space_status
+     * @return int
+     */
+    public function updateSGroupStatus($spac_gid, $space_status){
+        $data = array(
+            'space_status' => $space_status
+        );
+        $this->db->where('space_gid', $spac_gid);
+        $affectedRows = $this->db->update('zx_space_article_groups', $data); 
+        if( $affectedRows > 0){
+            
+            return 1;
+        } else {
+            
+            return 0;
+        }
+    }
     /**
      * when someone delete the group ,the group doesn't delete truely 
      * but just change the status of group and still saved in database

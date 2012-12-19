@@ -25,7 +25,7 @@
         </p>    
         <p>
             <label for="industryName">行业分类：</label>
-            <input type="text" id="industryName" name="industryName"/>
+            <input type="text" id="industryName" name="industryName" value=""/>
         </p>
         <p>
             <input type='submit' name='submit' value='提交'>

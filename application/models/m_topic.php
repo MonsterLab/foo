@@ -45,7 +45,7 @@ class M_topic extends CI_Model{
     * 
     * @return bolean                                成功返回true ，失败返回 false                                   
     */
-   public function createCertBase($cuid,$uid,$com_name,$com_nature='',$com_phone='',$zipcode='',$com_place='',$industry_id=0,$cert_begin=0,$cert_end=0){
+   public function createCertBase($cuid,$uid,$com_name = '',$com_nature='',$com_phone='',$zipcode='',$com_place='',$industry_id=0,$cert_begin=0,$cert_end=0){
        $sqlQuery = array(
            'cuid'=>$cuid,
            'uid'=>$uid,
@@ -137,9 +137,11 @@ class M_topic extends CI_Model{
     * 
     * @return array                     成功返回数组，失败返回false
     */
-   public function searchCertBase($uid){
+   public function searchCertBase($uid,$isStatus = true){
        $this->db->where('uid',$uid);
-       $this->db->where('status',1);        //查询没有被弃用的用户
+       if($isStatus){
+            $this->db->where('status',1);        //查询没有被弃用的用户
+       }     
        $this->db->select('id,uid,com_name,com_nature,com_phone,industry_id,zipcode,com_place,cert_begin,cert_end,audit,audit_id,cuid,ctime');
        $dbResult = $this->db->get('zx_topic_cert_base');
        if($dbResult->num_rows() > 0){
@@ -244,9 +246,11 @@ class M_topic extends CI_Model{
     * @param type $uid
     * @return boolean
     */
-    public function searchCertFile($uid){
+    public function searchCertFile($uid,$isStatus = true){
         $this->db->where('uid',$uid);
-        $this->db->where('status',1);
+        if($isStatus){
+            $this->db->where('status',1);
+        }    
         $this->db->select('id,uid,file_type_id,file_name,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_topic_cert_file');
        
@@ -374,9 +378,11 @@ class M_topic extends CI_Model{
     * @param type $uid
     * @return boolean
     */
-    public function searchCertContent($uid){
+    public function searchCertContent($uid,$isStatus = TRUE){
         $this->db->where('uid',$uid);
-        $this->db->where('status',1);
+        if($isStatus){
+            $this->db->where('status',1);
+        } 
         $this->db->select('id,uid,title,content,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_topic_cert_content');
        

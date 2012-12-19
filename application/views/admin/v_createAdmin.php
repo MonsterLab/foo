@@ -25,7 +25,7 @@
     
 <?php    
     echo "</select><br>";
-    echo "*管理用户名："."<input type='text' name='username' value=''>"."<br>";
+    echo "*用户名："."<input type='text' name='username' value=''>"."<br>";
     echo "*密码："."<input type='password' name='password' value=''>"."<br>";
     echo "*使用人："."<input type='text' name='truename' value=''>"."<br>";
     echo "*所在部门："."<input type='text' name='department' value=''>"."<br>";

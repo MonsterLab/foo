@@ -78,8 +78,8 @@
         
         $tablename = 'certbase';
         if($certBase['audit'] == 0){
-            $cbHtml .= "<a href='{$base_url}admin/audit/{$uid}/{$type}/{$tablename}/{$userBase['id']}/1'><input type='button' name='userbase_bt' value='通过'/></a>";
-            $cbHtml .= "<a href='{$base_url}admin/audit/{$uid}/{$type}/{$tablename}/{$userBase['id']}/-1'><input type='button' name='userbase_bt' value='未通过'/></a>";
+            $cbHtml .= "<a href='{$base_url}admin/audit/{$uid}/{$type}/{$tablename}/{$certBase['id']}/1'><input type='button' name='userbase_bt' value='通过'/></a>";
+            $cbHtml .= "<a href='{$base_url}admin/audit/{$uid}/{$type}/{$tablename}/{$certBase['id']}/-1'><input type='button' name='userbase_bt' value='未通过'/></a>";
         }  else {
             $cbHtml .= "已审核";
         }

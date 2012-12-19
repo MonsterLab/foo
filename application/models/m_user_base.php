@@ -78,17 +78,39 @@ class M_user_base extends CI_Model{
     * @param type $uid
     * @return boolean       成功返回true，失败返回false
     */
-   public function delete($uid){
+   public function delete($uid,$zxcode,$type=''){
        $sqlQuery = array('status'=>0);
        
-       $this->db->where('id',$uid);
-       $this->db->update('zx_user_base',$sqlQuery);
-       
-       if($this->db->affected_rows() > 0){
-           
+       if($type == 'topic'){
+            $this->db->trans_start();//开启事务
+            $this->db->update('zx_user_base',$sqlQuery,array('id'=>$uid));
+            $this->db->update('zx_topic_cert_base',$sqlQuery,array('uid'=>$uid));
+            $this->db->update('zx_topic_cert_file',$sqlQuery,array('uid'=>$uid));
+            $this->db->update('zx_topic_cert_content',$sqlQuery,array('uid'=>$uid));
+            $this->db->update('zx_code',array('status'=>-1),array('zx_code'=>$zxcode));
+            $this->db->trans_complete();//提交事务
+       }
+       if($type == 'medium'){
+           $this->db->trans_start();//开启事务
+            $this->db->update('zx_user_base',$sqlQuery,array('id'=>$uid));
+            $this->db->update('zx_medium_cert_base',$sqlQuery,array('uid'=>$uid));
+            $this->db->update('zx_medium_cert_file',$sqlQuery,array('uid'=>$uid));
+            $this->db->update('zx_medium_cert_content',$sqlQuery,array('uid'=>$uid));
+            $this->db->update('zx_code',array('status'=>-1),array('zx_code'=>$zxcode));
+            $this->db->trans_complete();//提交事务
+       }
+       if($type == 'talent'){
+           $this->db->trans_start();//开启事务
+            $this->db->update('zx_user_base',$sqlQuery,array('id'=>$uid));
+            $this->db->update('zx_talent_cert_base',$sqlQuery,array('uid'=>$uid));
+            $this->db->update('zx_talent_cert_file',$sqlQuery,array('uid'=>$uid));
+            $this->db->update('zx_talent_cert_content',$sqlQuery,array('uid'=>$uid));
+            $this->db->update('zx_code',array('status'=>-1),array('zx_code'=>$zxcode));
+            $this->db->trans_complete();//提交事务
+       }
+       if($this->db->trans_status()){
            return TRUE;
        }  else {
-           
            return FALSE;
        }
        
@@ -159,8 +181,9 @@ class M_user_base extends CI_Model{
             
            $this->db->where($sqlQuery,$key);
        }
-       
-       //$this->db->limit($limit,$offset);
+       if(!($limit == 'end' && $offset == 'start')){
+           $this->db->limit($limit,$offset);
+       }
        if($isStatus){
             $this->db->where('status',1);        //查询没有被弃用的用户
        }
@@ -190,16 +213,14 @@ class M_user_base extends CI_Model{
     * @return boolean                   成功返回true，失败false
     */
    public function setSpaceId($uid,$space_id){
-       //检验space_id必须大于0 
-       if($space_id > 0){
-            $this->db->where('id',$uid);
-            $this->db->update('zx_user_base',array('space_id',$space_id));
-            
-            if($this->db->affected_rows() > 0){
-                
-                return TRUE;
-            }
-       }
+       //$space_id > 0开通空间，  < 0 关闭空间
+        $this->db->where('id',$uid);
+        $this->db->update('zx_user_base',array('space_id'=>$space_id));
+
+        if($this->db->affected_rows() > 0){
+
+            return TRUE;
+        }
        
        return FALSE;
        
@@ -209,7 +230,7 @@ class M_user_base extends CI_Model{
    /**
     * 审核  客户基本信息
     * 审核通过置audit 1 
-    * 审核未通过置audit -1 ，并且将status置0（删除）
+    * 审核未通过置audit -1 ，并且将status置...不能删除
     * @param type $audit_id
     * @param type $base_id
     * @param type $isPass
@@ -221,7 +242,6 @@ class M_user_base extends CI_Model{
            $sqlQuery = array(
                 'audit_id'=>$audit_id,
                 'audit'=>$isPass,
-                'status'=>0                                 //审核未通过即删除    
             );
            
        }  elseif($isPass == 1) {                            //通过审核

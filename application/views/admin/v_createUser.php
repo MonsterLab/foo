@@ -14,7 +14,12 @@
 ?>  
 <div>
     <form action='<?php base_url('admin/createUser/')?>' method ='post'>
-    <label for="zxcode">征信编码：</label><input type="text" id="zxcode" name="zxcode"><br/>
+    <label for="zxcode">征信编码：</label>
+    <?php if($zxcode == ''){?>
+        <input type="text" id="zxcode" name="zxcode"><br/>
+    <?php }else{?>
+        <input type="text" id="zxcode" name="zxcode" value="<?= $zxcode?>" disabled><br/>
+    <?php }?>    
     <label for="sqcode">授权码：</label><input type='text' id="sqcode" name='sqcode' value=''><br/>
     <label for="type">所属征信库类型：</label>
         <select name = 'type'>

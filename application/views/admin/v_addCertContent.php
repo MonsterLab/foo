@@ -16,9 +16,10 @@
         if($certContents){
             echo "<h5>已提交文字类信息：</h5>";
             $cfHtml = "<table width='500'>";
+            $i = 1;
             foreach ($certContents as $certContent){
                 $cfHtml .= "<tr>";
-                $cfHtml .= "<td width='200'>标题：{$certContent['title']}</td>";
+                $cfHtml .= "<td width='200'>{$i}、标题：{$certContent['title']}</td>";
                 $cfHtml .= "<td width='200'>";
                 
                 if($handle == 'update'){
@@ -27,6 +28,7 @@
                 }
                 $cfHtml .= "</td>";
                 $cfHtml .= "</tr>";
+                $i ++ ;
             }
             $cfHtml .= '</table><br>';
 
@@ -36,6 +38,7 @@
 </div>
 <?php if($handle == 'add'){?>
 <div>
+    <h5>添加:</h5>
     <form action="<?php echo base_url("admin/addCertContent/$type/{$uid}") ?>" method='post'>
         <p>
             <label for="title">认证题目:</label>

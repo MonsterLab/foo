@@ -93,7 +93,7 @@ class Search extends CI_Controller{
         $data = array(
             'flag'=>'',
             'zxcode' => 0,
-            'com_name' => 'known'
+            'com_name' => 'unknown'
         );
         
         if($_POST){
@@ -214,9 +214,6 @@ class Search extends CI_Controller{
     private function turnIndustryidtoName($_array){
         //
         if($_array){
-            echo '<pre>';
-            print_r($_array);
-            echo '</pre>';
             foreach ($_array as $array){
                 $id = $array['industry_id'];
                 $fooIndustrys = $this->zxpool->searchIndustry($id,2);

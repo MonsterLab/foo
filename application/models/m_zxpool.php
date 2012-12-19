@@ -171,24 +171,24 @@ class M_zxpool extends CI_Model{
     * @param type $industyId
     * @param type $industry_name
     * @param type $type                         所属征信库
-    * @return int                               -1 行业名存在，0 ‘失败’（即数据未做改动） ，1 成功
+    * @return int                               -，0 ‘失败’（即数据未做改动） ，1 成功
     */
    public function updateIndustry($industyId,$industry_name,$type){
        //检查修改的行业名在同类型征信库中是否存在
-       $isExist = $this->checkIndustry($industyId,$industry_name, $type);
-       if($isExist){
-           
-           return -1;
-       }
+//       $isExist = $this->checkIndustry($industyId,$industry_name, $type);
+//       if($isExist){
+//           
+//           return -1;
+//       }
        
        $sqlQuery = array(
            'industry_name'=>$industry_name,
            'type'=>$type
        );
        $this->db->where('id',$industyId);
-       $this->db->update('zx_industry_type',$sqlQuery);
+       $dbUpdate = $this->db->update('zx_industry_type',$sqlQuery);
        
-       if($this->db->affected_rows() > 0){
+       if($dbUpdate > 0){
            
            return 1;
        }  else {
@@ -200,7 +200,7 @@ class M_zxpool extends CI_Model{
    /**
     * 查询行业类型
     * @param type $key                      关键字
-    * @param type $method                   查方法默认0 ； 0 所属征信库类型，1 行业名,3
+    * @param type $method                   查方法默认0 ； 0 所属征信库类型，1 行业名,2 id
     * @param type $$limit                   每页条数
     * @param type $$offset                  偏移量
     *   
@@ -327,13 +327,13 @@ class M_zxpool extends CI_Model{
     * @param type $fileTypeid
     * @param type $fileType
     * @param type $type                         所属征信库
-    * @return int                               -1 名存在，0 失败 ，1 成功
+    * @return int                               ，0 失败 ，1 成功
     */
    public function updateFileType($fileTypeid,$fileType,$type){
-       $isExist = $this->checkFileType($fileType,$type);
-       if($isExist){
-           return -1;
-       }
+//       $isExist = $this->checkFileType($fileType,$type);
+//       if($isExist){
+//           return -1;
+//       }
        
        $sqlQuery = array(
            'file_name'=>$fileType,

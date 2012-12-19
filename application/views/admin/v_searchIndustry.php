@@ -22,7 +22,8 @@
     foreach ($industrys as $industry){
         $html .= "<tr>";
         $html .= "<td align='center'>{$industry['industry_name']}</td>";
-        $html .= "<td align='center'></a><a href='{$base_url}admin/deleteIndustry/{$industry['id']}'><input type='button' value='删除'></a></td>";
+        //$html .= "<td align='center'><a href='{$base_url}admin/deleteIndustry/{$industry['id']}'><input type='button' value='删除'></a>";
+        $html .= "<td align='center'><a href='{$base_url}admin/updateIndustry/{$industry['id']}'><input type='button' value='修改'></a></td>";
         $html .= "</tr>";
     }
     echo $html;

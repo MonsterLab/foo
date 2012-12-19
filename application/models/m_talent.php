@@ -44,7 +44,7 @@ class M_talent extends CI_Model{
     * @param type $cert_end
     * @return boolean
     */
-   public function createCertBase($cuid,$uid,$cert_name,$sex,$nation,$personid,$birth_place,$live_place,$cert_begin,$cert_end){
+   public function createCertBase($cuid,$uid,$cert_name='',$sex=0,$nation='',$personid='',$birth_place='',$live_place='',$cert_begin=0,$cert_end=0){
        $sqlQuery = array(
            'cuid'=>$cuid,
            'uid'=>$uid,
@@ -135,9 +135,11 @@ class M_talent extends CI_Model{
     * 
     * @return array                     成功返回数组，失败返回false
     */
-   public function searchCertBase($uid){
+   public function searchCertBase($uid,$isStatus = TRUE){
        $this->db->where('uid',$uid);
-       $this->db->where('status',1);        //查询没有被弃用的用户
+       if($isStatus){
+            $this->db->where('status',1);
+        } 
        $this->db->select('id,uid,cert_name,sex,nation,personid,birth_place,live_place,cert_begin,cert_end,audit,audit_id,cuid,ctime');
        $dbResult = $this->db->get('zx_talent_cert_base');
        if($dbResult->num_rows() > 0){
@@ -242,9 +244,11 @@ class M_talent extends CI_Model{
     * @param type $uid
     * @return boolean
     */
-    public function searchCertFile($uid){
+    public function searchCertFile($uid,$isStatus = TRUE){
         $this->db->where('uid',$uid);
-        $this->db->where('status',1);
+        if($isStatus){
+            $this->db->where('status',1);
+        } 
         $this->db->select('id,uid,file_type_id,file_name,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_talent_cert_file');
        
@@ -372,9 +376,11 @@ class M_talent extends CI_Model{
     * @param type $uid
     * @return boolean
     */
-    public function searchCertContent($uid){
+    public function searchCertContent($uid,$isStatus = TRUE){
         $this->db->where('uid',$uid);
-        $this->db->where('status',1);
+        if($isStatus){
+            $this->db->where('status',1);
+        } 
         $this->db->select('id,uid,title,content,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_talent_cert_content');
        
@@ -447,7 +453,7 @@ class M_talent extends CI_Model{
        }
        
        $this->db->where('id',$base_id);
-       $this->db->update('zx_medium_cert_base',$sqlQuery);
+       $this->db->update('zx_talent_cert_base',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
            return TRUE;
@@ -487,7 +493,7 @@ class M_talent extends CI_Model{
        }
        
        $this->db->where('id',$base_id);
-       $this->db->update('zx_medium_cert_file',$sqlQuery);
+       $this->db->update('zx_talent_cert_file',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
            return TRUE;

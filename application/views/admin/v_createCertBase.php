@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-        <script type="text/javascript" src="<?= base_url()?>js/jquery-1.3.1.min.js"></script>
         
-        <link type="text/css" href="<?= base_url()?>include/css/datepicker/jquery-ui-1.8.16.custom.css" rel="stylesheet" />	
-        <link type="text/css" href="<?= base_url()?>include/css/datepicker/jquery.ui.slider.css" rel="stylesheet" />	
-        <script type="text/javascript" src="<?= base_url()?>include/js/datepicker/jquery-1.6.2.min.js"></script>
-        <script type="text/javascript" src="<?= base_url()?>include/js/datepicker/jquery-ui-1.8.16.custom.min.js"></script>
-        <script type="text/javascript" src="<?= base_url()?>include/js/datepicker/fz.js"></script>
-        <script type="text/javascript" src="<?= base_url()?>include/js/datepicker/jquery-ui-timepicker-addon.js"></script>	
-        <script type="text/javascript" src="<?= base_url()?>include/js/datepicker/jquery.ui.slider.min.js"></script>
+        <script type="text/javascript" src="<?php echo base_url('include/js/jquery-1.3.1.min.js')?>"></script>
+        
+        <link type="text/css" href="<?php echo base_url('include/css/datepicker/jquery-ui-1.8.16.custom.css')?>" rel="stylesheet" />	
+        <link type="text/css" href="<?php echo base_url('include/css/datepicker/jquery.ui.slider.css')?>" rel="stylesheet" />	
+        <script type="text/javascript" src="<?php echo base_url('include/js/datepicker/jquery-1.6.2.min.js')?>"></script>
+        <script type="text/javascript" src="<?php echo base_url('include/js/datepicker/jquery-ui-1.8.16.custom.min.js')?>"></script>
+        <script type="text/javascript" src="<?php echo base_url('include/js/datepicker/fz.js')?>"></script>
+        <script type="text/javascript" src="<?php echo base_url('include/js/datepicker/jquery-ui-timepicker-addon.js')?>"></script>	
+        <script type="text/javascript" src="<?php echo base_url('include/js/datepicker/jquery.ui.slider.min.js')?>"></script>
         
         <script type="text/javascript">
                 $(function(){
@@ -22,6 +23,7 @@
 <body>
 <?php
     $base_url = base_url();
+    
     if($flag != ''){
         echo $flag;
         exit();
@@ -36,7 +38,7 @@
 <?php
     
     if($handle == 'add'){
-        echo "<form action='{$base_url}admin/createCertBase/{$type}/{$uid}' method ='post'>";
+        echo "<form action='{$base_url}admin/createCertBase/{$type}/{$uid}/{$certBases[0]['id']}' method ='post'>";
     }  else {
         echo "<form action='{$base_url}admin/updateCertBase/{$type}/{$uid}/{$certBases[0]['id']}' method ='post'>";
     }
@@ -63,7 +65,7 @@
         公司所在地：<input type='text' name='com_place' value='<?php echo $certBases[0]['com_place']?>'><br>
         征信开始时间：<input type='text' id='cert_begin' name='cert_begin' value='<?php echo $certBases[0]['cert_begin']?>'><br>
         征信结束时间：<input type='text' id='cert_end' name='cert_end' value='<?php echo $certBases[0]['cert_end']?>'><br>
-    
+        
 <?php
 }  else {
  ?> 
@@ -93,5 +95,4 @@
 
     
 </body>
-</html>    
-    
+ </html>   

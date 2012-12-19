@@ -25,9 +25,10 @@
         if($certFiles){
             echo "<h5>已上传文件：</h5>";
             $cfHtml = "<table width='500'>";
+            $i = 1;
             foreach ($certFiles as $certFile){
                 $cfHtml .= "<tr>";
-                $cfHtml .= "<td width='200'>文件名称：{$certFile['file_type_name']}</td>";
+                $cfHtml .= "<td width='200'>{$i}、文件名称：{$certFile['file_type_name']}</td>";
                 $cfHtml .= "<td width='200'>";
                 $cfHtml .= "<img width='450' height='530' style='display:none' src='{$base_url}include/images/{$certFile['file_name']}'/>";
                 $cfHtml .= "<input type='button' class='showPic_button' value='查看'>";
@@ -36,6 +37,7 @@
                 }
                 $cfHtml .= "</td>";
                 $cfHtml .= "</tr>";
+                $i ++;
             }
             $cfHtml .= '</table><br>';
 
@@ -44,7 +46,8 @@
     ?>
 </div>    
 <?php if($handle == 'add'){?>
-<div>    
+<div> 
+    <h5>添加:</h5>
     <form action='<?php echo base_url("admin/addCertFile/{$type}/{$uid}")?>' method='post' enctype='multipart/form-data'>
 
         证书名：

@@ -22,7 +22,8 @@
     foreach ($fileTypes as $fileType){
         $html .= "<tr>";
         $html .= "<td align='center'>{$fileType['file_name']}</td>";
-        $html .= "<td align='center'></a><a href='{$base_url}admin/deleteFileType/{$fileType['id']}'><input type='button' value='删除'></a></td>";
+        //$html .= "<td align='center'><a href='{$base_url}admin/deleteFileType/{$fileType['id']}'><input type='button' value='删除'></a></td>";
+        $html .= "<td align='center'><a href='{$base_url}admin/updateFileType/{$fileType['id']}'><input type='button' value='修改'></a></td>";
         $html .= "</tr>";
     }
     echo $html;

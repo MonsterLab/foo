@@ -1,5 +1,5 @@
 <div>
-    <h2>添加客户</h2>
+    <h2>添加客户基本信息</h2>
 </div>
 
 <?php
@@ -8,26 +8,27 @@
     * 弹出提示信息
     */
    if($flag != ''){
-       echo "<script>alert('{$flag}');window.location='{$base_url}admin/searchCode';</script>";
+       echo "<script>alert('{$flag}');window.location='{$base_url}admin/createUser/';</script>";
        exit();
    }
-   
-    echo "<form action='{$base_url}admin/createUser/$zxcode' method ='post'>";
-    echo "征信编码：{$zxcode}"."<br>";
-    echo "所属征信库类型：";                    //11客服 12 平台管理 13 录入 14 审核 99超管 
-    echo "<select name = 'type'>";
-?>
-
-    <option value='topic' <?php echo $type=='topic' ? 'selected' : ''; ?>>纳税主体</option>
-    <option value='medium' <?php echo $type=='medium' ? 'selected' : ''; ?>>中介机构</option>
-    <option value='talent' <?php echo $type=='talent' ? 'selected' : ''; ?>>财税人才</option>
+?>  
+<div>
+    <form action='<?php base_url('admin/createUser/')?>' method ='post'>
+    <label for="zxcode">征信编码：</label><input type="text" id="zxcode" name="zxcode"><br/>
+    <label for="sqcode">授权码：</label><input type='text' id="sqcode" name='sqcode' value=''><br/>
+    <label for="type">所属征信库类型：</label>
+        <select name = 'type'>
+        <option value='topic' >纳税主体</option>
+        <option value='medium' >中介机构</option>
+        <option value='talent' >财税人才</option>
+        </select><br>
+    <label for="username">登录名：</label><input type='text' id="username" name='username' value=''><br>
+    <label for="password">密码：</label><input type='password' id="password" name='password' value=''><br>
+    <label for="truename">联系人：</label><input type='text' id="truename" name='truename' value=''><br>
+    <label for="position">职位：</label><input type='text' id="position" name='position' value=''><br>
+    <label for="phone">电话：</label><input type='text' id="phone" name='phone' value=''><br>
+    <label for="email">邮箱：</label><input type='text' id="email" name='email' value=''><br>
     
-<?php    
-    echo "</select><br>";
-    echo "公司名："."<input type='text' name='cert_name' value='{$cert_name}'>"."<br>";
-    echo "登录名："."<input type='text' name='username' value='{$username}'>"."<br>";
-    echo "密码："."<input type='password' name='password' value='{$password}'>"."<br>";
-    echo "授权码："."<input type='text' name='sqcode' value='{$sqcode}'>"."<br>";
-    echo "<input type='submit' name='submit' value='提交'>";
-    echo "</form>";
-?>
+    <input type='submit' name='submit' value='提交'>
+    </form>
+</div>

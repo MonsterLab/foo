@@ -120,8 +120,8 @@ class M_medium extends CI_Model{
            'cert_end'=>$cert_end,
        );
        $this->db->where('id',$baseId);
-       $this->db->update('zx_medium_cert_base',$sqlQuery);
-       if($this->db->affected_rows() > 0){
+       $dbUpdate = $this->db->update('zx_medium_cert_base',$sqlQuery);
+       if($dbUpdate > 0){
            
            return TRUE;
        }  else {
@@ -246,14 +246,14 @@ class M_medium extends CI_Model{
     public function searchCertFile($uid){
         $this->db->where('uid',$uid);
         $this->db->where('status',1);
-        $this->db->select('id,file_type_id,file_name,audit,audit_id,cuid,ctime');
+        $this->db->select('id,uid,file_type_id,file_name,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_medium_cert_file');
        
         if($dbResult->num_rows() > 0){
             foreach ($dbResult->result_array() as $row){
                 $result[] = $row;
             }
-
+            
             return $result;
         }  else {
 
@@ -269,7 +269,7 @@ class M_medium extends CI_Model{
     * @param type $_fileTypeId
     * @return boolean
     */
-   private function checkCertFile($_uid,$_fileTypeId){
+   public function checkCertFile($_uid,$_fileTypeId){
        $this->db->where('uid',$_uid);
        $this->db->where('file_type_id',$_fileTypeId);
        $this->db->where('status',1);
@@ -356,14 +356,14 @@ class M_medium extends CI_Model{
            'content'=>$content
        );
        $this->db->where('id',$id);
-       $this->db->update('zx_medium_cert_content',$sqlQuery);
+       $dbUpdate = $this->db->update('zx_medium_cert_content',$sqlQuery);
        
-       if($this->db->affected_rows() > 0){
+       if($dbUpdate > 0){
            
-           return true;
+           return TRUE;
        }  else {
            
-           return false;
+           return FALSE;
        }
    }
 
@@ -376,7 +376,7 @@ class M_medium extends CI_Model{
     public function searchCertContent($uid){
         $this->db->where('uid',$uid);
         $this->db->where('status',1);
-        $this->db->select('id,title,content,audit,audit_id,cuid,ctime');
+        $this->db->select('id,uid,title,content,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_medium_cert_content');
        
         if($dbResult->num_rows() > 0){

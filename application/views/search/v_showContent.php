@@ -1,5 +1,5 @@
 <div>
-    <a href="<?php echo base_url("admin/showLuruView/{$uid}")?>"><input type="button" value="返回"/></a>
+    <a href="<?php echo base_url("search/showUserInfos/{$uid}")?>"><input type="button" value="返回"/></a>
 </div>
 <div id="content">
     <?php

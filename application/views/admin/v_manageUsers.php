@@ -8,7 +8,8 @@
     <?php 
         $base_url = base_url();
         echo "<form action='{$base_url}admin/searchUsers/' method='post'>";
-        echo "<input type='text' name='keySearch'>";
+        echo "<label for='key'>征信编码：</label>";
+        echo "<input type='text' id='key' name='keySearch'>";
         echo "<input type='submit' name='submit' value='搜索'><br>";
 
         if($flag != ''){

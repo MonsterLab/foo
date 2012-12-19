@@ -608,6 +608,29 @@ class Admin extends CI_Controller{
     }
     
     /**
+     * 展示文字认证信息
+     * @param type $type
+     * @param type $uid
+     */
+    public function showContent($type,$uid){
+        if($type == 'topic'){
+            $fooCertContent = $this->topic->searchCertContent($uid);
+        }
+        if($type == 'medium'){
+            $fooCertContent = $this->medium->searchCertContent($uid);
+        }
+        if($type == 'talent'){
+            $fooCertContent = $this->talent->searchCertContent($uid);
+        }
+        $data['title'] = $fooCertContent[0]['title'];
+        $data['content'] = $fooCertContent[0]['content'];
+        $data['uid'] = $uid;
+        
+        $this->load->view('admin/v_showContent',$data);
+        
+    }
+    
+    /**
      * 添加征信基本信息
      */
     public function createCertBase($type = '',$uid = 0,$baseId = 0){
@@ -618,6 +641,7 @@ class Admin extends CI_Controller{
             redirect(base_url('admin/login/'));
         }
         
+        $data['flag'] = '';
         $data['type'] = $type;
         $data['uid'] = $uid;
         //
@@ -690,7 +714,7 @@ class Admin extends CI_Controller{
             
             $this->load->view('admin/v_createCertBase',$data);
             
-        }
+        } 
     }
 
     /**
@@ -1283,7 +1307,7 @@ class Admin extends CI_Controller{
      * @param type $tableType
      * @param type $tid
      */
-    public function showFileOrContent($uid,$type,$tableType,$tid){
+    public function showAuditFileOrContent($tid,$type,$tableType){
         //权限设定
         $power = $this->admin->getPower();
         $powerArray = array(14,99);                 //审核、超管
@@ -1291,18 +1315,45 @@ class Admin extends CI_Controller{
             redirect(base_url('admin/login/'));
         }
         
-        $data['uid'] = $uid;
-        $data['type'] = $type;
-        $data['tableType'] = $tableType;
-        $data['tid'] = $tid;
         
         if($tableType == 'certfile'){
-            $data['fileName'] = $this->input->post('fileName');
-            $this->load->view('admin/v_showFile',$data);
-        }elseif ($tableType == 'certcontent') {
-            $data['title'] = $this->input->post('title');
-            $data['content'] = $this->input->post('content');
-            $this->load->view('admin/v_showContent',$data);
+            if($type == 'topic'){
+                $fooCertFile = $this->topic->searchCertFile($tid,FALSE,1);
+            }
+            if($type == 'medium'){
+                $fooCertFile = $this->medium->searchCertFile($tid,FALSE,1);
+            }
+            if($type == 'talent'){
+                $fooCertFile = $this->talent->searchCertFile($tid,FALSE,1);
+            }
+            
+            $data['type'] = $type;
+            $data['tableType'] = $tableType;
+            $data['tid'] = $fooCertFile[0]['id'];
+            $data['uid'] = $fooCertFile[0]['uid'];
+            $data['fileName'] = $fooCertFile[0]['file_name'];
+            
+            $this->load->view('admin/v_showAuditFile',$data);
+        }
+        if ($tableType == 'certcontent') {
+            if($type == 'topic'){
+                $fooCertContent = $this->topic->searchCertContent($tid,FALSE,1);
+            }
+            if($type == 'medium'){
+                $fooCertContent = $this->medium->searchCertContent($tid,FALSE,1);
+            }
+            if($type == 'talent'){
+                $fooCertContent = $this->talent->searchCertContent($tid,FALSE,1);
+            }
+            
+            $data['type'] = $type;
+            $data['tableType'] = $tableType;
+            $data['tid'] = $fooCertContent[0]['id'];
+            $data['uid'] = $fooCertContent[0]['uid'];
+            $data['title'] = $fooCertContent[0]['title'];
+            $data['content'] = $fooCertContent[0]['content'];
+            
+            $this->load->view('admin/v_showAuditContent',$data);
         }
         
     }
@@ -1379,11 +1430,23 @@ class Admin extends CI_Controller{
             }
 
         }  else {
-
+            
+             $fooUID = $this->admin->getUID();
             if($type != NULL){
-                $fooUserBase = $this->userbase->search($type,2);                     //按类库查询
+                //录入
+                if($power == 13){
+                    $fooUserBase = $this->userbase->search($fooUID,4,'end','start',TRUE,$type);
+                }  else {
+                    $fooUserBase = $this->userbase->search($type,2);
+                }
+                
             }  else {
-                $fooUserBase = $this->userbase->search();                           //查询全部
+                //录入
+                if($power == 13){
+                    $fooUserBase = $this->userbase->search($fooUID,4,'end','start');
+                }  else {
+                    $fooUserBase = $this->userbase->search();
+                }
             }
 
             if($fooUserBase){

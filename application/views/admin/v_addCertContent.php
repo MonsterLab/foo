@@ -25,6 +25,8 @@
                 if($handle == 'update'){
                     $cfHtml .= "<a href='{$base_url}admin/updateCertContent/{$certContent['id']}/{$type}/{$uid}'><input type='button' value='查看'></a>";
                     $cfHtml .= "<a href='{$base_url}admin/updateCertContent/{$certContent['id']}/{$type}/{$uid}'><input type='button' value='修改'></a>";
+                }elseif ($handle == 'add') {
+                    $cfHtml .= "<a href='{$base_url}admin/showContent/{$type}/{$uid}'><input type='button' value='查看'></a>";
                 }
                 $cfHtml .= "</td>";
                 $cfHtml .= "</tr>";

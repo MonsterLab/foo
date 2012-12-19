@@ -76,6 +76,7 @@ class M_zxpool extends CI_Model{
        
        $this->db->limit($limit,$offset);
        $this->db->select('id,zx_code,status');
+       $this->db->order_by('id','desc');
        $dbResult = $this->db->get('zx_code');
        
        if($dbResult->num_rows() > 0){
@@ -223,6 +224,7 @@ class M_zxpool extends CI_Model{
        $this->db->where('status',1);
        //$this->db->limit($limit,$offset);
        $this->db->select('id,industry_name,type,cuid,ctime');
+       $this->db->order_by('id','desc');
        $dbResult = $this->db->get('zx_industry_type');
        
        if($dbResult->num_rows() > 0){
@@ -377,6 +379,7 @@ class M_zxpool extends CI_Model{
        $this->db->where('status',1);
        //$this->db->limit($limit,$offset);
        $this->db->select('id,file_name,type,cuid,ctime');
+       $this->db->order_by('id','desc');
        $dbResult = $this->db->get('zx_cert_file_type');
        
        if($dbResult->num_rows() > 0){

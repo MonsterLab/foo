@@ -408,7 +408,7 @@ class M_cms extends CI_Model{
      * @return int
      */
     public function getAllGroups($uid = 0, $status = 1){
-        $this->db->select("gid, group_name, groupfather_id");
+        $this->db->select("gid, group_name, groupfather_id, group_url");
         if($uid != 0){
             $this->db->where('uid', $uid); 
         }

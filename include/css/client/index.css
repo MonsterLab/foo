@@ -31,7 +31,7 @@ ul{
 	color: #FF0000; 
 	font-weight: bold ;
 }
-. minP{
+.minP{
 	height: 26px;
 	line-height: 26px;
 }
@@ -52,27 +52,33 @@ ul{
 	height: 87px;
 	background:url("../../images/bottom.gif") no-repeat;	
 }
-#bottom  ul{
-	width: 885px;
+#bottom  ul#guide{
+	width: 825px;
 	height: 25px;
 	margin-left: 40px;
+        padding: 0 0 0 60px;
 	background: #AEB5BD;
 	border: 1px solid #000;
 }
-#bottom ul li{
+#bottom ul.sub{
+    position: absolute;
+    left: 100px;
+    top:100px;
+}
+#bottom ul#guide li{
 	float: left;
 	width: 72px;
 	font-size:14px;
 	line-height: 25px;
 	font-weight: bold;
 }
-#bottom ul .first{
+#bottom ul#guide .first{
 	margin-left: 60px;
 }
-#bottom ul .returnI{
+#bottom ul#guide .returnI{
 	margin-left: 30px;
 	width: 102px;
 }
-#bottom ul .returnI a{
+#bottom ul#guide .returnI a{
 	color:#000099;
 }

@@ -8,10 +8,172 @@ class Space extends CI_Controller{
         $this->load->library('Page');
     }
     
-    public function index($uid = 5){
+    public function index($uid = 2){
+       // $this->getContentOfColumn($uid);
+        $nav = $this->echoMenu();
+        $data['nav'] = $nav['subPage'];
+        $this->load->view('space/index', $data);
         
-        $this->load->view('space/index');
     }
+    
+    private function getContentOfColumn($uid){
+        //getGroupByGroupfather($groupfather_id, $status = 1){
+        $space_uid = $uid;
+        $uid = 0;
+        $status = 1;
+        $groups = $this->space->getAllSGroups($uid, $status);
+        $fatherGid = 0;
+        // search for father 
+        $gszsGid = 0;       //公司展示
+        $qyjsGid = 0;       //企业介绍
+        $qywhGid = 0;       //企业文化
+        $rlzyGid = 0;       //人力资源
+        $zxbdGid = 0;       //最新报导
+        foreach ($groups as $father){
+            if($father['space_group_name'] == '公司展示'){
+                $gszsGid = $father['space_gid'];
+            }
+            if($father['space_group_name'] == '企业介绍'){
+                $qyjsGid = $father['space_gid'];
+            }
+            if($father['space_group_name'] == '企业文化'){
+                $qywhGid = $father['space_gid'];
+            }
+            if($father['space_group_name'] == '人力资源'){
+                $rlzyGid = $father['space_gid'];
+            }
+            if($father['space_group_name'] == '最新报导'){
+                $zxbdGid = $father['space_gid'];
+            }
+        }
+        
+        //first 公司展示
+        $groupids = $this->getChildGid($space_uid, $gszsGid);
+        
+        $groupids[] = $gid;     //add own gid 
+        $method = 2;        //the method si getSArticlesOfGroup()
+        $limit = 'start';
+        $offset = 'end';
+        $status = 1;
+        //$key,$method,$space_status = 1,$limit=0,$offset = 5 , $space_audit = 0
+        $space_audit = 1;
+        $aritcles = $this->space->searchS($groupids, $method, $status, $limit, $offset, $space_audit, $space_uid);
+        
+        print_r($aritcles);
+        
+        
+    }
+
+    /**
+     * 用户空间登录
+     * @return type
+     */
+    public function login(){
+        print_r($_POST);
+        $data['flag'] = ''; 
+        if($_POST){
+            $username = trim($this->input->post('username'));
+            $userpassword = trim($this->input->post('password'));
+            
+            if($username == NULL || $userpassword == NULL){
+                $data['flag'] = '请完善信息!';
+                $this->load->view('space/login',$data);
+                return;
+            }
+            
+            $fooLogin = $this->userbase->login($username,$userpassword);
+
+            if($fooLogin == -1){
+                $data['flag'] = '不存在此用户!';
+                $this->load->view('space/login',$data);
+                return;
+            }
+            if($fooLogin == 0){
+                $data['flag'] = '密码错误!';
+                $this->load->view('space/login',$data);
+                return;
+            }
+            if($fooLogin == 1){
+                redirect(base_url("space/index/"));
+            } 
+            
+            return;
+        }
+        
+        $this->load->view('space/login',$data);
+       
+        
+    }
+
+    /**
+     * 登出
+     */
+    public function logout(){
+        $this->userbase->logout();
+        redirect(base_url('space/login/'));
+    }
+    
+    private function echoMenu(){
+        $uid = 0;
+        $status = 1;
+        $groups = $this->space->getAllSGroups($uid, $status);
+        $fatherGid = 0;
+        // search for father 
+        foreach ($groups as $father){
+            if($father['space_group_name'] == '首页'){
+                $fatherGid = $father['space_gid'];
+                break;
+            }
+        }
+        
+        //添加相反了之后把数组倒置
+//        $groupsCopy;
+//        for($i = count($groups) - 1; $i >= 0; $i--){
+//            $groupsCopy[] = $groups[$i];
+//        }
+//        $groups = $groupsCopy;
+        $guideIndex = '';
+        $guideSub = '';  
+        $indexguideHead = '<ul id="guide">';
+        $subguideHead = '<ul class="daohang">';
+        foreach ($groups as $father){
+            if($father['space_groupfather_id'] == $fatherGid){
+                $guideIndex .= '<li><a href="'.base_url('space/showList/'.$father['space_group_url'].'/'.$father['space_gid']).'">'.$father['space_group_name'].'</a></li>';
+                $guideSub .= '<li class="main"><a href="'.base_url('space/showList/'.$father['space_group_url'].'/'.$father['space_gid']).'">'.$father['space_group_name'].'</a>';
+                $guideSub .= $this->getGuide($father['space_gid'], $groups);
+                $guideSub .= '</li>';
+            }
+        }
+        $guideEnd = '<li><a href="'.base_url('space/login').'">用户登录</a></li>';
+        $guideEnd .='<li class="returnI"><a href="'.base_url('cms/index').'">返回平台首页</a></li>';
+        $guideEnd .= '</ul>';
+        
+        $indexPage = $indexguideHead.$guideIndex.$guideEnd;
+        $subPage = $subguideHead.$guideSub.$guideEnd;
+        $data = array(
+            'index' => $indexPage,
+            'subPage' => $subPage
+        );
+        
+        return $data;
+    }
+    
+    private function getGuide($gid, $groups){
+        $guide = '<ul class="sub">';
+        foreach ($groups as $father){
+            if($father['space_groupfather_id'] == $gid){
+                $guide .= '<li><a href="'.base_url('space/showList/'.$father['space_group_url'].'/'.$father['space_gid']).'">'.$father['space_group_name'].'</a></li>';
+                $this->getGuide($father['space_gid'], $groups);
+            }
+        }
+        $guide .= '</ul>';
+        if($guide == '<ul></ul>'){
+            return '';
+        }
+        
+        return $guide;
+    }
+    
     
     public function article($space_uid, $space_groupid, $aid){
         //TODO nav

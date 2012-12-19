@@ -41,8 +41,5 @@
         <div id="footer">
             版权所有&copy中国财经网
         </div>
-
-        
-
     </body>
 </html>

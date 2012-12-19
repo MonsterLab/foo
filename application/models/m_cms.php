@@ -47,15 +47,21 @@ class M_cms extends CI_Model{
     
     /**
      * 
-     * @param type $aid
      * @param type $uid
      * @param type $username
      * @param type $title
      * @param type $content
      * @param type $groupid
+     * @param type $ctime
+     * @param type $audit
+     * @param type $audit_id
+     * @param type $viewtimes
+     * @param type $status
      * @return int  1: insert article successful 0: insert fail
      */
-    public function create($uid , $username  , $title ,$content, $groupid){   
+    public function create($uid , $username, $title ,$content, 
+            $groupid, $ctime = '', $audit = 0, $audit_id = 0, $viewtimes = 0, $status = 0){   
+        
        $sql= array(
             'uid' => $uid,
             'username' => $username,
@@ -63,11 +69,32 @@ class M_cms extends CI_Model{
             'content' => $content,
             'groupid' => $groupid
           );
-       $insertId = $this->db->insert('zx_articles',$sql);
+       if($ctime != 0){
+           $sql['ctime'] = $ctime;
+       }
+       if($audit != 0){
+           $sql['audit'] = $audit;
+       }
        
+       if($audit_id != 0){
+           $sql['audit_id'] = $audit_id;
+       }
+       
+       if($viewtimes != 0){
+           $sql['viewtimes'] = 0;
+       }
+       
+       if($status != 0){
+           $sql['status'] = $status;
+       }
+           
+       
+       $this->db->insert('zx_articles',$sql);
+       
+       $insertId =  $this->db->insert_id();
        if($insertId > 0){
 
-           return 1;
+           return $insertId;
        }  else {
 
            return 0;
@@ -248,20 +275,14 @@ class M_cms extends CI_Model{
     }
     
     /**
-     * this method is the same as the method updateStatus,
-     * both of them just change the status ,but not delete the article truely
      * 
      * @param type $aid
      * @param type $status
      * @return int
      */
     public function deleteArticle($aid, $status){
-        $data = array(
-            'status' => $status
-        );
         $this->db->where('aid', $aid);
-        $this->db->update('zx_articles', $data); 
-        $affectedRows = $this->db->affected_rows();
+        $affectedRows = $this->db->delete('zx_articles', $data); 
         if( $affectedRows > 0){
             
             return 1;
@@ -284,8 +305,7 @@ class M_cms extends CI_Model{
             'status' => $status
         );
         $this->db->where('aid', $aid);
-        $this->db->update('zx_articles', $data); 
-        $affectedRows = $this->db->affected_rows();
+        $affectedRows = $this->db->update('zx_articles', $data); 
         if( $affectedRows > 0){
             
             return 1;
@@ -368,10 +388,12 @@ class M_cms extends CI_Model{
             'group_sumarry' => $group_summary,
             'groupfather_id' => $groupfather_id
           );
-       $insertId = $this->db->insert('zx_article_groups',$sql);
+       $this->db->insert('zx_article_groups',$sql);
+       
+       $insertId =  $this->db->insert_id();
        if($insertId > 0){
 
-           return 1;
+           return $insertId;
        }  else {
 
            return 0;
@@ -413,7 +435,7 @@ class M_cms extends CI_Model{
      * @return type
      */
     public function getGroupByGid($gid, $status = 1){
-        $this->db->select("gid, group_url, group_name, groupfather_id");
+        $this->db->select("gid, group_url, group_name, groupfather_id, group_sumarry");
         $this->db->where('status',$status);
         $this->db->where('gid', $gid);
         $query = $this->db->get('zx_article_groups');
@@ -462,15 +484,30 @@ class M_cms extends CI_Model{
      * @param type $groupfather_id
      * @return int
      */
-    public function updateGroup($gid ,$uid, $group_name, $group_url, $group_sumarry, $groupfather_id, $status){
-        $data = array(
-            'uid' => $uid,
-            'group_name' => $group_name,
-            'group_url' => $group_url,
-            'group_sumarry' => $group_sumarry,
-            'groupfather_id' => $groupfather_id,
-            'status' => $status
-        );
+    public function updateGroup($gid, $groupfather_id = 0, $status = 0, $uid = 0, $group_name = 0, $group_url = 0, $group_sumarry = 0){
+        if($groupfather_id != 0){
+            $data['groupfather_id'] = $groupfather_id;
+        }
+        
+        if($uid != 0){
+            $data['uid'] = $uid;
+        }
+        
+        if($group_name != 0){
+            $data['group_name'] = $group_name;
+        }
+        
+        if($group_url != 0){
+            $data['group_url'] = $group_url;
+        }
+        
+        if($group_sumarry != 0){
+            $data['group_sumarry'] = $group_sumarry;
+        }
+        
+        if($status != 0){
+            $data['status'] = $status;
+        }
         $this->db->where('gid', $gid);
         $this->db->update('zx_article_groups', $data); 
         $affectedRows = $this->db->affected_rows();
@@ -484,6 +521,26 @@ class M_cms extends CI_Model{
         
     }
     
+    /**
+     * update the group's status = 0;
+     * @param type $gid
+     * @param type $status
+     * @return int
+     */
+    public function updateGroupStatus($gid, $status){
+        $data = array(
+            'status' => $status
+        );
+        $this->db->where('gid', $gid);
+        $affectedRows = $this->db->update('zx_article_groups', $data); 
+        if( $affectedRows > 0){
+            
+            return 1;
+        } else {
+            
+            return 0;
+        }
+    }
 
     /**
      * when someone delete the group ,the group doesn't delete truely 

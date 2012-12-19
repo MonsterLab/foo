@@ -55,18 +55,6 @@ h1,h2,h3,h4,h5,h6{font-size:100%;}
 </head>
 <body>
 
-    <?php
-        /**
-         * 弹出提示信息
-         */
-        if($flag != ''){
-            $base_url = base_url();
-            echo "<script>alert('{$flag}');window.location='{$base_url}index.php/admin/login/';</script>";
-            exit();
-        }
-    ?>
-    
-    
     
 <form action="" method="post">
 	<div class="loginPanel">
@@ -118,7 +106,16 @@ h1,h2,h3,h4,h5,h6{font-size:100%;}
 		</div>
 	</div>
 </form>
-
+    <?php
+        /**
+         * 弹出提示信息
+         */
+        if($flag != ''){
+            $base_url = base_url();
+            echo "<script>alert('{$flag}');window.location='{$base_url}index.php/admin/login/';</script>";
+            exit();
+        }
+    ?>
 
 </body>
 </html>

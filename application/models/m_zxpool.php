@@ -35,18 +35,23 @@ class M_zxpool extends CI_Model{
    }
    /**
     * 更新征信编码使用状态
-    * 
+    * 作用：1、检查征信编码是否存在， 2、检查征信编码是否已经使用，3、更新（即使用征信编码）
+    *
     * @param int $zxCode
-    * @return int                   -1征信编码未设置   0操作失败   1操作成功
+    * @return int                   -1征信编码不存在   0操作失败   1操作成功
     */
-   public function useCode($zxCode = 0){
-       if($zxCode == 0){
+   public function useCode($zxCode = NULL){
+       //检查征信编码是否存在，不存在返回-1
+       $isExist = $this->checkZxcode($zxCode);
+       if(!$isExist){
            return -1;
        }
+       
        $this->db->where('zx_code',$zxCode);
        $this->db->set('status',1);
        $this->db->update('zx_code');
        
+       //此处用$this->db->affected_rows()，不用update（）返回值；目的：添加用户时根据返回值判断该zxcode是否已经使用
        if($this->db->affected_rows() > 0){
            
            return 1;
@@ -84,6 +89,24 @@ class M_zxpool extends CI_Model{
            return FALSE;
        }
        
+   }
+   
+   /**
+    * 检查征信编码是否存在
+    * ，存在返回true，否则，返回false
+    * @param type $_zxcode
+    * @return boolean
+    */
+   private function checkZxcode($_zxcode){
+       $this->db->where('zx_code',$_zxcode);
+       $dbResult = $this->db->get('zx_code');
+       if($dbResult->num_rows() > 0){
+           
+           return TRUE;
+       }  else {
+           
+           return FALSE;
+       }
    }
 
 

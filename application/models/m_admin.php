@@ -32,7 +32,7 @@ class M_admin extends CI_Model{
     * @param type $email                    //E-mail
     * $power                                //11客服 12 平台管理 13 录入 14 审核 99超管 
     * 
-    * @return boolean                       //成功返回 1，失败返回 0，用户名存在返回 -1
+    * @return boolean                       //成功返回 id，失败返回 0，用户名存在返回 -1
     */
    public function create($cuid,$username,$password,$truename,$department,$phone,$email,$power){
        $isExist = $this->checkUsername($username);
@@ -54,7 +54,7 @@ class M_admin extends CI_Model{
        $this->db->insert('zx_admin',$sqlQuery);
        if($this->db->affected_rows() > 0){
            
-           return 1;
+           return $this->db->insert_id();
        }  else {
            
            return 0;
@@ -74,9 +74,9 @@ class M_admin extends CI_Model{
        $sqlQuery = array('status'=>0);
        
        $this->db->where('id',$uid);
-       $this->db->update('zx_admin',$sqlQuery);
+       $dbResult = $this->db->update('zx_admin',$sqlQuery);
        
-       if($this->db->affected_rows() > 0){
+       if($dbResult > 0){
            
            return TRUE;
        }  else {
@@ -88,17 +88,26 @@ class M_admin extends CI_Model{
    /**
     * 修改管理员信息
     * 
+    * 用户登录名不可以修改
     * @param type $uid                          //用户id
+    * @param type $$username                    //登录名
     * @param type $password                     //用户密码
     * @param type $truename                     //真实姓名，使用人
     * @param type $department                   //部门
     * @param type $phone                        //电话
     * @param type $email                        //E-mail
     * 
-    * @return boobean                       
+    * @return boobean                           成功 1，失败 0 ，已存在 -1
     */
-   public function update($uid,$password,$truename,$department,$phone,$power,$email){
+   public function update($uid,$username,$password,$truename,$department,$phone,$email,$power){
+       $isExist = $this->checkUsername($username,$uid);
+       if($isExist){
+           //用户名存在，返回-1
+           return -1;
+       }
+       
        $sqlQuery = array(
+           'username'=>$username,
            'password'=>$password,
            'truename'=>$truename,
            'department'=>$department,
@@ -107,13 +116,13 @@ class M_admin extends CI_Model{
            'email'=>$email
        );
        $this->db->where('id',$uid);
-       $this->db->update('zx_admin',$sqlQuery);
-       if($this->db->affected_rows() > 0){
+       $dbResult = $this->db->update('zx_admin',$sqlQuery);
+       if($dbResult > 0){
            
-           return TRUE;
+           return 1;
        }  else {
            
-           return false;
+           return 0;
        }
    }
    
@@ -148,6 +157,7 @@ class M_admin extends CI_Model{
            $this->db->where($sqlQuery,$key);
        }
        
+       $this->db->where('power <',99);      //查询除超管之外的管理员
        $this->db->where('status',1);        //查询没有被弃用的用户
        $this->db->select('id,username,password,truename,department,phone,power,email,cuid,ctime');
        $dbResult = $this->db->get('zx_admin',$limit,$offset);
@@ -214,10 +224,12 @@ class M_admin extends CI_Model{
     * 检验用户名是否存在
     * 存在，return true
     * 不存在，return false
+    * $_uid主要供修改使用，判断 所修改之后的username不能在其它id中出现，否则已存在
     * @param type $_username
     * @return boolean
     */
-   private function checkUsername($_username){
+   private function checkUsername($_username,$_uid = 0){
+       $this->db->where('id !=',$_uid);
        $this->db->where('username',$_username);
        $this->db->where('status',1);
        $this->db->select('id');

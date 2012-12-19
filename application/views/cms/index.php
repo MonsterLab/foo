@@ -5,20 +5,7 @@
 <title>中国经济网 信用频道</title>
 <link href="<?php echo base_url('include/css/client/index.css');?>" type="text/css" rel="stylesheet" />
 </head>
-
-<body>    
-    <?php
-        /**
-         * 弹出提示信息
-         */
-        if($flag != ''){
-            $base_url = base_url();
-            echo "<script>alert('{$flag}');window.location='{$base_url}search/step1/';</script>";
-            exit();
-        }
-        
-    ?>
-    
+<body>
 <div id="main">
 	<div id="top">
     	<div class="form">
@@ -59,5 +46,17 @@
         </ul>
     </div>
 </div>
+    
+    <?php
+        /**
+         * 弹出提示信息
+         */
+        if($flag != ''){
+            $base_url = base_url();
+            echo "<script>alert('{$flag}');window.location='{$base_url}search/step1/';</script>";
+            exit();
+        }
+        
+    ?>
 </body>
 </html>

@@ -1,0 +1,12 @@
+$(function(){
+	$(".showPic_button").toggle(function(){
+			$(this).prev("img").slideDown(1000);
+		},
+		function(){
+			$(this).prev("img").slideUp(1000);
+		}
+	);
+	$("img").dblclick(function(){
+		$(this).slideUp(1000);
+	});
+});

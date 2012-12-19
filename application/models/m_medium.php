@@ -45,7 +45,7 @@ class M_medium extends CI_Model{
     * 
     * @return bolean                                成功返回true ，失败返回 false                                   
     */
-   public function createCertBase($cuid,$uid,$com_name,$com_nature,$com_phone,$zipcode,$com_place,$industry_id,$cert_begin,$cert_end){
+   public function createCertBase($cuid,$uid,$com_name,$com_nature='',$com_phone='',$zipcode='',$com_place='',$industry_id=0,$cert_begin=0,$cert_end=0){
        $sqlQuery = array(
            'cuid'=>$cuid,
            'uid'=>$uid,
@@ -246,14 +246,14 @@ class M_medium extends CI_Model{
     public function searchCertFile($uid){
         $this->db->where('uid',$uid);
         $this->db->where('status',1);
-        $this->db->select('id,file_type_id,file_name,audit,audit_id,cuid,ctime');
+        $this->db->select('id,uid,file_type_id,file_name,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_medium_cert_file');
        
         if($dbResult->num_rows() > 0){
             foreach ($dbResult->result_array() as $row){
                 $result[] = $row;
             }
-
+            
             return $result;
         }  else {
 
@@ -269,7 +269,7 @@ class M_medium extends CI_Model{
     * @param type $_fileTypeId
     * @return boolean
     */
-   private function checkCertFile($_uid,$_fileTypeId){
+   public function checkCertFile($_uid,$_fileTypeId){
        $this->db->where('uid',$_uid);
        $this->db->where('file_type_id',$_fileTypeId);
        $this->db->where('status',1);
@@ -376,7 +376,7 @@ class M_medium extends CI_Model{
     public function searchCertContent($uid){
         $this->db->where('uid',$uid);
         $this->db->where('status',1);
-        $this->db->select('id,title,content,audit,audit_id,cuid,ctime');
+        $this->db->select('id,uid,title,content,audit,audit_id,cuid,ctime');
         $dbResult = $this->db->get('zx_medium_cert_content');
        
         if($dbResult->num_rows() > 0){

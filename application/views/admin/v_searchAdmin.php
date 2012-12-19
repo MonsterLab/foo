@@ -33,6 +33,9 @@
             if($admin['power'] == 14){
                 $state = '审核';
             }
+            if($admin['power'] == 99){
+                $state = '超级管理员';
+            }
             
             $html .= "<tr>";
             $html .= "<td align='center'>{$admin['username']}</td>";
@@ -40,7 +43,7 @@
             $html .= "<td align='center'>{$admin['department']}</td>";
             $html .= "<td align='center'>{$state}</td>";
             $html .= "<td align='center'>{$admin['ctime']}</td>";
-            $html .= "<td align='center'><a href='{$base_url}admin/createAdmin/{$admin['id']}/'><input type='button' value='修改'></a>   ";
+            $html .= "<td align='center'><a href='{$base_url}admin/updateAdmin/{$admin['id']}/'><input type='button' value='修改'></a>   ";
             $html .= "<a href='{$base_url}admin/deleteAdmin/{$admin['id']}/'><input type='button' value='删除'></a></td>";
             $html .= "</tr>";
         }

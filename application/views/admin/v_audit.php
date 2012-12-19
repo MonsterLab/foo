@@ -1,9 +1,5 @@
 <?php
     
-//    echo '<pre>';
-//    print_r($certFiles);
-//    echo '</pre>';
-    
     $base_url = base_url();
     
     if($userBases){
@@ -38,21 +34,45 @@
         echo "<h3>认证基本信息：</h3>";
         $cbHtml = "<table width='500'>";
         foreach ($certBases as $certBase){
-            $cbHtml .= "<tr>";
-            $cbHtml .= "<td width='200'>公司名称：{$certBase['com_name']}</td>";
-            $cbHtml .= "<td width='200'>单位性质：{$certBase['com_nature']}</td>";
-            $cbHtml .= "</tr>";
-            $cbHtml .= "<tr>";
-            $cbHtml .= "<td width='200'>行业类别：{$certBase['industry_name']}</td>";
-            $cbHtml .= "<td width='200'>单位电话：{$certBase['com_phone']}</td>";
-            $cbHtml .= "</tr>";
-            $cbHtml .= "<tr>";
-            $cbHtml .= "<td width='200'>邮政编码：{$certBase['zipcode']}</td>";
-            $cbHtml .= "<td width='200'>所在地址：{$certBase['com_place']}</td>";
-            $cbHtml .= "</tr>";
-            $cbHtml .= "<tr>";
-            $cbHtml .= "<td width='400'>征信期限：{$certBase['cert_begin']}-{$certBase['cert_end']}</td>";
-            $cbHtml .= "</tr>";
+            if($type == 'topic' || $type == 'medium'){
+                $cbHtml .= "<tr>";
+                $cbHtml .= "<td width='200'>认证法人名称：{$certBase['com_name']}</td>";
+                $cbHtml .= "<td width='200'>单位性质：{$certBase['com_nature']}</td>";
+                $cbHtml .= "</tr>";
+                $cbHtml .= "<tr>";
+                $cbHtml .= "<td width='200'>行业类别：{$certBase['industry_id']}</td>";
+                $cbHtml .= "<td width='200'>单位电话：{$certBase['com_phone']}</td>";
+                $cbHtml .= "</tr>";
+                $cbHtml .= "<tr>";
+                $cbHtml .= "<td width='200'>邮政编码：{$certBase['zipcode']}</td>";
+                $cbHtml .= "<td width='200'>所在地址：{$certBase['com_place']}</td>";
+                $cbHtml .= "</tr>";
+                $cbHtml .= "<tr>";
+                $cbHtml .= "<td width='400'>征信期限：{$certBase['cert_begin']}-{$certBase['cert_end']}</td>";
+                $cbHtml .= "</tr>";
+
+            }  else {
+                if($certBase['sex']){
+                    $sex = '男';
+                }  else {
+                    $sex = '女';
+                }
+                $cbHtml .= "<tr>";
+                $cbHtml .= "<td width='200'>认证法人名称：{$certBase['cert_name']}</td>";
+                $cbHtml .= "<td width='200'>性别：{$sex}</td>";
+                $cbHtml .= "</tr>";
+                $cbHtml .= "<tr>";
+                $cbHtml .= "<td width='200'>民族：{$certBase['nation']}</td>";
+                $cbHtml .= "<td width='200'>身份证号：{$certBase['personid']}</td>";
+                $cbHtml .= "</tr>";
+                $cbHtml .= "<tr>";
+                $cbHtml .= "<td width='200'>出生地：{$certBase['birth_place']}</td>";
+                $cbHtml .= "<td width='200'>现居地：{$certBase['live_place']}</td>";
+                $cbHtml .= "</tr>";
+                $cbHtml .= "<tr>";
+                $cbHtml .= "<td width='400'>征信期限：{$certBase['cert_begin']}-{$certBase['cert_end']}</td>";
+                $cbHtml .= "</tr>";
+            }
         }
         $cbHtml .= '</table><br>';
         

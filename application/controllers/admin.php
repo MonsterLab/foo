@@ -568,6 +568,7 @@ class Admin extends CI_Controller{
         }
         
         $data['handle'] = 'add';
+        $data['head'] = '添加';
         
         $this->load->view('admin/v_createUserBase',$data);
         $this->load->view('admin/v_createCertBase',$data);
@@ -849,6 +850,7 @@ class Admin extends CI_Controller{
         $data['noneShow4'] = 1;
         
         $data['handle'] = 'update';
+        $data['head'] = '修改';
         
         $this->load->view('admin/v_createUserBase',$data);
         $this->load->view('admin/v_createCertBase',$data);
@@ -983,7 +985,7 @@ class Admin extends CI_Controller{
         }
     }
 
-    public function updateCertFile($type,$uid,$fileId){
+    public function updateCertFile($fileId,$fileTypeId,$type,$uid){
         //权限设定
         $power = $this->admin->getPower();
         $powerArray = array(99);                 //超管
@@ -991,36 +993,41 @@ class Admin extends CI_Controller{
             redirect(base_url('admin/login/'));
         }
         
-        if($_POST){
-            $fooFilename = trim($this->input->post('filename'));
-            if($fooFilename == null){
-                $data['flag'] = "请完善信息！";
-                $this->load->view('admin/v_addCertFile',$data);
-                return;
-            
+        $fooFileTypes = $this->zxpool->searchFileType();
+        foreach ($fooFileTypes as $fooFileType){
+            if($fileTypeId == $fooFileType['id']){
+                $fileTypeName = $fooFileType['file_name'];
             }
+        }
+        $data['flag'] = '';
+        $data['fileId'] = $fileId;
+        $data['fileTypeId'] = $fileTypeId;
+        $data['fileTypeName'] = $fileTypeName;
+        $data['type'] = $type;
+        $data['uid'] = $uid;
+        
+        if($_POST){
+            
             $fooFile = $this->uploadpic('file');
             
             if($type == 'topic'){
-                $fooResult = $this->topic->updateCertFile($fileId,$fooFilename,$fooFile);
+                $fooResult = $this->topic->updateCertFile($fileId,$fileTypeId,$fooFile);
             }elseif ($type == 'medium') {
-                $fooResult = $this->medium->updateCertFile($fileId,$fooFilename,$fooFile);
+                $fooResult = $this->medium->updateCertFile($fileId,$fileTypeId,$fooFile);
             }elseif ($type == 'talent') {
-                $fooResult = $this->talent->updateCertFile($fileId,$fooFilename,$fooFile);
+                $fooResult = $this->talent->updateCertFile($fileId,$fileTypeId,$fooFile);
             }
             
-            if($fooResult == -1){
-                $data['flag'] = '已经上传该类型证书！';
-            } elseif ($fooResult == 0){
+            if ($fooResult == 0){
                 $data['flag'] = '上传失败！';
             } elseif ($fooResult == 1){
                 redirect(base_url("admin/showUpdateView/$uid"));
             }
             
-            $this->load->view('admin/v_addCertFile',$data);
+            $this->load->view('admin/v_updateCertFile',$data);
             
         }  else {
-           redirect(base_url("admin/showUpdateView/$uid"));
+           $this->load->view('admin/v_updateCertFile',$data);
         }
     }
     
@@ -1028,7 +1035,7 @@ class Admin extends CI_Controller{
      * 修改认证文字信息
      * 
      */
-    public function updateCertContent($type ,$uid ,$contentId){
+    public function updateCertContent($contentId,$type ,$uid ){
         //权限设定
         $power = $this->admin->getPower();
         $powerArray = array(99);                 //超管
@@ -1036,17 +1043,21 @@ class Admin extends CI_Controller{
             redirect(base_url('admin/login/'));
         }
         
+        
+        $data['flag'] = '';
+        $data['type'] = $type;
+        
         if($_POST){
             $fooTitle = trim($this->input->post('title'));
             $fooContent = $this->input->post('content');
             
             if($fooTitle == NULL || $fooContent == NULL){
                 $data['flag'] = "请完善信息！";
-                $this->load->view('admin/v_addCertContent',$data);
+                $this->load->view('admin/v_updateCertContent',$data);
                 return;
             }
-            
             if($type == 'topic'){
+                
                 $fooResult = $this->topic->updateCertContent($contentId,$fooTitle,$fooContent);
             }elseif ($type == 'medium') {
                 $fooResult = $this->medium->updateCertContent($contentId,$fooTitle,$fooContent);
@@ -1054,18 +1065,29 @@ class Admin extends CI_Controller{
                 $fooResult = $this->talent->updateCertContent($contentId,$fooTitle,$fooContent);
             }
             
-            if($fooResult == -1){
-                $data['flag'] = '已经存在此标题认证内容！';
-            } elseif ($fooResult == 0){
+            if (!$fooResult){
                 $data['flag'] = '更新失败！';
-            } elseif ($fooResult == 1){
-                redirect(base_url("admin/showLuruView/$uid"));
+            } elseif ($fooResult){
+                redirect(base_url("admin/showUpdateView/$uid"));
             }
             
-            $this->load->view('admin/v_addCertContent',$data);
+            $this->load->view('admin/v_updateCertContent',$data);
             
         }  else {
-            redirect(base_url("admin/showLuruView/$uid"));
+            //显示现有信息
+            if($type == 'topic'){
+                $fooCertContent = $this->topic->searchCertContent($uid);
+            }
+            if($type == 'medium'){
+                $fooCertContent = $this->medium->searchCertContent($uid);
+            }
+            if($type == 'talent'){
+                $fooCertContent = $this->talent->searchCertContent($uid);
+            }
+
+            $data['certContent'] = $fooCertContent;
+            
+            $this->load->view('admin/v_updateCertContent',$data);
         }
     }
     
@@ -1123,9 +1145,6 @@ class Admin extends CI_Controller{
                 }
            }
            
-           if(!$fooResult){
-               
-           }
         }
         //以下为 显示审核信息
         $fooUserBases = $this->userbase->search($uid,3);                    //按id搜索,获得客户基本信息

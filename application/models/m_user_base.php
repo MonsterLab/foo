@@ -118,8 +118,8 @@ class M_user_base extends CI_Model{
            'type'=>$type
        );
        $this->db->where('id',$uid);
-       $this->db->update('zx_user_base',$sqlQuery);
-       if($this->db->affected_rows() > 0){
+       $dbUpdate = $this->db->update('zx_user_base',$sqlQuery);
+       if($dbUpdate > 0){
            
            return 1;
        }  else {

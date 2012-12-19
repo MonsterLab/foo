@@ -119,8 +119,8 @@ class M_talent extends CI_Model{
            'cert_end'=>$cert_end,
        );
        $this->db->where('id',$baseId);
-       $this->db->update('zx_talent_cert_base',$sqlQuery);
-       if($this->db->affected_rows() > 0){
+       $dbUpdate = $this->db->update('zx_talent_cert_base',$sqlQuery);
+       if($dbUpdate > 0){
            
            return TRUE;
        }  else {
@@ -355,9 +355,9 @@ class M_talent extends CI_Model{
            'content'=>$content
        );
        $this->db->where('id',$id);
-       $this->db->update('zx_talent_cert_content',$sqlQuery);
+       $dbUpdate = $this->db->update('zx_talent_cert_content',$sqlQuery);
        
-       if($this->db->affected_rows() > 0){
+       if($dbUpdate > 0){
            
            return true;
        }  else {

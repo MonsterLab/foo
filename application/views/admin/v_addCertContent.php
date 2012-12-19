@@ -1,13 +1,14 @@
-<div>
-    <h2>添加认证文字类信息</h2>
-</div>
 <?php
     $base_url = base_url();
     if($flag != ''){
         echo $flag;
         exit();
     }
-?>  
+?> 
+<div>
+    <h2><?= $head?>认证文字类信息</h2>
+</div>
+ 
 
 <div>
     
@@ -19,7 +20,11 @@
                 $cfHtml .= "<tr>";
                 $cfHtml .= "<td width='200'>标题：{$certContent['title']}</td>";
                 $cfHtml .= "<td width='200'>";
-                $cfHtml .= "<input type='button' class='showPic_button' value='查看'>";
+                
+                if($handle == 'update'){
+                    $cfHtml .= "<a href='{$base_url}admin/updateCertContent/{$certContent['id']}/{$type}/{$uid}'><input type='button' value='查看'></a>";
+                    $cfHtml .= "<a href='{$base_url}admin/updateCertContent/{$certContent['id']}/{$type}/{$uid}'><input type='button' value='修改'></a>";
+                }
                 $cfHtml .= "</td>";
                 $cfHtml .= "</tr>";
             }
@@ -29,6 +34,7 @@
         }
     ?>
 </div>
+<?php if($handle == 'add'){?>
 <div>
     <form action="<?php echo base_url("admin/addCertContent/$type/{$uid}") ?>" method='post'>
         <p>
@@ -57,3 +63,4 @@
         </p>    
     </form>
 </div>    
+<?php }?>

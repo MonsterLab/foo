@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-        <script type="text/javascript" src="<?= base_url()?>js/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="<?= base_url()?>js/jquery-1.3.1.min.js"></script>
         
         <link type="text/css" href="<?= base_url()?>include/css/datepicker/jquery-ui-1.8.16.custom.css" rel="stylesheet" />	
         <link type="text/css" href="<?= base_url()?>include/css/datepicker/jquery.ui.slider.css" rel="stylesheet" />	
@@ -20,18 +20,21 @@
 	</script>
 </head>
 <body>
-
-
-
-<div>
-    <h2>添加认证基本信息</h2>
-</div>
-
 <?php
     $base_url = base_url();
     if($flag != ''){
-        exit($flag);
+        echo $flag;
+        exit();
     }
+?>  
+
+
+<div>
+    <h2><?= $head?>认证基础信息</h2>
+</div>
+
+<?php
+    
     if($handle == 'add'){
         echo "<form action='{$base_url}admin/createCertBase/{$type}/{$uid}' method ='post'>";
     }  else {

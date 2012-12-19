@@ -1,17 +1,20 @@
-<div>
-    <h2>添加用户基本信息</h2>
-</div>
-
 <?php
     $base_url = base_url();
     if($flag != ''){
-        exit($flag);
+        echo $flag;
+        exit();
     }
-    
+?>  
+
+<div>
+    <h2><?= $head?>用户基本信息</h2>
+</div>
+
+<?php
     //添加、修改共用
     if($handle == 'add'){
         echo "<form action='{$base_url}admin/createUserBase/{$uid}/{$zxcode}' method ='post'>";
-    }  else {
+    }  elseif($handle == 'update') {
         echo "<form action='{$base_url}admin/updateUserBase/{$uid}/' method ='post'>";
     }
 ?>        

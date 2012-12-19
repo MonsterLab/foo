@@ -6,7 +6,7 @@
 <link href="<?php echo base_url('include/css/client/index.css');?>" type="text/css" rel="stylesheet" />
 </head>
 
-<body>
+<body>    
     <?php
         /**
          * 弹出提示信息

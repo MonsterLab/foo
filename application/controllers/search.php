@@ -47,7 +47,6 @@ class Search extends CI_Controller{
             if($fooZxcode == NULL){  
                 $data['flag'] = '请完善信息！';
                 $this->load->view('cms/index',$data);
-                //$this->load->view('search/step1',$data);
                 return;
             }
             $fooUserBase = $this->userbase->search($fooZxcode,1);

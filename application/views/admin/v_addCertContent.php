@@ -1,3 +1,6 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+</head>
 <?php
     $base_url = base_url();
     if($flag != ''){

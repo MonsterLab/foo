@@ -135,7 +135,7 @@ class Search extends CI_Controller{
             
         }  else {
             
-            redirect(base_url('search/index'));
+            redirect(base_url('cms/index'));
         }
     }
     

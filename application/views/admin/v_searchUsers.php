@@ -1,3 +1,6 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+</head>
 <div>
     <h2><?= $head;?></h2>
 </div>

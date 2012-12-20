@@ -11,7 +11,7 @@ class Space extends CI_Controller{
         $this->load->library('Page');
     }
     
-    public function index($uid = 2){
+    public function index($uid){
         $column = $this->getContentOfColumn($uid);
         $nav = $this->echoMenu($uid);
         $username = $this->getUsername($uid);
@@ -400,16 +400,22 @@ class Space extends CI_Controller{
     
     
     public function edit($space_uid){
+        $power = $this->userbase->getPower();
+        if(!$power){
+            redirect(base_url('space/login/'));
+        }
         $nav = $this->echoMenu($space_uid);
         $username = $this->getUsername($space_uid);
-        
-        
         $uid = $space_uid;
         $space_status = 1;
         $uidadmin = 0;          // get all groups
         $space_groups = $this->space->getAllSGroups($uidadmin, $space_status);
         $data['space_groups'] = $space_groups;
         $data['uid'] = $uid;
+        $data['uid'] = $space_uid;
+        $data['username'] = $username;
+        $data['nav'] = $nav['subPage']; 
+        $data['footer'] = '版权所有&copy;中国经济网';
         if(isset($_POST['sub'])){
             $space_groupid = $this->input->post('space_gid');
             $space_title = $this->input->post('space_title');
@@ -422,10 +428,12 @@ class Space extends CI_Controller{
 
             if($result){
                 $data['flag'] = 1;
-                $data['message'] = '添加成功';    
+                $data['message'] = '添加成功,等待管理员审核后可显示';    
                 $data['space_gid'] = $space_groupid;
 
-                $this->load->view('admin/v_createSArticle', $data);
+                $this->load->view('space/v_header', $data);
+                $this->load->view('space/v_edit', $data);
+                $this->load->view('space/v_footer', $data);
             } else {
                 $data['flag'] = 0;
                 $data['message'] = '添加失败';
@@ -433,22 +441,15 @@ class Space extends CI_Controller{
                 $data['title'] = $title;
                 $data['content'] = $content;
 
-                $this->load->view('admin/v_createSArticle', $data);
+                $this->load->view('space/v_header', $data);
+                $this->load->view('space/v_edit', $data);
+                $this->load->view('space/v_footer', $data);
             }
 
-        } else { //if the admin don't position at a user            
-            $this->load->view('admin/v_createSArticle', $data);
+        } else {         
+            $this->load->view('space/v_header', $data);
+            $this->load->view('space/v_edit', $data);
+            $this->load->view('space/v_footer', $data);
         }
-        
-        
-        
-        $data['uid'] = $space_uid;
-        $data['username'] = $username;
-        $data['nav'] = $nav['subPage']; 
-        $data['footer'] = '版权所有&copy;中国经济网';
-        
-        $this->load->view('space/v_header', $data);
-        $this->load->view('space/v_edit', $data);
-        $this->load->view('space/v_footer', $data);
     }
 }

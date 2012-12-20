@@ -1,6 +1,6 @@
         <div id="content">
             <div id="createArticle">
-            <form action="<?php echo base_url('admin/createSArticle?uid='.$uid) ?>" method="post">
+            <form action="<?php echo base_url('space/edit/'.$uid) ?>" method="post">
                 <?php 
                     if(isset($flag)){
                         echo '<p>'.$message.'</p>';

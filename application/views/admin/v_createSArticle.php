@@ -43,7 +43,6 @@
                     <?
                         $this->load->helper('form_helper');
                         $url = base_url('include/fckeditor').'/';
-                        echo $url;
                         $data = array(
                                       'name'        => 'space_content',
                                       'id'          => 'content',

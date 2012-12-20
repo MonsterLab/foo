@@ -42,6 +42,10 @@ class Search extends CI_Controller{
             'zxcode' => 0,
             'com_name' => 'unknown'            
         );
+        $nav = $this->echoMenu();
+        $data['nav'] = $nav['subPage'];
+        $data['footer'] = '版权所有&copy中国经济网';
+        
         if($_POST){
             $fooZxcode = $this->input->post('zxcode');
             if($fooZxcode == NULL){  
@@ -82,10 +86,7 @@ class Search extends CI_Controller{
             $data['userBases'] = $fooUserBase;
             $data['zxcode'] = $fooZxcode;
             
-            $nav = $this->echoMenu();
-            $data['nav'] = $nav['subPage'];
-            $data['footer'] = '版权所有&copy中国经济网';
-
+            
             $this->load->view('cms/v_header', $data);
             $this->load->view('search/step2',$data);
             $this->load->view('cms/v_footer', $data);
@@ -105,6 +106,9 @@ class Search extends CI_Controller{
             'zxcode' => 0,
             'com_name' => 'unknown'
         );
+         $nav = $this->echoMenu();
+        $data['nav'] = $nav['subPage'];
+        $data['footer'] = '版权所有&copy中国经济网';
         
         if($_POST){
             $data['zxcode'] = $this->input->post('zxcode');
@@ -112,7 +116,9 @@ class Search extends CI_Controller{
             
             if($data['sqcode'] == NULL){
                 $data['flag'] = '请完善信息！';
+                $this->load->view('cms/v_header', $data);
                 $this->load->view('search/step2',$data);
+                $this->load->view('cms/v_footer', $data);
                 return;
             }
             $fooUserBases = $this->userbase->search($data['zxcode'],1);
@@ -125,7 +131,9 @@ class Search extends CI_Controller{
             
             if($fooSqcode != $data['sqcode']){
                 $data['flag'] = '授权码错误！';
+                $this->load->view('cms/v_header', $data);
                 $this->load->view('search/step2',$data);
+                $this->load->view('cms/v_footer', $data);
                 return;
             }
             
@@ -221,25 +229,6 @@ class Search extends CI_Controller{
 
             $fooCertContent = $this->talent->searchCertContent($uid);
         }
-//        echo $type;
-//        
-//        echo "<pre>";
-//        print_r($fooUserBases);
-//        echo "</pre>";
-//        
-//        echo "<pre>";
-//        print_r($fooCertBases);
-//        echo "</pre>";
-//        
-//        echo "<pre>";
-//        print_r($fooCertFiles);
-//        echo "</pre>";
-//        
-//        echo "<pre>";
-//        print_r($fooCertContent);
-//        echo "</pre>";
-//        
-//        exit();
 
         $data['type'] = $type;
         $data['uid'] = $uid;

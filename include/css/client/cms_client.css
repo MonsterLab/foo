@@ -172,9 +172,8 @@ ul, ol{
 /*article end*/
 /*游客查询*/
 #infoList_two{
-    width: 968px;
     min-height: 528px;
-    padding-left:  30px;
+    padding :0 30px;
     border:1px solid #ccc;
     position: relative;
     background:#d9dfef;

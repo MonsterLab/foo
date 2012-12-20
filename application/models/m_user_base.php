@@ -361,9 +361,10 @@ class M_user_base extends CI_Model{
     * @return boolean
     */
    public function getPower(){
+       
        if(isset($_SESSION['user'])){
-           if(empty($_SESSION['user']['id'])){
-               
+           if(!empty($_SESSION['user']['id'])){
+
                return TRUE;
            }  else {
                

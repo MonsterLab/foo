@@ -56,7 +56,7 @@ h1,h2,h3,h4,h5,h6{font-size:100%;}
 <body>
 
     
-<form action="" method="post">
+<form action="<?php echo base_url('space/login') ?>" method="post">
 	<div class="loginPanel">
 		<div class="x-box-tl">
 			<div class="x-box-tr">

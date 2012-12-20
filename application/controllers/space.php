@@ -11,7 +11,10 @@ class Space extends CI_Controller{
         $this->load->library('Page');
     }
     
-    public function index($uid){
+    public function index($uid =0){
+        if($uid <= 0){
+            redirect(base_url('space/login/'));
+        }
         $column = $this->getContentOfColumn($uid);
         $nav = $this->echoMenu($uid);
         $username = $this->getUsername($uid);
@@ -162,7 +165,11 @@ class Space extends CI_Controller{
      */
     public function login(){
         $data['flag'] = ''; 
+        
         if($_POST){
+            $uid = 0;
+            print_r($_POST);
+                //echo '<script> alert("'.base_url("space/index/".$uid).'");</script>';
             $username = trim($this->input->post('username'));
             $userpassword = trim($this->input->post('password'));
             
@@ -185,7 +192,10 @@ class Space extends CI_Controller{
                 return;
             }
             if($fooLogin == 1){
-                redirect(base_url("space/index/"));
+                
+                $uid = $_SESSION['user']['id'];
+                
+                redirect(base_url("space/index/".$uid));
             } 
             
             return;

@@ -54,7 +54,7 @@
          */
         if(isset($flag) && $flag != ''){
             $base_url = base_url();
-            echo "<script>alert('{$flag}');window.location='{$base_url}search/step1/';</script>";
+            echo "<script>alert('{$flag}');window.location='{$base_url}cms/index/';</script>";
             exit();
         }
         

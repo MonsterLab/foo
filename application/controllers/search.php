@@ -11,6 +11,8 @@ class Search extends CI_Controller{
         $this->load->model('M_talent','talent');            //人才
         $this->load->model('M_topic','topic');              //主体
         $this->load->model('M_medium','medium');            //中介
+        $this->load->model('M_cms','cms');
+        $this->load->library('Page');
     }
     
     public function index(){
@@ -45,7 +47,6 @@ class Search extends CI_Controller{
             if($fooZxcode == NULL){  
                 $data['flag'] = '请完善信息！';
                 $this->load->view('cms/index',$data);
-                //$this->load->view('search/step1',$data);
                 return;
             }
             $fooUserBase = $this->userbase->search($fooZxcode,1);
@@ -80,12 +81,21 @@ class Search extends CI_Controller{
             
             $data['userBases'] = $fooUserBase;
             $data['zxcode'] = $fooZxcode;
+            
+            $nav = $this->echoMenu();
+            $data['nav'] = $nav['subPage'];
+            $data['footer'] = '版权所有&copy中国经济网';
+
+            $this->load->view('cms/v_header', $data);
             $this->load->view('search/step2',$data);
+            $this->load->view('cms/v_footer', $data);
+            
+            
             
             
         }  else {#end of post
             
-            $this->load->view('cms/index',$data);
+            redirect(base_url('cms/index/'));
         }
     }
     
@@ -105,79 +115,26 @@ class Search extends CI_Controller{
                 $this->load->view('search/step2',$data);
                 return;
             }
-            $fooUserBase = $this->userbase->search($data['zxcode'],1);
+            $fooUserBases = $this->userbase->search($data['zxcode'],1);
             
-            if($fooUserBase == FALSE){
-                redirect(base_url('search/index'));
+            if($fooUserBases == FALSE){
+                redirect(base_url('cms/index'));
             }
-            $fooSqcode = $fooUserBase[0]['sq_code'];
-            $type = $fooUserBase['0']['type'];
-            $uid = $fooUserBase['0']['id'];
+            $fooSqcode = $fooUserBases[0]['sq_code'];
+            $uid = $fooUserBases['0']['id'];
             
             if($fooSqcode != $data['sqcode']){
                 $data['flag'] = '授权码错误！';
                 $this->load->view('search/step2',$data);
                 return;
             }
-            //topic、medium、talent 
-            $fooUserBases = $this->userbase->search($uid,3);                    //按id搜索,获得客户基本信息
-            if($type == 'topic'){
-                $fooCertBase = $this->topic->searchCertBase($uid);             //获得认证基本信息
-                $fooCertBases = $this->turnIndustryidtoName($fooCertBase);
-
-                $fooCertFile = $this->topic->searchCertFile($uid);             //获得认证扫描信息
-                $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
-
-                $fooCertContent = $this->topic->searchCertContent($uid);        //获得认证文字类信息
-            }
-            if($type == 'medium'){
-                $fooCertBase = $this->medium->searchCertBase($uid);             //获得认证基本信息
-                $fooCertBases = $this->turnIndustryidtoName($fooCertBase);
-
-                $fooCertFile = $this->medium->searchCertFile($uid);             //获得认证扫描信息
-                $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
-
-                $fooCertContent = $this->medium->searchCertContent($uid);
-            }
-            if($type == 'talent'){
-                $fooCertBases = $this->talent->searchCertBase($uid);             //获得认证基本信息
-
-                $fooCertFile = $this->talent->searchCertFile($uid);             //获得认证扫描信息
-                $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
-
-                $fooCertContent = $this->talent->searchCertContent($uid);
-            }
-    //        echo $type;
-    //        
-    //        echo "<pre>";
-    //        print_r($fooUserBases);
-    //        echo "</pre>";
-    //        
-    //        echo "<pre>";
-    //        print_r($fooCertBases);
-    //        echo "</pre>";
-    //        
-    //        echo "<pre>";
-    //        print_r($fooCertFiles);
-    //        echo "</pre>";
-    //        
-    //        echo "<pre>";
-    //        print_r($fooCertContent);
-    //        echo "</pre>";
-    //        
-    //        exit();
-
-
-            $data['userBases'] = $fooUserBases;
-            $data['certBases'] = $fooCertBases;
-            $data['certFiles'] = $fooCertFiles;
-            $data['certContents'] = $fooCertContent;
             
-            $this->load->view('search/step2res',$data);
+            $this->showUserInfos($uid);
+            
             
         }  else {
             
-            redirect(base_url('search/index'));
+            redirect(base_url('cms/index'));
         }
     }
     
@@ -226,35 +183,164 @@ class Search extends CI_Controller{
         } 
         
     }
-//    public function showUserInfos(){
+    
+    
+    public function showUserInfos($uid){
+        $data = array(
+            'flag'=>'',
+            'zxcode' => 0,
+            'com_name' => 'unknown'
+        );
+        
+        $fooUserBases = $this->userbase->search($uid,3);
+        $type = $fooUserBases[0]['type'];
+        //topic、medium、talent 
+        if($type == 'topic'){
+            $fooCertBase = $this->topic->searchCertBase($uid);             //获得认证基本信息
+            $fooCertBases = $this->turnIndustryidtoName($fooCertBase);
+
+            $fooCertFile = $this->topic->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
+
+            $fooCertContent = $this->topic->searchCertContent($uid);        //获得认证文字类信息
+        }
+        if($type == 'medium'){
+            $fooCertBase = $this->medium->searchCertBase($uid);             //获得认证基本信息
+            $fooCertBases = $this->turnIndustryidtoName($fooCertBase);
+
+            $fooCertFile = $this->medium->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
+
+            $fooCertContent = $this->medium->searchCertContent($uid);
+        }
+        if($type == 'talent'){
+            $fooCertBases = $this->talent->searchCertBase($uid);             //获得认证基本信息
+
+            $fooCertFile = $this->talent->searchCertFile($uid);             //获得认证扫描信息
+            $fooCertFiles = $this->turnFileTypeidtoName($fooCertFile);
+
+            $fooCertContent = $this->talent->searchCertContent($uid);
+        }
+//        echo $type;
 //        
-//        if($fooType == 'topic'){
-//            $fooBase = $this->topic->searchCertBase($fooUID);
-//            $fooContent = $this->topic->searchCertContent($fooUID);
-//            $fooFile = $this->topic->searchCertFile($fooUID);
-//
-//        }
-//        if($fooType == 'medium'){
-//
-//            $fooBase = $this->medium->searchCertBase($fooUID);
-//            $fooContent = $this->medium->searchCertContent($fooUID);
-//            $fooFile = $this->medium->searchCertFile($fooUID);
-//
-//        }           
-//        if($fooType == 'talent'){
-//            $fooBase = $this->talent->searchCertBase($fooUID);
-//            $fooContent = $this->talent->searchCertContent($fooUID);
-//            $fooFile = $this->talent->searchCertFile($fooUID);
-//
-//        }           
-//
-//        $data['userBases'] = $fooUserBase;
-//        $data['certBases'] = $fooBase;
-//        $data['certContents'] = $fooContent;
-//        $data['certFiles'] = $fooFile;
-//
-//        $this->load->view('search/step2res',$data);
-//    }
+//        echo "<pre>";
+//        print_r($fooUserBases);
+//        echo "</pre>";
+//        
+//        echo "<pre>";
+//        print_r($fooCertBases);
+//        echo "</pre>";
+//        
+//        echo "<pre>";
+//        print_r($fooCertFiles);
+//        echo "</pre>";
+//        
+//        echo "<pre>";
+//        print_r($fooCertContent);
+//        echo "</pre>";
+//        
+//        exit();
+
+        $data['type'] = $type;
+        $data['uid'] = $uid;
+        $data['userBases'] = $fooUserBases;
+        $data['certBases'] = $fooCertBases;
+        $data['certFiles'] = $fooCertFiles;
+        $data['certContents'] = $fooCertContent;
+
+        $nav = $this->echoMenu();
+        $data['nav'] = $nav['subPage'];
+        $data['footer'] = '版权所有&copy中国经济网';
+
+        $this->load->view('cms/v_header', $data);
+        $this->load->view('search/step2res',$data);
+        $this->load->view('cms/v_footer', $data);
+        
+    }
+    
+    public function showContent($type,$uid){
+        if($type == 'topic'){
+            $fooCertContent = $this->topic->searchCertContent($uid);
+        }
+        if($type == 'medium'){
+            $fooCertContent = $this->medium->searchCertContent($uid);
+        }
+        if($type == 'talent'){
+            $fooCertContent = $this->talent->searchCertContent($uid);
+        }
+        $data['title'] = $fooCertContent[0]['title'];
+        $data['content'] = $fooCertContent[0]['content'];
+        $data['uid'] = $uid;
+        
+        $nav = $this->echoMenu();
+        $data['nav'] = $nav['subPage'];
+        $data['footer'] = '版权所有&copy中国经济网';
+
+        $this->load->view('cms/v_header', $data);
+        $this->load->view('search/v_showContent',$data);
+        $this->load->view('cms/v_footer', $data);
+        
+    }
+    
+    private function getGuide($gid, $groups){
+        $guide = '<ul class="sub">';
+        foreach ($groups as $father){
+            if($father['groupfather_id'] == $gid){
+                $guide .= '<li><a href="'.  base_url('cms/showList/'.$father['group_url'].'/'.$father['gid']).'">'.$father['group_name'].'</a></li>';
+                $this->getGuide($father['gid'], $groups);
+            }
+        }
+        $guide .= '</ul>';
+        if($guide == '<ul></ul>'){
+            return '';
+        }
+        
+        return $guide;
+    }
+    private function echoMenu(){
+        $uid = 0;
+        $status = 1;
+        $groups = $this->cms->getAllGroups($uid, $status);
+        $fatherGid = 0;
+        // search for father 
+        foreach ($groups as $father){
+            if($father['group_name'] == '首页'){
+                $fatherGid = $father['gid'];
+                break;
+            }
+        }
+        
+        //添加相反了之后把数组倒置
+        $groupsCopy;
+        for($i = count($groups) - 1; $i >= 0; $i--){
+            $groupsCopy[] = $groups[$i];
+        }
+        $groups = $groupsCopy;
+        $guideIndex = '';
+        $guideSub = '';  
+        $indexguideHead = '<ul id="guide">';
+        $subguideHead = '<ul class="daohang">';
+        foreach ($groups as $father){
+            if($father['groupfather_id'] == $fatherGid){
+                $guideIndex .= '<li><a href="'.base_url('cms/showList/'.$father['group_url'].'/'.$father['gid']).'">'.$father['group_name'].'</a></li>';
+                $guideSub .= '<li class="main"><a href="'.base_url('cms/showList/'.$father['group_url'].'/'.$father['gid']).'">'.$father['group_name'].'</a>';
+                $guideSub .= $this->getGuide($father['gid'], $groups);
+                $guideSub .= '</li>';
+            }
+        }
+        $guideEnd = '<li><a href="'.base_url('space/login').'">用户登录</a></li>';
+        $guideEnd .='<li class="returnI"><a href="'.base_url('cms/index').'">返回平台首页</a></li>';
+        $guideEnd .= '</ul>';
+        
+        $indexPage = $indexguideHead.$guideIndex.$guideEnd;
+        $subPage = $subguideHead.$guideSub.$guideEnd;
+        $data = array(
+            'index' => $indexPage,
+            'subPage' => $subPage
+        );
+        
+        return $data;
+    }
     
 }
 

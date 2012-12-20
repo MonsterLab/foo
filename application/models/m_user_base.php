@@ -161,7 +161,7 @@ class M_user_base extends CI_Model{
     * 
     * @return array                     //成功返回数组，失败返回false
     */
-   public function search($key = '',$method = 0 ,$limit = 10,$offset = 0,$isStatus = true){
+   public function search($key = '',$method = 0 ,$limit = 10,$offset = 0,$isStatus = true,$type = ''){
        
        //若关键字不为空，设置查询条件
        if($key != ''){
@@ -178,9 +178,21 @@ class M_user_base extends CI_Model{
             if($method == 3){
                 $sqlQuery = 'id';            //用户id查询
             }
+            if($method == 4){                   //创建
+                $sqlQuery = 'cuid';
+            }
+            if($method == 5){                   //审核
+                $sqlQuery = 'audit_id';
+            }
             
            $this->db->where($sqlQuery,$key);
+           
+           //这是配合$method=4、5使用，查询出该类行的，自己创造或者审核的用户
+           if($type != ''){
+               $this->db->where('type',$type);
+           }
        }
+       
        if(!($limit == 'end' && $offset == 'start')){
            $this->db->limit($limit,$offset);
        }
@@ -188,6 +200,7 @@ class M_user_base extends CI_Model{
             $this->db->where('status',1);        //查询没有被弃用的用户
        }
        $this->db->select('id,zx_code,sq_code,username,password,truename,position,phone,email,type,space_id,audit,audit_id,cuid,ctime');
+       $this->db->order_by('id','desc');
        $dbResult = $this->db->get('zx_user_base');
        if($dbResult->num_rows() > 0){
            foreach ($dbResult->result_array() as $row){

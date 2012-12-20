@@ -1,3 +1,6 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+</head>
 <div>
     <h2><?= $head;?></h2>
 </div>
@@ -40,5 +43,7 @@
         $html .= "<td align='center'><a href='{$link}'><input type='button' value='{$handle}'></a></td>";
         $html .= "</tr>";
     }
+    $html .= "</table>";
     echo $html;
+    echo $pageBar;
     

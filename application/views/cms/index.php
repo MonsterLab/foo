@@ -6,6 +6,17 @@
 <link href="<?php echo base_url('include/css/client/index.css');?>" type="text/css" rel="stylesheet" />
 </head>
 <body>
+    <?php
+        /**
+         * 弹出提示信息
+         */
+        if(isset($flag) && $flag != ''){
+            $base_url = base_url();
+            echo "<script>alert('{$flag}');window.location='{$base_url}cms/index/';</script>";
+            exit();
+        }
+        
+    ?>
 <div id="main">
 	<div id="top">
     	<div class="form">
@@ -48,16 +59,6 @@
     </div>
 </div>
     
-    <?php
-        /**
-         * 弹出提示信息
-         */
-        if(isset($flag) && $flag != ''){
-            $base_url = base_url();
-            echo "<script>alert('{$flag}');window.location='{$base_url}search/step1/';</script>";
-            exit();
-        }
-        
-    ?>
+    
 </body>
 </html>

@@ -245,8 +245,13 @@ class M_medium extends CI_Model{
     * @param type $uid
     * @return boolean
     */
-    public function searchCertFile($uid,$isStatus = TRUE){
-        $this->db->where('uid',$uid);
+    public function searchCertFile($key,$isStatus = TRUE,$method = 0){
+        if($method == 0){
+            $this->db->where('uid',$key);
+        }
+        if($method == 1){
+            $this->db->where('id',$key);
+        }
         if($isStatus){
             $this->db->where('status',1);
         } 
@@ -377,8 +382,13 @@ class M_medium extends CI_Model{
     * @param type $uid
     * @return boolean
     */
-    public function searchCertContent($uid,$isStatus = TRUE){
-        $this->db->where('uid',$uid);
+    public function searchCertContent($key,$isStatus = TRUE,$method = 0){
+        if($method == 0){
+            $this->db->where('uid',$key);
+        }
+        if($method == 1){
+            $this->db->where('id',$key);
+        }
         if($isStatus){
             $this->db->where('status',1);
         } 

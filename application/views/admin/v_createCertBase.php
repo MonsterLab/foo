@@ -65,12 +65,12 @@
         公司所在地：<input type='text' name='com_place' value='<?php echo $certBases[0]['com_place']?>'><br>
         征信开始时间：<input type='text' id='cert_begin' name='cert_begin' value='<?php echo $certBases[0]['cert_begin']?>'><br>
         征信结束时间：<input type='text' id='cert_end' name='cert_end' value='<?php echo $certBases[0]['cert_end']?>'><br>
-        
 <?php
 }  else {
  ?> 
         客户名：<input type='text' name='cert_name' value='<?php echo $certBases[0]['cert_name']?>'><br>
-        性别：<input type='radio' name='sex' value="1" <?php if($certBases[0]['sex']){echo 'checked';}?>/>男<input type='radio' name='sex' value ="0" <?php if(!$certBases[0]['sex']){echo 'checked';}?>>女<br><br>
+        性别：<input type='radio' id="male" name='sex' value="1" <?php if($certBases[0]['sex']){echo 'checked';}?>/><label for="male">男</label>
+            <input type='radio' id="female" name='sex' value ="0" <?php if(!$certBases[0]['sex']){echo 'checked';}?>><label for="female">女</label><br><br>
         民族：<input type='text' name='nation' value='<?php echo $certBases[0]['nation']?>'><br>
         身份证：<input type='text' name='personid' value='<?php echo $certBases[0]['personid']?>'><br>
         出生地：<input type='text' name='birth_place' value='<?php echo $certBases[0]['birth_place']?>'><br>

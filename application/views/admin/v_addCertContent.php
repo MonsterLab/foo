@@ -1,3 +1,6 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+</head>
 <?php
     $base_url = base_url();
     if($flag != ''){
@@ -25,6 +28,8 @@
                 if($handle == 'update'){
                     $cfHtml .= "<a href='{$base_url}admin/updateCertContent/{$certContent['id']}/{$type}/{$uid}'><input type='button' value='查看'></a>";
                     $cfHtml .= "<a href='{$base_url}admin/updateCertContent/{$certContent['id']}/{$type}/{$uid}'><input type='button' value='修改'></a>";
+                }elseif ($handle == 'add') {
+                    $cfHtml .= "<a href='{$base_url}admin/showContent/{$type}/{$uid}'><input type='button' value='查看'></a>";
                 }
                 $cfHtml .= "</td>";
                 $cfHtml .= "</tr>";

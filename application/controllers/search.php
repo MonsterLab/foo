@@ -119,7 +119,7 @@ class Search extends CI_Controller{
             $fooUserBases = $this->userbase->search($data['zxcode'],1);
             
             if($fooUserBases == FALSE){
-                redirect(base_url('search/index'));
+                redirect(base_url('cms/index'));
             }
             $fooSqcode = $fooUserBases[0]['sq_code'];
             $uid = $fooUserBases['0']['id'];

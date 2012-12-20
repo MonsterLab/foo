@@ -42,11 +42,12 @@
                     <label for="content">文章内容</label>
                     <?
                         $this->load->helper('form_helper');
+                        $url = base_url('include/fckeditor').'/';
                         $data = array(
                                       'name'        => 'content',
                                       'id'          => 'content',
                                       'toolbarset'  => 'Default',
-                                      'basepath'    => '/workspace/foo/include/fckeditor/',
+                                      'basepath'    => $url,
                                       'width'       => '80%',
                                       'height'      => '500'
                             );

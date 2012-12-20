@@ -1,11 +1,5 @@
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <link href="<?php echo base_url("include/css/admin.css");?>" type="text/css" rel="stylesheet"/>
-        <title></title>
-    </head>
-    <body id="createArticle-body">
-        <div id="createArticle">
+        <div id="content">
+            <div id="createArticle">
             <form action="<?php echo base_url('admin/createSArticle?uid='.$uid) ?>" method="post">
                 <?php 
                     if(isset($flag)){
@@ -42,13 +36,11 @@
                     <label for="content">文章内容</label>
                     <?
                         $this->load->helper('form_helper');
-                        $url = base_url('include/fckeditor').'/';
-                        echo $url;
                         $data = array(
                                       'name'        => 'space_content',
                                       'id'          => 'content',
                                       'toolbarset'  => 'Default',
-                                      'basepath'    => $url,
+                                      'basepath'    => '/workspace/foo/include/fckeditor/',
                                       'width'       => '80%',
                                       'height'      => '500'
                             );
@@ -61,5 +53,4 @@
                 </p>
             </form>            
         </div>
-    </body>
-</html>
+     </div>

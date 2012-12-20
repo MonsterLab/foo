@@ -1,24 +1,3 @@
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <link href="<?php echo base_url("include/css/client/cms_client.css");?>" type="text/css" rel="stylesheet"/>
-        <title></title>
-    </head>
-    <body>
-        <div id="header">
-            <h1>中国经济网</h1>
-            <ul>
-                <li><a href="">导航1</a></li>
-                <li><a href="">导航1</a></li>
-                <li><a href="">导航1</a></li>
-                <li><a href="">导航1</a></li>
-                <li><a href="">导航1</a></li>
-                <li><a href="">导航1</a></li>
-                <li><a href="">导航1</a></li>
-                <li><a href="">导航1</a></li>
-                <li><a href="">导航1</a></li>                
-            </ul>
-        </div>
         <div id="content">
             <div id="infoList">
                 <h3><?php echo $guide;?></h3>
@@ -31,21 +10,15 @@
                 </div>
             </div>
             <div id="column1">
-                sdfs
+                <h3>公司展示</h3>
+                <?php echo $column['gszs']; ?>
             </div>
             <div id="column2">
-                sfsf
+                <h3>人力资源</h3>
+                <?php echo $column['rlzy']; ?>
             </div>
             <div id="column3">
-                dfsd
+                <h3>最新报导</h3>
+                <?php echo $column['zxbd']; ?>
             </div>
         </div>
-        <div id="line_10"></div>
-        <div id="footer">
-            版权所有&copy中国财经网
-        </div>
-
-        
-
-    </body>
-</html>

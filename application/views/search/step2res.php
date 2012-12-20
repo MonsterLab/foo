@@ -7,7 +7,8 @@
 <script src="<?php echo base_url('include/js/showPic.js')?>" type="text/javascript"></script>
 </head>
 <body>
-
+<div id="content">
+    <div id="infoList_two">
 <?php
     
 //    echo '<pre>';
@@ -17,7 +18,7 @@
     $base_url = base_url();
     
     if($userBases){
-        echo "<h3>客户基本信息：</h3>";
+        echo "<p style='font-size:20;color:brown'>客户基本信息：</p>";
         if($userBases[0]['audit'] == 1){
             $ubHtml = "<table  width='500'>";
             foreach ($userBases as $userBase){
@@ -43,7 +44,7 @@
     }
     
     if($certBases){
-        echo "<h3>认证基本信息：</h3>";
+        echo "<p style='font-size:20;color:brown'>认证基本信息：</p>";
         //判断认证基本信息是否审核
         if($certBases[0]['audit'] == 1){
             $cbHtml = "<table width='550'>";
@@ -99,7 +100,7 @@
     }
     
     if($certFiles){
-        echo "<h5>扫描件信息：</h5>";
+        echo "<p style='font-size:20;color:brown'>扫描件信息：</p>";
         $cfHtml = "<table width='500'>";
         foreach ($certFiles as $certFile){
             $cfHtml .= "<tr>";
@@ -123,7 +124,7 @@
       
     
     if($certContents){
-            echo "<h5>文字类信息：</h5>";
+            echo "<p style='font-size:15;color:brown'>文字类信息：</p>";
             $cfHtml = "<table width='500'>";
             foreach ($certContents as $certContent){
                 $cfHtml .= "<tr>";
@@ -146,7 +147,7 @@
     }
 ?> 
     <div>
-        <h3>客户空间</h3>
+        <p style='font-size:20;color:brown'>客户空间：</p>
         <?php 
             if($userBases[0]['space_id'] > 0){
                 echo "详细信息，请<a href='#'>查看客户空间</a>";
@@ -155,5 +156,7 @@
             }
         ?>
     </div>
+</div>        
+</div>        
 </body>
 </html>

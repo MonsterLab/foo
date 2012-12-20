@@ -1,3 +1,8 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+<body>
 <div>
     <h2>客户管理</h2>
 </div>
@@ -54,3 +59,5 @@
         echo $html;
     ?>
 </div>
+</body>
+</html>

@@ -40,5 +40,7 @@
         $html .= "<td align='center'><a href='{$link}'><input type='button' value='{$handle}'></a></td>";
         $html .= "</tr>";
     }
+    $html .= "</table>";
     echo $html;
+    echo $pageBar;
     

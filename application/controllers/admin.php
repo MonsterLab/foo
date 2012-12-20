@@ -1451,6 +1451,8 @@ class Admin extends CI_Controller{
 
             if($fooUserBase){
                 $data['userBases'] = $fooUserBase;
+                
+                
             }  else {
                 $data['flag'] = '没有数据！';
             }
@@ -1532,10 +1534,21 @@ class Admin extends CI_Controller{
             
         }  else {
             $fooCodes = $this->zxpool->searchCode();
+        
         }
         
         if($fooCodes){
-            $data['zxcodes'] = $fooCodes;
+            
+            $allRows = count($fooCodes);
+            $page = new Page($allRows);
+            $limit = $page->getLimit();
+            $offset = $page->getOffset();
+            $currentCodes = $this->zxpool->searchCode('',$offset,$limit);
+            $pageBar = $page->getPage($currentCodes);
+            //$currentPage = $page->getCurrentPage();
+            
+            $data['zxcodes'] = $currentCodes;
+            $data['pageBar'] = $pageBar;
         }  else {
             $data['flag'] = '没有数据！';
         }

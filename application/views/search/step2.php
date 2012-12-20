@@ -1,3 +1,5 @@
+<div id="content">
+    <div id="infoList_two">
 <?php
     if($flag != ''){
         echo $flag;
@@ -9,21 +11,21 @@
     
 ?>
 
-输入授权编码:<br/>
+<br/>
 <form method="post" action="<?php echo base_url('search/step2')?>">
     <input type="hidden" name="zxcode" value="<?php echo $zxcode;?>"/>
-    <input type="text" name="sqcode" />
-    <input type="submit" value="查询" />
+    <label for="sqcode">查询详细信息，请输入授权码：</label><input type="text" id="zxcode" name="sqcode" />
+    <input type="submit"  value="查询" />
 </form><br/>
 
 <?php
     if($flag == ''){
-        echo "<h3>客户基本信息：</h3>";
+        echo "<p style='font-size:20;color:red'>客户基本信息：</p>";
         if($userBases[0]['audit'] == 0){
             echo '该客户基本信息未通过审核！';
             exit();
         }
-        $ubHtml = "<table  width='500'>";
+        $ubHtml = "<table  width='500' class='table'>";
         foreach ($userBases as $userBase){
             $ubHtml .= "<tr>";
             $ubHtml .= "<td width='200'>征信编码：{$userBase['zx_code']}</td>";
@@ -43,3 +45,5 @@
         echo $ubHtml;
     }
 ?>
+    </div>
+</div>

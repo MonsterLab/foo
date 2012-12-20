@@ -1661,7 +1661,7 @@ class Admin extends CI_Controller{
                 //按行遍历数据
                 foreach($resourse as $string){              
                     //TODO:windows下边换行符是"\r\n"，记得换
-                    $fooData = str_replace("\n",'', $string);
+                    $fooData = str_replace("\r\n",'', $string);
                     if(!preg_match("/^[0-9a-z]+$/",$fooData)){
                         //TODO:数据中含有非数字字母
                         $data['flag'] = '文件数据格式错误！';

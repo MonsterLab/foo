@@ -243,7 +243,7 @@ class Search extends CI_Controller{
 //        exit();
 
         $data['type'] = $type;
-        
+        $data['uid'] = $uid;
         $data['userBases'] = $fooUserBases;
         $data['certBases'] = $fooCertBases;
         $data['certFiles'] = $fooCertFiles;

@@ -150,7 +150,7 @@
         <p style='font-size:20;color:brown'>客户空间：</p>
         <?php 
             if($userBases[0]['space_id'] > 0){
-                echo "详细信息，请<a href='#'>查看客户空间</a>";
+                echo "详细信息，请<a href='{$base_url}space/index/{$uid}'>查看客户空间</a>";
             }  else {
                 echo "该客户尚未开通空间！";
             }

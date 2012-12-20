@@ -69,7 +69,7 @@ class Space extends CI_Controller{
      * @return type
      */
     public function login(){
-        print_r($_POST);
+        
         $data['flag'] = ''; 
         if($_POST){
             $username = trim($this->input->post('username'));
